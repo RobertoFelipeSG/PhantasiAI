@@ -149,7 +149,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graphique.misEnPause.connect(lambda: self.chat.log_event("Data stream paused"))
         self.graphique.repris.connect(lambda: self.chat.log_event("Data stream resumed"))
 
-        # Clear layout and re-add graph then chat with mode-based stretch
         for i in reversed(range(self.disposition_corps.count())):
             self.disposition_corps.takeAt(i)
 
@@ -194,7 +193,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def afficher_dialogue_canaux(self):
         dialogue = QtWidgets.QDialog(self)
-        dialogue.setWindowTitle("SSelect Channels")
+        dialogue.setWindowTitle("Select Channels")
         disposition = QtWidgets.QVBoxLayout(dialogue)
 
         tout = QtWidgets.QCheckBox("Select/Deselect All")
