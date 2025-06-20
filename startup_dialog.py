@@ -3,16 +3,13 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 class StartupDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PhantasiAI - Configuration de démarrage")
-        # Increased size for better readability
+        self.setWindowTitle("PhantasiAI - Startup Configuration")
         self.setFixedSize(550, 380)
         self.setModal(True)
 
-        # Set a larger default font
         default_font = QtGui.QFont("Segoe UI", 12)
         self.setFont(default_font)
 
-        # Variables to store selections
         self.selected_mode = None
         self.selected_type = None
 
@@ -24,7 +21,7 @@ class StartupDialog(QtWidgets.QDialog):
         main_layout.setContentsMargins(40, 40, 40, 40)
 
         # Title
-        title = QtWidgets.QLabel("Configuration de PhantasiAI")
+        title = QtWidgets.QLabel("PhantasiAI Configuration")
         title_font = QtGui.QFont(self.font().family(), 18, QtGui.QFont.Bold)
         title.setFont(title_font)
         title.setAlignment(QtCore.Qt.AlignCenter)
@@ -37,8 +34,8 @@ class StartupDialog(QtWidgets.QDialog):
         mode_layout.setSpacing(20)
 
         self.mode_group = QtWidgets.QButtonGroup()
-        self.pro_mode_btn = QtWidgets.QRadioButton("Mode Pro")
-        self.normal_mode_btn = QtWidgets.QRadioButton("Mode Normal")
+        self.pro_mode_btn = QtWidgets.QRadioButton("Graph Mode")
+        self.normal_mode_btn = QtWidgets.QRadioButton("Chat Mode")
         for btn in (self.pro_mode_btn, self.normal_mode_btn):
             btn.setFont(QtGui.QFont(self.font().family(), 13))
         self.mode_group.addButton(self.pro_mode_btn, 0)
@@ -54,8 +51,8 @@ class StartupDialog(QtWidgets.QDialog):
         type_layout.setSpacing(20)
 
         self.type_group = QtWidgets.QButtonGroup()
-        self.db_mode_btn = QtWidgets.QRadioButton("Base de données")
-        self.live_mode_btn = QtWidgets.QRadioButton("Mode Live")
+        self.db_mode_btn = QtWidgets.QRadioButton("Database")
+        self.live_mode_btn = QtWidgets.QRadioButton("Real-Time Mode")
         for btn in (self.db_mode_btn, self.live_mode_btn):
             btn.setFont(QtGui.QFont(self.font().family(), 13))
         self.type_group.addButton(self.db_mode_btn, 0)
@@ -68,12 +65,12 @@ class StartupDialog(QtWidgets.QDialog):
         button_layout = QtWidgets.QHBoxLayout()
         button_layout.addStretch()
 
-        self.cancel_btn = QtWidgets.QPushButton("Annuler")
+        self.cancel_btn = QtWidgets.QPushButton("Cancel")
         self.cancel_btn.setFixedSize(120, 40)
         self.cancel_btn.setFont(QtGui.QFont(self.font().family(), 12))
         self.cancel_btn.clicked.connect(self.reject)
 
-        self.next_btn = QtWidgets.QPushButton("Suivant")
+        self.next_btn = QtWidgets.QPushButton("Next")
         self.next_btn.setFixedSize(120, 40)
         self.next_btn.setFont(QtGui.QFont(self.font().family(), 12))
         self.next_btn.setEnabled(False)
@@ -81,6 +78,7 @@ class StartupDialog(QtWidgets.QDialog):
 
         button_layout.addWidget(self.cancel_btn)
         button_layout.addWidget(self.next_btn)
+
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
 
@@ -96,8 +94,8 @@ class StartupDialog(QtWidgets.QDialog):
     def on_next_clicked(self):
         mode_id = self.mode_group.checkedId()
         type_id = self.type_group.checkedId()
-        self.selected_mode = "pro" if mode_id == 0 else "normal"
-        self.selected_type = "database" if type_id == 0 else "live"
+        self.selected_mode = "pro" if mode_id == 0 else "chat"
+        self.selected_type = "database" if type_id == 0 else "real-time"
         self.accept()
 
     def get_selections(self):

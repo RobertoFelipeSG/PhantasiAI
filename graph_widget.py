@@ -1,9 +1,8 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
-import time
+from data_thread import DataThread
 
-from data_thread import DataThread 
 ZOOM_FACTOR = 1.2
 
 class GraphWidget(QtWidgets.QWidget):
@@ -14,73 +13,65 @@ class GraphWidget(QtWidgets.QWidget):
     zoomArriere  = QtCore.pyqtSignal()
 
     def __init__(self, read_func, num_channels=1, channel_labels=None,
-                 title="EMG Temps Réel", sample_rate=220,
+                 title="EMG Visualization", sample_rate=220,
                  buffer_seconds=2, parent=None):
-       
         super().__init__(parent)
         self._manual_y = False
         self.num_channels = num_channels
-        
+
+        # build labels
         if channel_labels and len(channel_labels) == num_channels:
             self.channel_labels = channel_labels
         else:
             self.channel_labels = [f"Ch {i+1}" for i in range(num_channels)]
 
-        # Data thread
+        # compute a rough spacing from the very first sample:
+        first = np.asarray(read_func())
+        amp_range = float(np.max(first) - np.min(first))
+        self.spacing = amp_range * 1.2 if amp_range > 0 else 1.0
+
+        # Data acquisition thread
         self.thread = DataThread(read_func, sample_rate, buffer_seconds,
                                  multi_channel=(num_channels > 1))
         self.thread.dataUpdated.connect(self.update_plot)
 
-        # Plot setup
-        self.plot = pg.PlotWidget(title=title)
+        # Set up a single PlotWidget
+        self.plot = pg.PlotWidget()
+        self.plot.hideAxis('left')
         self.plot.setBackground("w")
         window = buffer_seconds
         self.plot.setXRange(0, window, padding=0)
-        self.plot.setStyleSheet("border-radius: 8px; border: 1px solid #cccccc;")
-        self.plot.setLabel('bottom', 'Temps', **{'size':'10pt'})
-        self.plot.setLabel('left',   'Amplitude', **{'size':'10pt'})
         self.plot.showGrid(x=True, y=True, alpha=0.3)
 
-        # Legend
-        self.legend = self.plot.addLegend()
-        columns = min(self.num_channels, 8)
-        self.legend.setColumnCount(columns)
-
-        # Create curves with labels
+        # create one curve per channel, precompute offsets
         self.curves = []
-        for idx, label in enumerate(self.channel_labels):
-            pen = pg.mkPen(pg.intColor(idx, self.num_channels), width=2)
-            curve = self.plot.plot(pen=pen, name=label)
+        self.offsets = []
+        for idx in range(self.num_channels):
+            pen = pg.mkPen(pg.intColor(idx, self.num_channels), width=1)
+            curve = self.plot.plot(pen=pen)
             self.curves.append(curve)
+            self.offsets.append(idx * self.spacing)
 
-        btn_size = QtCore.QSize(120, 60)  # Increased button size
-        font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-    
+        # Control buttons
+        btn_size = QtCore.QSize(160, 60)  
+        font = QtGui.QFont("Segoe UI", 8)
 
         self.btn_pause      = QtWidgets.QPushButton("Pause")
         self.btn_zoom_in    = QtWidgets.QPushButton("+")
         self.btn_zoom_out   = QtWidgets.QPushButton("–")
         self.btn_reset_zoom = QtWidgets.QPushButton("Reset")
-        
+
         for btn in (self.btn_pause, self.btn_zoom_in,
                     self.btn_zoom_out, self.btn_reset_zoom):
             btn.setFixedSize(btn_size)
             btn.setFont(font)
-            # Add style sheet for additional control
-            btn.setStyleSheet("""
-                QPushButton {
-                    font-size: 8pt;
-                    padding: 8px;
-                }
-            """)
-        
+            btn.setStyleSheet("QPushButton { font-size: 9pt; }")
+
         self.btn_pause.clicked.connect(self.toggle_pause)
         self.btn_zoom_in.clicked.connect(self.zoom_in)
         self.btn_zoom_out.clicked.connect(self.zoom_out)
         self.btn_reset_zoom.clicked.connect(self.reset_zoom)
 
-        # Layout
         ctl_layout = QtWidgets.QHBoxLayout()
         ctl_layout.setContentsMargins(0,0,0,0)
         ctl_layout.setSpacing(8)
@@ -95,27 +86,33 @@ class GraphWidget(QtWidgets.QWidget):
         layout.addWidget(self.plot, stretch=1)
         layout.addLayout(ctl_layout)
 
-        # Start acquisition
+        # start acquisition
         self.thread.start()
 
     @QtCore.pyqtSlot(np.ndarray, np.ndarray)
     def update_plot(self, t, y):
+        """ y shape = (N, num_channels) """
         if t.size == 0 or y.size == 0:
             return
+
+        # update each curve with its vertical offset
         for idx, curve in enumerate(self.curves):
-            curve.setData(t, y[:, idx])
+            curve.setData(t, y[:, idx] + self.offsets[idx])
+
+        # scroll X to show only the last buffer_seconds
         t_last = t[-1]
-        vb = self.plot.getViewBox()
         window = self.thread.buffer_len / self.thread.sample_rate
-        xmin = max(0, t_last - window)
-        vb.setXRange(xmin, xmin + window, padding=0)
+        self.plot.setXRange(t_last - window, t_last, padding=0)
+
+        # Y auto-range only if user hasn't zoomed manually
         if not self._manual_y:
+            vb = self.plot.getViewBox()
             vb.enableAutoRange(axis=pg.ViewBox.YAxis)
 
     def toggle_pause(self):
         if self.thread.isRunning():
             self.thread.stop()
-            self.btn_pause.setText("Reprendre")
+            self.btn_pause.setText("Resume")
             self.misEnPause.emit()
         else:
             self.thread.start()

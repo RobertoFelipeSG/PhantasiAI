@@ -40,7 +40,7 @@ QToolBar, QStatusBar {
 }
 """
 
-class FenetrePrincipale(QtWidgets.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, mode, mode_label=""):
         super().__init__()
         self.mode = mode  
@@ -48,11 +48,12 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
         if mode_label:
             title += f" – {mode_label}"
         self.setWindowTitle(title)
-        self.setFixedSize(1280, 720)
         self._build_ui()
 
+        self.setMinimumSize(1280, 720)
+
         if not self.charger_fichier_npz():
-            QtWidgets.QMessageBox.critical(self, "Erreur", "Aucun fichier .npz sélectionné. Fermeture.")
+            QtWidgets.QMessageBox.critical(self, "Error", "No .npz file selected. Closing.")
             sys.exit(0)
 
     def _build_ui(self):
@@ -62,10 +63,10 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
         disposition_principale.setSpacing(0)
 
         # Toolbar buttons
-        self.btn_changer         = QtWidgets.QPushButton("Ouvrir")
-        self.btn_sauvegarder     = QtWidgets.QPushButton("Enregistrer")
-        self.btn_canaux          = QtWidgets.QPushButton("Canaux")
-        self.btn_caracteristiques = QtWidgets.QPushButton("Données EMG")
+        self.btn_changer         = QtWidgets.QPushButton("Open")
+        self.btn_sauvegarder     = QtWidgets.QPushButton("Save")
+        self.btn_canaux          = QtWidgets.QPushButton("Channels")
+        self.btn_caracteristiques = QtWidgets.QPushButton("EMG Data")
 
         btn_size = QtCore.QSize(160, 60)
         font    = QtGui.QFont("Segoe UI", 7)
@@ -89,9 +90,7 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
         self.disposition_corps.setContentsMargins(12, 6, 12, 12)
         self.disposition_corps.setSpacing(10)
 
-        # ChatWidget reserves its width but we add it on the right later
         self.chat = ChatWidget(mode=self.mode)
-        # Start with just the chat (it'll be repositioned after data load)
         self.disposition_corps.addWidget(self.chat)
 
         disposition_principale.addLayout(self.disposition_corps)
@@ -105,22 +104,21 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
 
     def sauvegarder_logs(self):
         chemin, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Enregistrer les logs", "", "Fichier texte (*.txt)"
+            self, "Save Logs", "", "Text File (*.txt)"
         )
         if chemin:
             try:
                 with open(chemin, 'w') as f:
                     f.write("\n".join(self.chat.get_logs()))
-                self.chat.log_event(f"Logs enregistrées dans {os.path.basename(chemin)}")
+                self.chat.log_event(f"Logs saved to {os.path.basename(chemin)}")
                 QtWidgets.QMessageBox.information(
-                    self, "Enregistrement réussi",
-                    f"Logs enregistrées dans {os.path.basename(chemin)}"
+                    self, "Save Successful",
+                    f"Logs saved to {os.path.basename(chemin)}"
                 )
             except Exception as e:
-                QtWidgets.QMessageBox.critical(self, "Erreur d'enregistrement", str(e))
+                QtWidgets.QMessageBox.critical(self, "Save Error", str(e))
 
     def construire_corps(self):
-        # Remove existing GraphWidget if present
         for i in reversed(range(self.disposition_corps.count())):
             w = self.disposition_corps.itemAt(i).widget()
             if isinstance(w, GraphWidget):
@@ -137,19 +135,19 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
             self.indice_donnees = (self.indice_donnees + 1) % len(mat)
             return vec.tolist()
 
-        etiquettes = [f"Canal {c+1}" for c in self.canaux_selectionnes]
+        etiquettes = [f"Channel {c+1}" for c in self.canaux_selectionnes]
 
         # Instantiate GraphWidget
         self.graphique = GraphWidget(
             read_func=lire_vecteur,
             num_channels=self.nb_canaux,
             channel_labels=etiquettes,
-            title="Canaux EMG",
+            title="EMG Channels",
             sample_rate=self.frequence_echantillonnage,
             buffer_seconds=self.secondes_tampon
         )
-        self.graphique.misEnPause.connect(lambda: self.chat.log_event("Flux de données en pause"))
-        self.graphique.repris.connect(lambda: self.chat.log_event("Reprise du flux de données"))
+        self.graphique.misEnPause.connect(lambda: self.chat.log_event("Data stream paused"))
+        self.graphique.repris.connect(lambda: self.chat.log_event("Data stream resumed"))
 
         # Clear layout and re-add graph then chat with mode-based stretch
         for i in reversed(range(self.disposition_corps.count())):
@@ -164,11 +162,11 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
         self.disposition_corps.addWidget(self.chat, chat_stretch)
 
         liste = ', '.join(str(c+1) for c in self.canaux_selectionnes)
-        self.chat.log_event(f"Graphique initialisé pour canaux : {liste}")
+        self.chat.log_event(f"Graph initialized for channels: {liste}")
 
     def charger_fichier_npz(self):
         chemin, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Sélectionnez un fichier .npz", "", "Archive NumPy (*.npz)"
+            self, "Select a .npz file", "", "NumPy Archive (*.npz)"
         )
         if not chemin:
             return False
@@ -183,23 +181,23 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
             self.secondes_tampon = 2
             self.canaux_selectionnes = [0]
             self.chat.set_file(chemin)
-            self.chat.log_event(f"Ouverture du fichier « {os.path.basename(chemin)} »")
+            self.chat.log_event(f"Opened file « {os.path.basename(chemin)} »")
             self.construire_corps()
             return True
         except Exception as e:
-            QtWidgets.QMessageBox.critical(self, "Erreur", str(e))
+            QtWidgets.QMessageBox.critical(self, "Error", str(e))
             return False
 
     def au_changement(self):
         if self.charger_fichier_npz():
-            self.chat.log_event("Source de données changée")
+            self.chat.log_event("Data source changed")
 
     def afficher_dialogue_canaux(self):
         dialogue = QtWidgets.QDialog(self)
-        dialogue.setWindowTitle("Sélection des canaux")
+        dialogue.setWindowTitle("SSelect Channels")
         disposition = QtWidgets.QVBoxLayout(dialogue)
 
-        tout = QtWidgets.QCheckBox("Sélectionner/Désélectionner tout")
+        tout = QtWidgets.QCheckBox("Select/Deselect All")
         tout.setChecked(len(self.canaux_selectionnes) == self.donnees_completes.shape[1])
         disposition.addWidget(tout)
 
@@ -231,7 +229,7 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
 
         btn_layout = QtWidgets.QHBoxLayout()
         btn_ok = QtWidgets.QPushButton("OK")
-        btn_cancel = QtWidgets.QPushButton("Annuler")
+        btn_cancel = QtWidgets.QPushButton("Cancel")
         btn_ok.clicked.connect(dialogue.accept)
         btn_cancel.clicked.connect(dialogue.reject)
         btn_layout.addStretch()
@@ -243,7 +241,7 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
             sel = [i for i, cb in enumerate(self.cases) if cb.isChecked()]
             if sel:
                 self.canaux_selectionnes = sel
-                self.chat.log_event(f"Canaux sélectionnés : {', '.join(str(i+1) for i in sel)}")
+                self.chat.log_event(f"Channels selected: {', '.join(str(i+1) for i in sel)}")
                 self.construire_corps()
 
     def enregistrer_caracteristiques(self):
@@ -256,7 +254,7 @@ class FenetrePrincipale(QtWidgets.QMainWindow):
             ssc = feats['ssc'][idx]
             var = feats['var'][idx]
             self.chat.log_event(
-                f"Caractéristiques Canal {ch+1} — MAV: {mav:.6f}, RMS: {rms:.6f}, SSC: {ssc}, VAR: {var:.6e}"
+                f"Channel {ch+1} Features — MAV: {mav:.6f}, RMS: {rms:.6f}, SSC: {ssc}, VAR: {var:.6e}"
             )
 
     def closeEvent(self, event):
@@ -278,7 +276,7 @@ def main():
             run_live_mode()
             return
         else:
-            fen = FenetrePrincipale(mode=mode, mode_label=mode_label)
+            fen = MainWindow(mode=mode, mode_label=mode_label)
             fen.show()
             sys.exit(app.exec_())
     else:

@@ -73,7 +73,7 @@ class DataThread(QtCore.QObject):
 class LiveWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PhantasiAI - Mode Live")
+        self.setWindowTitle("PhantasiAI - Live Mode")
         self.win = pg.GraphicsLayoutWidget(show=True)
         self.setCentralWidget(self.win)
         self.plots = []
@@ -82,7 +82,7 @@ class LiveWindow(QtWidgets.QMainWindow):
         self.selected_analog_inputs = []
 
         self.button_layout = QtWidgets.QHBoxLayout()
-        self.change_channels_button = QtWidgets.QPushButton("Modifier les canaux")
+        self.change_channels_button = QtWidgets.QPushButton("Modify Channels")
         self.change_channels_button.clicked.connect(self.change_selected_channels)
         self.button_layout.addWidget(self.change_channels_button)
 
@@ -95,15 +95,15 @@ class LiveWindow(QtWidgets.QMainWindow):
     def prompt_user_for_channel(self):
         channels_with_sensors = [i for i in range(len(analog_inputs)) if is_sensor_connected(analog_inputs[i])]
         if not channels_with_sensors:
-            QtWidgets.QMessageBox.warning(self, "Erreur", "Aucun capteur détecté.")
+            QtWidgets.QMessageBox.warning(self, "Error", "No sensors detected.")
             return
 
         dialog = QtWidgets.QDialog(self)
-        dialog.setWindowTitle("Sélectionner les canaux")
+        dialog.setWindowTitle("Select Channels")
         layout = QtWidgets.QVBoxLayout()
         checkboxes = []
         for i in channels_with_sensors:
-            checkbox = QtWidgets.QCheckBox(f"Canal {i}")
+            checkbox = QtWidgets.QCheckBox(f"Channel {i}")
             checkbox.setChecked(False)
             checkboxes.append(checkbox)
             layout.addWidget(checkbox)
@@ -130,7 +130,7 @@ class LiveWindow(QtWidgets.QMainWindow):
         self.curves.clear()
 
         for i, pin in enumerate(self.selected_analog_inputs):
-            plot = self.win.addPlot(row=len(self.plots), col=0, title=f"EMG Signal - Canal {selected_channels[i]}")
+            plot = self.win.addPlot(row=len(self.plots), col=0, title=f"EMG Signal - Channel {selected_channels[i]}")
             curve = plot.plot(pen='y')
             self.curves.append(curve)
             self.plots.append(plot)
@@ -160,7 +160,7 @@ class LiveWindow(QtWidgets.QMainWindow):
 
 def run_live_mode():
     if not try_connect_arduino():
-        QtWidgets.QMessageBox.critical(None, "Erreur", "Connexion à l'Arduino échouée.")
+        QtWidgets.QMessageBox.critical(None, "Error", "Failed to connect to Arduino.")
         return
 
     app = QtWidgets.QApplication([])
