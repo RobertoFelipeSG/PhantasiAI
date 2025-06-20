@@ -1,0 +1,5 @@
+PyQT5
+pyqtgraph
+serial
+pyfirmata
+pylsl
