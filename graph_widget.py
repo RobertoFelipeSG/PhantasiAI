@@ -3,8 +3,7 @@ import pyqtgraph as pg
 import numpy as np
 import time
 
-from data_thread import DataThread  # separate file: data_thread.py
-
+from data_thread import DataThread 
 ZOOM_FACTOR = 1.2
 
 class GraphWidget(QtWidgets.QWidget):
