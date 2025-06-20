@@ -9,6 +9,10 @@ import time
 import threading
 from collections import deque
 from PyQt6.QtWidgets import QApplication, QLabel, QWidget
+from PyQt6.QtGui import QKeyEvent
+from PyQt6.QtCore import Qt
+
+
 
 board = None
 analog_inputs = []
@@ -240,12 +244,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         dialog.accept()
 
-    # detect flag
+    # detect flag    
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Return:
-            ts = round(round(time.perf_counter() * 220) / 220, 3)  #  round the timestamp for matching
+        if event.key() == Qt.Key.Key_Return:  
+            ts = round(round(time.perf_counter() * 220) / 220, 3) #  round the timestamp for matching
             event_timestamps.add(ts)
-            print(f"Flag marked at {ts:.6f}")
+            print("Event saved")
+            QtWidgets.QMessageBox.information(self, "Event", "Event saved.")
+
+
     
     def zoom_in_y(self):
         self.y_min /= self.zoom_factor
@@ -316,7 +323,12 @@ def main():
                 sys.exit(app.exec())
 
         elif mode == "Database":
-            db_path = '../data/dataset_v2_blocks/health/left/alex_kovalev_standart_elbow_left/preproc_angles/test'
+            db_path = r"C:\Users\maria\OneDrive - Universite de Montreal\Documents\PhantasiAi\Code\Previous Code\Codes Camille"
+
+            print("Looking for directory:", db_path)
+            print("Exists?", os.path.exists(db_path))
+
+            
             data = load_npz_files(db_path)
 
             num_channels = data.shape[1]
