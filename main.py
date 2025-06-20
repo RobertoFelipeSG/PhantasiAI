@@ -1,190 +1,269 @@
 import sys
 import os
-from PyQt5 import QtWidgets
 import numpy as np
-
+from PyQt5 import QtWidgets, QtGui, QtCore
 from graph_widget import GraphWidget
 from chat_widget import ChatWidget
-from startup_dialog import StartupDialog
+from emg_features_extractor import EMGFeatureExtractor
 
-class MainWindow(QtWidgets.QMainWindow):
-    def __init__(self, mode, data_type):
+# Custom application-wide StyleSheet
+APP_STYLESHEET = """
+QMainWindow {
+    background-color: #FFFFFF;
+}
+QPushButton {
+    background-color: #F7F7F7;
+    border: 1px solid #CCCCCC;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+QPushButton:hover {
+    background-color: #EEEEEE;
+}
+QPushButton:pressed {
+    background-color: #DDDDDD;
+}
+QDialog, QWidget {
+    background-color: #FFFFFF;
+}
+QLabel, QCheckBox, QRadioButton {
+    font-size: 13px;
+}
+QToolBar, QStatusBar {
+    background-color: #F7F7F7;
+    border-top: 1px solid #DDDDDD;
+    padding: 4px;
+}
+"""
+
+class FenetrePrincipale(QtWidgets.QMainWindow):
+    def __init__(self):
         super().__init__()
-        self.mode = mode
-        self.data_type = data_type
-        
-        self.setWindowTitle(f"PhantasiAi - {mode.capitalize()} Mode")
+        self.setWindowTitle("PhantasiAi")
         self.setFixedSize(1280, 720)
 
-        container = QtWidgets.QWidget()
-        main_layout = QtWidgets.QVBoxLayout(container)
-        main_layout.setContentsMargins(0,0,0,0)
-        main_layout.setSpacing(0)
+        # Main container and layout
+        conteneur = QtWidgets.QWidget()
+        disposition_principale = QtWidgets.QVBoxLayout(conteneur)
+        disposition_principale.setContentsMargins(0, 0, 0, 0)
+        disposition_principale.setSpacing(0)
 
-        self.btn_change = QtWidgets.QPushButton("Ouvrir")
-        self.btn_save   = QtWidgets.QPushButton("Enregistrer")
-        self.btn_channels = QtWidgets.QPushButton("Channels")
-
-        buttons = [self.btn_change, self.btn_save, self.btn_channels]
-        for btn in buttons:
-            btn.setFixedSize(120, 36)
-        top = QtWidgets.QHBoxLayout()
-        top.setContentsMargins(8,8,8,4)
-        top.setSpacing(6)
-        top.addWidget(self.btn_change)
-        top.addWidget(self.btn_save)
-        top.addWidget(self.btn_channels)
-        top.addStretch()
-        main_layout.addLayout(top)
-
-        body = QtWidgets.QHBoxLayout()
-        body.setContentsMargins(8,4,8,8)
-        body.setSpacing(8)
-
-        self.chat = ChatWidget(mode)  
-        body.addWidget(self.chat, 1)
-
-        main_layout.addLayout(body)
-        self.setCentralWidget(container)
-
-        self.btn_change.clicked.connect(self.on_change)
-        self.btn_save.clicked.connect(lambda: self.chat.log_event("Enregistrement demandé"))
+        # Toolbar buttons
+        self.btn_changer = QtWidgets.QPushButton("Ouvrir")
+        self.btn_sauvegarder = QtWidgets.QPushButton("Enregistrer")
+        self.btn_canaux = QtWidgets.QPushButton("Canaux")
+        self.btn_caracteristiques = QtWidgets.QPushButton("Données EMG")
         
-
-        self.btn_save.clicked.connect(self.save_logs)
-
+        btn_size = QtCore.QSize(160, 60)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(7)  
         
+        for btn in (self.btn_changer, self.btn_sauvegarder, self.btn_canaux, self.btn_caracteristiques):
+            btn.setFixedSize(btn_size)
+            btn.setFont(font)
+            btn.setStyleSheet("""
+                QPushButton {
+                    font-size: 7pt;
+                    padding: 7px;
+                }
+            """)
 
-        self.btn_channels.clicked.connect(lambda: self.chat.log_event("Gestion des canaux demandée"))
-        self.btn_channels.clicked.connect(self.show_channels_dialog)
-        
-        self.chat.log_event(f"Application lancée en mode {mode} avec type {data_type}")
+        # Toolbar layout
+        barre_outils = QtWidgets.QHBoxLayout()
+        barre_outils.setContentsMargins(12, 12, 12, 6)
+        barre_outils.setSpacing(8)
+        barre_outils.addWidget(self.btn_changer)
+        barre_outils.addWidget(self.btn_sauvegarder)
+        barre_outils.addWidget(self.btn_canaux)
+        barre_outils.addWidget(self.btn_caracteristiques)
+        barre_outils.addStretch()
+        disposition_principale.addLayout(barre_outils)
 
-        if not self.load_npz_file():
-            QtWidgets.QMessageBox.critical(
-                self, "Erreur", "Aucun fichier .npz sélectionné. Fermeture."
-            )
+        # Body: graph + chat
+        self.disposition_corps = QtWidgets.QHBoxLayout()
+        self.disposition_corps.setContentsMargins(12, 6, 12, 12)
+        self.disposition_corps.setSpacing(10)
+        self.chat = ChatWidget()
+        self.disposition_corps.addWidget(self.chat, 1)
+        disposition_principale.addLayout(self.disposition_corps)
+
+        self.setCentralWidget(conteneur)
+
+        # Signals
+        self.btn_changer.clicked.connect(self.au_changement)
+        self.btn_sauvegarder.clicked.connect(self.sauvegarder_logs)
+        self.btn_canaux.clicked.connect(self.afficher_dialogue_canaux)
+        self.btn_caracteristiques.clicked.connect(self.enregistrer_caracteristiques)
+
+        # Load data
+        if not self.charger_fichier_npz():
+            QtWidgets.QMessageBox.critical(self, "Erreur", "Aucun fichier .npz sélectionné. Fermeture.")
             sys.exit(0)
 
+    def sauvegarder_logs(self):
+        chemin, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self, "Enregistrer les logs", "", "Fichier texte (*.txt)"
+        )
+        if chemin:
+            try:
+                with open(chemin, 'w') as f:
+                    f.write("\n".join(self.chat.get_logs()))
+                self.chat.log_event(f"Logs enregistrées dans {os.path.basename(chemin)}")
+                QtWidgets.QMessageBox.information(
+                    self, "Enregistrement réussi",
+                    f"Logs enregistrées dans {os.path.basename(chemin)}"
+                )
+            except Exception as e:
+                QtWidgets.QMessageBox.critical(self, "Erreur d'enregistrement", str(e))
 
-    def save_logs(self):
-            path, _ = QtWidgets.QFileDialog.getSaveFileName(
-                self, "Enregistrer les logs", "", "Fichier texte (*.txt)"
-            )
-            if path:
-                try:
-                    with open(path, 'w') as file:
-                        logs = self.chat.get_logs()
-                        file.write('\n'.join(logs))
-                    self.chat.log_event(f"Logs enregistrées dans {os.path.basename(path)}")
-                    QtWidgets.QMessageBox.information(self, "Enregistrement réussi", f"Logs enregistrées dans {os.path.basename(path)}")
-                except Exception as e:
-                    QtWidgets.QMessageBox.critical(self, "Erreur d'enregistrement", str(e))
-                    
-    def build_body(self):
-        if hasattr(self, 'graph') and self.graph:
-            self.graph.setParent(None)
+    def construire_corps(self):
+        if hasattr(self, 'graphique'):
+            self.graphique.thread.stop()
+            self.graphique.setParent(None)
 
-        def read_array():
-            v = self.data[self.data_idx]
-            self.data_idx = (self.data_idx + 1) % len(self.data)
-            return float(v)
+        mat = self.donnees_completes[:, self.canaux_selectionnes]
+        self.nb_canaux = len(self.canaux_selectionnes)
+        self.indice_donnees = 0
 
-        self.graph = GraphWidget(read_array, title="EMG Temps Réel")
-        
-        self.graph.misEnPause.connect(lambda: self.chat.log_event("Flux de données en pause"))
-        self.graph.repris.connect(lambda: self.chat.log_event("Reprise du flux de données"))
+        def lire_vecteur():
+            vec = mat[self.indice_donnees]
+            self.indice_donnees = (self.indice_donnees + 1) % len(mat)
+            return vec.tolist()
 
-        body = self.centralWidget().layout().itemAt(1)
-        body.insertWidget(0, self.graph, 3)
-        self.chat.log_event("Widget graphique initialisé")
+        etiquettes = [f"Canal {c+1}" for c in self.canaux_selectionnes]
 
-    def load_npz_file(self):
-        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+        self.graphique = GraphWidget(
+            read_func=lire_vecteur,
+            num_channels=self.nb_canaux,
+            channel_labels=etiquettes,
+            title="Canaux EMG",
+            sample_rate=self.frequence_echantillonnage,
+            buffer_seconds=self.secondes_tampon
+        )
+        self.graphique.misEnPause.connect(
+            lambda: self.chat.log_event("Flux de données en pause")
+        )
+        self.graphique.repris.connect(
+            lambda: self.chat.log_event("Reprise du flux de données")
+        )
+        self.disposition_corps.insertWidget(0, self.graphique, 1)
+
+        liste_canaux = ', '.join(str(c+1) for c in self.canaux_selectionnes)
+        self.chat.log_event(f"Graphique initialisé pour canaux : {liste_canaux}")
+
+    def charger_fichier_npz(self):
+        chemin, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, "Sélectionnez un fichier .npz", "", "Archive NumPy (*.npz)"
         )
-        if not path:
+        if not chemin:
             return False
         try:
-            with np.load(path) as ar:
-                print("Arrays in file:", ar.files)
-                if 'emg' in ar.files:
-                    arr = ar['emg']
-                    print(f"Array 'emg' shape: {arr.shape}, first 10 values: {arr.flat[:10]}")
-                    if arr.size:
-                        self.data = arr.flatten()
-                        self.data_idx = 0
-                else:
-                    for k in ar.files:
-                        arr = ar[k]
-                        print(f"Array '{k}' shape: {arr.shape}, first 10 values: {arr.flat[:10]}")
-                        if arr.size:
-                            self.data = arr.flatten()
-                            self.data_idx = 0
-                            break
-            self.chat.set_file(path)
-            self.chat.log_event(f"Ouverture du fichier « {os.path.basename(path)} »")
-            self.build_body()
+            with np.load(chemin) as ar:
+                cle = 'emg' if 'emg' in ar.files else ar.files[0]
+                tableau = ar[cle]
+            if tableau.ndim == 1:
+                tableau = tableau.reshape(-1, 1)
+            self.donnees_completes = tableau
+            self.frequence_echantillonnage = 220
+            self.secondes_tampon = 2
+            self.canaux_selectionnes = [0]
+            self.chat.set_file(chemin)
+            self.chat.log_event(f"Ouverture du fichier « {os.path.basename(chemin)} »")
+            self.construire_corps()
             return True
         except Exception as e:
             QtWidgets.QMessageBox.critical(self, "Erreur", str(e))
             return False
 
-    def on_change(self):
-        if self.load_npz_file():
-            self.graph.thread.buf.clear()
-            self.graph.thread.tbuf.clear()
+    def au_changement(self):
+        if self.charger_fichier_npz():
             self.chat.log_event("Source de données changée")
 
-    def closeEvent(self, e):
-        if hasattr(self, 'graph') and self.graph:
-            self.graph.thread.stop()
-        super().closeEvent(e)
-    def show_channels_dialog(self):
-            dialog = QtWidgets.QDialog(self)
-            dialog.setWindowTitle("Sélection des canaux")
-            dialog.setFixedSize(400, 250)
-            
-            layout = QtWidgets.QVBoxLayout(dialog)
-            
-            button_layout = QtWidgets.QHBoxLayout()
-            
-            for i in range(1, 6):
-                channel_btn = QtWidgets.QPushButton(f"Canal {i}")
-                channel_btn.setFixedSize(70, 70)
-                channel_btn.clicked.connect(lambda checked, ch=i: self.select_channel(ch))
-                button_layout.addWidget(channel_btn)
-            
-            layout.addLayout(button_layout)
-            
-            close_btn = QtWidgets.QPushButton("Fermer")
-            close_btn.clicked.connect(dialog.close)
-            layout.addWidget(close_btn)
-            
-            dialog.exec_()
+    def afficher_dialogue_canaux(self):
+        dialogue = QtWidgets.QDialog(self)
+        dialogue.setWindowTitle("Sélection des canaux")
+        disposition = QtWidgets.QVBoxLayout(dialogue)
 
-    def select_channel(self, channel):
-        self.chat.log_event(f"Canal {channel} sélectionné")
+        tout_selectionner = QtWidgets.QCheckBox("Sélectionner/Désélectionner tout")
+        tout_selectionner.setChecked(
+            len(self.canaux_selectionnes) == self.donnees_completes.shape[1]
+        )
+        disposition.addWidget(tout_selectionner)
+
+        grille = QtWidgets.QGridLayout()
+        self.cases_a_cocher = []
+        nb_canaux = self.donnees_completes.shape[1]
+        for idx in range(nb_canaux):
+            cb = QtWidgets.QCheckBox(f"Canal {idx+1}")
+            cb.setChecked(idx in self.canaux_selectionnes)
+            self.cases_a_cocher.append(cb)
+            grille.addWidget(cb, idx//4, idx%4)
+        disposition.addLayout(grille)
+
+        def au_tout_selectionner(etat):
+            for cb in self.cases_a_cocher:
+                cb.blockSignals(True)
+                cb.setChecked(bool(etat))
+                cb.blockSignals(False)
+
+        def au_changement_case():
+            tous_coches = all(cb.isChecked() for cb in self.cases_a_cocher)
+            tout_selectionner.blockSignals(True)
+            tout_selectionner.setChecked(tous_coches)
+            tout_selectionner.blockSignals(False)
+
+        tout_selectionner.stateChanged.connect(au_tout_selectionner)
+        for cb in self.cases_a_cocher:
+            cb.stateChanged.connect(au_changement_case)
+
+        boutons = QtWidgets.QHBoxLayout()
+        btn_ok = QtWidgets.QPushButton("OK")
+        btn_annuler = QtWidgets.QPushButton("Annuler")
+        btn_ok.clicked.connect(dialogue.accept)
+        btn_annuler.clicked.connect(dialogue.reject)
+        boutons.addStretch()
+        boutons.addWidget(btn_ok)
+        boutons.addWidget(btn_annuler)
+        disposition.addLayout(boutons)
+
+        if dialogue.exec_() == QtWidgets.QDialog.Accepted:
+            sel = [i for i, cb in enumerate(self.cases_a_cocher) if cb.isChecked()]
+            if sel:
+                self.canaux_selectionnes = sel
+                self.chat.log_event(
+                    f"Canaux sélectionnés : {', '.join(str(i+1) for i in sel)}"
+                )
+                self.construire_corps()
+
+    def enregistrer_caracteristiques(self):
+        mat = self.donnees_completes[:, self.canaux_selectionnes]
+        extracteur = EMGFeatureExtractor(emg_array=mat)
+        caract = extracteur.features_dict
+        for idx, ch in enumerate(self.canaux_selectionnes):
+            mav = caract['mav'][idx]
+            rms = caract['rms'][idx]
+            ssc = caract['ssc'][idx]
+            var = caract['var'][idx]
+            self.chat.log_event(
+                f"Caractéristiques Canal {ch+1} — MAV: {mav:.6f}, RMS: {rms:.6f}, SSC: {ssc}, VAR: {var:.6e}"
+            )
+
+    def closeEvent(self, evenement):
+        if hasattr(self, 'graphique'):
+            self.graphique.thread.stop()
+        super().closeEvent(evenement)
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
-    
-    startup = StartupDialog()
-    if startup.exec_() == QtWidgets.QDialog.Accepted:
-        mode, data_type = startup.get_selections()
-        
-        if data_type == "live":
-            print(f"Mode Live sélectionné avec mode {mode}")
-            print("Fermeture de l'application...")
-            sys.exit(0)
-        else:
-            # Launch main application for database mode
-            w = MainWindow(mode, data_type)
-            w.show()
-            sys.exit(app.exec_())
-    else:
-        # User cancelled
-        sys.exit(0)
+    app.setFont(QtGui.QFont("Segoe UI", 10))
+    app.setStyleSheet(APP_STYLESHEET)
+
+    fenetre = FenetrePrincipale()
+    fenetre.show()
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

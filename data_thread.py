@@ -1,57 +1,76 @@
-import threading
-import time
-from collections import deque
-
-import numpy as np
 from PyQt5 import QtCore
-import pyqtgraph as pg
+import numpy as np
+import time
 
-SAMPLE_RATE    = 220       
-BUFFER_SECONDS = 2         
-
-class DataThread(QtCore.QObject):
+class DataThread(QtCore.QThread):
+    """
+    QThread-based real-time data acquisition thread supporting multi-channel streams.
+    Emits:
+      dataUpdated(times: np.ndarray, values: np.ndarray)
+    """
     dataUpdated = QtCore.pyqtSignal(np.ndarray, np.ndarray)
 
-    def __init__(self, read_func):
+    def __init__(self, read_func, sample_rate=220, buffer_seconds=2, multi_channel=False):
         super().__init__()
         self.read = read_func
-        maxlen = BUFFER_SECONDS * SAMPLE_RATE
-        self.buf, self.tbuf = deque(maxlen=maxlen), deque(maxlen=maxlen)
-        self.idx, self.running = 0, False
+        self.sample_rate = sample_rate
+        self.buffer_len = int(sample_rate * buffer_seconds)
+        self.multi_channel = multi_channel
 
-    def start(self):
-        if not self.running:
-            self.running = True
-            threading.Thread(target=self._loop, daemon=True).start()
+        # Infer channel count from first read
+        first = self.read()
+        arr = np.asarray(first)
+        if self.multi_channel:
+            self.num_channels = arr.size
+            self._values = np.zeros((self.buffer_len, self.num_channels), dtype=float)
+        else:
+            self.num_channels = 1
+            self._values = np.zeros(self.buffer_len, dtype=float)
+        self._times = np.zeros(self.buffer_len, dtype=float)
+
+        # Initialize buffer
+        self._index = 0
+        self._running = False
+        self._store_sample(arr)
+
+    def _store_sample(self, arr):
+        pos = self._index % self.buffer_len
+        if self.multi_channel:
+            self._values[pos, :] = arr.flatten()
+        else:
+            self._values[pos] = float(arr)
+        self._times[pos] = self._index / self.sample_rate
+        self._index += 1
+
+    def run(self):
+        self._running = True
+        t_prev = time.perf_counter()
+        while self._running:
+            arr = np.asarray(self.read())
+            self._store_sample(arr)
+
+            # Build window
+            if self._index < self.buffer_len:
+                times = self._times[:self._index].copy()
+                vals = self._values[:self._index].copy()
+            else:
+                pos = (self._index - 1) % self.buffer_len
+                shift = pos + 1
+                times = np.roll(self._times, -shift)
+                vals = np.roll(self._values, -shift, axis=0)
+
+            # Ensure 2D array
+            if not self.multi_channel:
+                vals = vals.reshape(-1, 1)
+
+            # Emit
+            self.dataUpdated.emit(times, vals)
+
+            # Maintain rate
+            dt = time.perf_counter() - t_prev
+            time.sleep(max(0, 1/self.sample_rate - dt))
+            t_prev = time.perf_counter()
 
     def stop(self):
-        self.running = False
-
-    def _loop(self):
-        while self.running:
-            t0 = time.perf_counter()
-            ts = self.idx / SAMPLE_RATE
-            val = self.read()
-            self.buf.append(val)
-            self.tbuf.append(ts)
-            self.idx += 1
-
-            self.dataUpdated.emit(
-                np.array(self.tbuf, dtype=float),
-                np.array(self.buf, dtype=float),
-            )
-
-            dt = time.perf_counter() - t0
-            time.sleep(max(1/SAMPLE_RATE - dt, 0))
-
-    @QtCore.pyqtSlot(np.ndarray, np.ndarray)
-    def update_plot(self, t, y):
-        if t.size == 0:
-            return
-        self.curve.setData(t, y)
-        t_last = t[-1]
-        vb = self.curve.getViewBox()
-        xmin = max(0, t_last - BUFFER_SECONDS)
-        vb.setXRange(xmin, xmin + BUFFER_SECONDS, padding=0)
-        if not getattr(self, '_manual_y', False):
-            vb.enableAutoRange(axis=pg.ViewBox.YAxis)
+        self._running = False
+        self.wait()
