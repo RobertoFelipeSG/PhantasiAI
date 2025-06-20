@@ -26,15 +26,15 @@ class ChatWidget(QtWidgets.QFrame):
         lbl.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(lbl)
 
-        self.file_label = QtWidgets.QLabel("Fichier : (aucun sélectionné)")
+        self.file_label = QtWidgets.QLabel("File : (none selected)")
         self.file_label.setFont(QtGui.QFont("", 9))
         layout.addWidget(self.file_label)
 
-        self.date_label = QtWidgets.QLabel("Date : (aucune)")
+        self.date_label = QtWidgets.QLabel("Date : (none)")
         self.date_label.setFont(QtGui.QFont("", 9))
         layout.addWidget(self.date_label)
 
-        # zone de log
+        # log area
         self.log = QtWidgets.QTextEdit()
         self.log.setReadOnly(True)
         self.log.setFont(QtGui.QFont("", 9))
@@ -42,14 +42,14 @@ class ChatWidget(QtWidgets.QFrame):
 
         # saisie
         self.input = QtWidgets.QLineEdit()
-        self.input.setPlaceholderText("Tapez votre message…")
+        self.input.setPlaceholderText("Type your message here...")
         self.input.returnPressed.connect(self.send_message)
         # Style the input to make room for the button
         self.input.setStyleSheet("padding-right: 30px; padding: 4px;")
 
         # Create a button with arrow icon
         self.send_icon_button = QtWidgets.QToolButton(self.input)
-        self.send_icon_button.setText("➤")  # Using UTF-8 arrow character
+        self.send_icon_button.setText("➤")  
         self.send_icon_button.setStyleSheet("color: #A523DC; background: transparent; border: none; font-size: 16px;")
         self.send_icon_button.setCursor(QtCore.Qt.PointingHandCursor)
         self.send_icon_button.clicked.connect(self.send_message)
@@ -82,7 +82,7 @@ class ChatWidget(QtWidgets.QFrame):
     @QtCore.pyqtSlot(str)
     def set_file(self, path):
         nom = os.path.basename(path)
-        self.file_label.setText(f"Fichier : {nom}")
+        self.file_label.setText(f"File : {nom}")
         ctime = time.localtime(os.path.getctime(path))
         datestr = time.strftime("%Y-%m-%d %H:%M:%S", ctime)
         self.date_label.setText(f"Date : {datestr}")
@@ -91,9 +91,9 @@ class ChatWidget(QtWidgets.QFrame):
     def send_message(self):
         message = self.input.text().strip()
         if message:
-            self.log_event(f"Vous: {message}")
+            self.log_event(f"You: {message}")
             self.input.clear()
-            self.log_event(f"Message recu: '{message}'")
+            self.log_event(f"Message received: '{message}'")
 
     def get_logs(self):
         return self.logs
