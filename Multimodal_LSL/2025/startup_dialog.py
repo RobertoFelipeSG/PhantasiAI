@@ -20,14 +20,12 @@ class StartupDialog(QtWidgets.QDialog):
         main_layout.setSpacing(25)
         main_layout.setContentsMargins(40, 40, 40, 40)
 
-        # Title
         title = QtWidgets.QLabel("PhantasiAI Configuration")
         title_font = QtGui.QFont(self.font().family(), 18, QtGui.QFont.Bold)
         title.setFont(title_font)
         title.setAlignment(QtCore.Qt.AlignCenter)
         main_layout.addWidget(title)
 
-        # Mode category
         mode_group = QtWidgets.QGroupBox("Mode")
         mode_group.setFont(QtGui.QFont(self.font().family(), 14, QtGui.QFont.Bold))
         mode_layout = QtWidgets.QHBoxLayout(mode_group)
@@ -44,7 +42,6 @@ class StartupDialog(QtWidgets.QDialog):
         mode_layout.addWidget(self.normal_mode_btn)
         main_layout.addWidget(mode_group)
 
-        # Type category
         type_group = QtWidgets.QGroupBox("Type")
         type_group.setFont(QtGui.QFont(self.font().family(), 14, QtGui.QFont.Bold))
         type_layout = QtWidgets.QHBoxLayout(type_group)
@@ -61,7 +58,6 @@ class StartupDialog(QtWidgets.QDialog):
         type_layout.addWidget(self.live_mode_btn)
         main_layout.addWidget(type_group)
 
-        # Buttons
         button_layout = QtWidgets.QHBoxLayout()
         button_layout.addStretch()
 
@@ -82,7 +78,6 @@ class StartupDialog(QtWidgets.QDialog):
         main_layout.addStretch()
         main_layout.addLayout(button_layout)
 
-        # Enable Next only when both are selected
         self.mode_group.buttonClicked.connect(self.check_selections)
         self.type_group.buttonClicked.connect(self.check_selections)
 
@@ -95,7 +90,7 @@ class StartupDialog(QtWidgets.QDialog):
         mode_id = self.mode_group.checkedId()
         type_id = self.type_group.checkedId()
         self.selected_mode = "pro" if mode_id == 0 else "chat"
-        self.selected_type = "database" if type_id == 0 else "real-time"
+        self.selected_type = "database" if type_id == 0 else "live"
         self.accept()
 
     def get_selections(self):
