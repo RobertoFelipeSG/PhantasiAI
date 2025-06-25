@@ -3,12 +3,26 @@ import os
 import numpy as np
 from PyQt5 import QtWidgets, QtGui, QtCore
 
+# monkey‐patch scipy.signal.welch so that any window='hanning' is rewritten to 'hann'
+import scipy.signal
+_original_welch = scipy.signal.welch
+def patched_welch(*args, **kwargs):
+    if kwargs.get('window') == 'hanning':
+        kwargs['window'] = 'hann'
+    return _original_welch(*args, **kwargs)
+scipy.signal.welch = patched_welch
+
+from pysiology.electromyography import (
+    getMAV, getRMS, getWL, getZC, getIEMG, getWAMP,
+    getVAR, getLOG, getPSD, getMNF, getMDF
+)
+
 from graph_widget import GraphWidget
 from chat_widget import ChatWidget
-from emg_features_extractor import EMGFeatureExtractor
 from startup_dialog import StartupDialog
 from live_mode import LiveMode
 
+# Application-wide stylesheet
 APP_STYLESHEET = """
 QMainWindow {
     background-color: #FFFFFF;
@@ -42,8 +56,8 @@ QToolBar, QStatusBar {
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, mode, mode_label="", data_type="database"):
         super().__init__()
-        self.mode = mode                   
-        self.data_type = data_type         
+        self.mode = mode
+        self.data_type = data_type
         title = "PhantasiAi"
         if mode_label:
             title += f" – {mode_label}"
@@ -51,7 +65,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self._build_ui()
 
         if self.data_type == "live":
-            # Real-time mode: tries to connect to Arduino
             self.live = LiveMode(
                 port="/dev/ttyUSB0",
                 sample_rate=220,
@@ -60,18 +73,14 @@ class MainWindow(QtWidgets.QMainWindow):
             if not self.live.connect():
                 QtWidgets.QMessageBox.critical(
                     self, "Connection Error",
-                    "Failed to connect to Arduino.\n"
+                    "Failed to connect to Arduino.\n" +
                     "Please make sure it is plugged in and try again."
                 )
                 sys.exit(1)
             self.setup_live_graph()
         else:
-            # Database mode: prompts for .npz file
             if not self.load_npz_file():
-                QtWidgets.QMessageBox.critical(
-                    self, "Error",
-                    "No .npz file selected. Closing."
-                )
+                QtWidgets.QMessageBox.critical(self, "Error", "No .npz file selected. Closing.")
                 sys.exit(1)
 
     def _build_ui(self):
@@ -80,14 +89,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
+        # Toolbar buttons
         self.btn_open     = QtWidgets.QPushButton("Open")
         self.btn_save     = QtWidgets.QPushButton("Save")
         self.btn_channels = QtWidgets.QPushButton("Channels")
         self.btn_features = QtWidgets.QPushButton("EMG Data")
         btn_size = QtCore.QSize(160, 60)
         font     = QtGui.QFont("Segoe UI", 7)
-        for btn in (self.btn_open, self.btn_save,
-                    self.btn_channels, self.btn_features):
+        for btn in (self.btn_open, self.btn_save, self.btn_channels, self.btn_features):
             btn.setFixedSize(btn_size)
             btn.setFont(font)
             btn.setStyleSheet("QPushButton { font-size: 7pt; padding: 7px; }")
@@ -112,6 +121,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setCentralWidget(container)
 
+        # Connect signals
         self.btn_open.clicked.connect(self.on_file_change)
         self.btn_save.clicked.connect(self.save_logs)
         self.btn_channels.clicked.connect(self.show_channel_dialog)
@@ -129,9 +139,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 data = archive[key]
             if data.ndim == 1:
                 data = data.reshape(-1, 1)
-            self.full_data       = data
-            self.sample_rate     = 220
-            self.buffer_seconds  = 2
+            self.full_data = data
+            self.sample_rate = 220
+            self.buffer_seconds = 2
             self.selected_channels = [0]
 
             self.chat.set_file(path)
@@ -151,7 +161,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         mat = self.full_data[:, self.selected_channels]
         self.num_channels = len(self.selected_channels)
-        self.data_index   = 0
+        self.data_index = 0
 
         def read_vector():
             v = mat[self.data_index]
@@ -170,6 +180,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.graph.misEnPause.connect(lambda: self.chat.log_event("Data paused"))
         self.graph.repris.connect(lambda: self.chat.log_event("Data resumed"))
 
+        # Rebuild layout
         for i in reversed(range(self.body_layout.count())):
             self.body_layout.takeAt(i)
         gs, cs = (4, 1) if self.mode=="pro" else (3, 2)
@@ -237,20 +248,52 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def compute_features(self):
         mat = self.full_data[:, self.selected_channels]
-        extractor = EMGFeatureExtractor(emg_array=mat)
-        feats = extractor.features_dict
-        for idx, ch in enumerate(self.selected_channels):
-            mav = feats['mav'][idx]
-            rms = feats['rms'][idx]
-            ssc = feats['ssc'][idx]
-            var = feats['var'][idx]
-            self.chat.log_event(
-                f"Channel {ch+1} Features — MAV: {mav:.6f}, "
-                f"RMS: {rms:.6f}, SSC: {ssc}, VAR: {var:.6e}"
+        fs = self.sample_rate
+        n_segs = 10  # segments per channel
+
+        for idx, ch_data in enumerate(mat.T):
+            seg_len = len(ch_data) // n_segs
+            mav, rms, wl, zc = [], [], [], []
+            iemg, wamp, var, logd = [], [], [], []
+            mnf, mdf = [], []
+
+            for j in range(n_segs):
+                seg = ch_data[j*seg_len:(j+1)*seg_len].tolist()
+                mav.append(getMAV(seg))
+                rms.append(getRMS(seg))
+                wl.append(getWL(seg))
+                zc.append(getZC(seg, threshold=1e-4))
+                iemg.append(getIEMG(seg))
+                wamp.append(getWAMP(seg, threshold=1e-4))
+                var.append(getVAR(seg))
+                try:
+                    v = getLOG(seg)
+                    logd.append(v if np.isfinite(v) else 0.0)
+                except:
+                    logd.append(0.0)
+                psd, freqs = getPSD(seg, fs)
+                mnf.append(getMNF(psd, freqs))
+                mdf.append(getMDF(psd, freqs))
+
+            summary = {
+                'MAV':  np.mean(mav),
+                'RMS':  np.mean(rms),
+                'WL':   np.mean(wl),
+                'ZC':   np.mean(zc),
+                'IEMG': np.mean(iemg),
+                'WAMP': np.mean(wamp),
+                'VAR':  np.mean(var),
+                'LOG':  np.mean(logd),
+                'MNF':  np.mean(mnf),
+                'MDF':  np.mean(mdf),
+            }
+            ch_num = self.selected_channels[idx] + 1
+            msg = f"Channel {ch_num} Features — " + ", ".join(
+                f"{k}: {v:.2f}" for k,v in summary.items()
             )
+            self.chat.log_event(msg)
 
     def setup_live_graph(self):
-        # Clear body
         for i in reversed(range(self.body_layout.count())):
             w = self.body_layout.itemAt(i).widget()
             if w:
@@ -274,7 +317,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_logs(self):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(
-            self, "Save Logs", "", "Text File (*.txt>"
+            self, "Save Logs", "", "Text File (*.txt)"
         )
         if path:
             try:
@@ -303,13 +346,9 @@ def main():
 
     dialog = StartupDialog()
     if dialog.exec_() == QtWidgets.QDialog.Accepted:
-        mode, data_type = dialog.get_selections()  
+        mode, data_type = dialog.get_selections()
         mode_label = f"{mode.capitalize()} Mode"
-        window = MainWindow(
-            mode=mode,
-            mode_label=mode_label,
-            data_type=data_type
-        )
+        window = MainWindow(mode=mode, mode_label=mode_label, data_type=data_type)
         window.show()
         sys.exit(app.exec_())
     else:

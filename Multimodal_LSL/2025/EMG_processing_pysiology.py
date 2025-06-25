@@ -174,4 +174,4 @@ if __name__ == "__main__":
     )
 
     end = time.time()
-    print(f"⏱ Total execution time: {end - start:.2f} seconds")
+    print(f"Total execution time: {end - start:.2f} seconds")
