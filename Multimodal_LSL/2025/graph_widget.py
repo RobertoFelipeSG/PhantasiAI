@@ -35,7 +35,6 @@ class GraphWidget(QtWidgets.QWidget):
                                  multi_channel=(num_channels > 1))
         self.thread.dataUpdated.connect(self.update_plot)
 
-        # Set up a single PlotWidget
         self.plot = pg.PlotWidget()
         self.plot.hideAxis('left')
         self.plot.setBackground("w")
@@ -43,12 +42,13 @@ class GraphWidget(QtWidgets.QWidget):
         self.plot.setXRange(0, window, padding=0)
         self.plot.showGrid(x=True, y=True, alpha=0.3)
 
-        # create one curve per channel, precompute offsets
+        self.plot.addLegend(offset=(10, 10))
+
         self.curves = []
         self.offsets = []
         for idx in range(self.num_channels):
             pen = pg.mkPen(pg.intColor(idx, self.num_channels), width=1)
-            curve = self.plot.plot(pen=pen)
+            curve = self.plot.plot(pen=pen, name=self.channel_labels[idx])
             self.curves.append(curve)
             self.offsets.append(idx * self.spacing)
 
