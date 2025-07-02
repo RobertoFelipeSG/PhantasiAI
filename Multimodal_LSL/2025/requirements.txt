@@ -3,3 +3,6 @@ pyqtgraph
 serial
 pyfirmata
 pylsl
+pysiology
+scipy
+setuptools

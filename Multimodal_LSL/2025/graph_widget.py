@@ -19,6 +19,10 @@ class GraphWidget(QtWidgets.QWidget):
         self._manual_y = False
         self.num_channels = num_channels
 
+        self.last_spike_time = 0
+        self.spike_interval = 5.0
+        self.spike_lines = []
+
         # build labels
         if channel_labels and len(channel_labels) == num_channels:
             self.channel_labels = channel_labels
@@ -104,6 +108,21 @@ class GraphWidget(QtWidgets.QWidget):
         window = self.thread.buffer_len / self.thread.sample_rate
         self.plot.setXRange(t_last - window, t_last, padding=0)
 
+        # Add yellow spikes every 5 seconds
+        current_time = t[-1]
+        if current_time - self.last_spike_time >= self.spike_interval:
+            
+            window = self.thread.buffer_len / self.thread.sample_rate
+            for line in self.spike_lines[:]:
+                if line.value() < current_time - window:
+                    self.plot.removeItem(line)
+                    self.spike_lines.remove(line)
+            
+            spike_line = pg.InfiniteLine(pos=current_time, angle=90, pen=pg.mkPen('yellow', width=2))
+            self.plot.addItem(spike_line)
+            self.spike_lines.append(spike_line)
+            self.last_spike_time = current_time
+   
         # Y auto-range only if user hasn't zoomed manually
         if not self._manual_y:
             vb = self.plot.getViewBox()
