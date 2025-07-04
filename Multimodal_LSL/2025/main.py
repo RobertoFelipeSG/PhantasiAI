@@ -66,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.data_type == "live":
             self.live = LiveMode(
-                port="/dev/ttyUSB0",
+                port="COM3",
                 sample_rate=220,
                 buffer_seconds=2
             )
@@ -77,6 +77,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     "Please make sure it is plugged in and try again."
                 )
                 sys.exit(1)
+                
+            self.selected_channels = [0] 
             self.setup_live_graph()
         else:
             if not self.load_npz_file():
@@ -198,18 +200,24 @@ class MainWindow(QtWidgets.QMainWindow):
         dialog.setWindowTitle("Select Channels")
         layout = QtWidgets.QVBoxLayout(dialog)
 
+        if self.data_type == "live":
+            total_channels = len(self.live.channels)
+            current_selection = self.selected_channels
+        else:
+            total_channels = self.full_data.shape[1]
+            current_selection = self.selected_channels
+
         select_all = QtWidgets.QCheckBox("Select/Deselect All")
-        select_all.setChecked(len(self.selected_channels)==self.full_data.shape[1])
+        select_all.setChecked(len(current_selection) == total_channels)
         layout.addWidget(select_all)
 
         grid = QtWidgets.QGridLayout()
         self.checkboxes = []
-        total = self.full_data.shape[1]
-        for idx in range(total):
+        for idx in range(total_channels):
             cb = QtWidgets.QCheckBox(f"Channel {idx+1}")
-            cb.setChecked(idx in self.selected_channels)
+            cb.setChecked(idx in current_selection)
             self.checkboxes.append(cb)
-            grid.addWidget(cb, idx//4, idx%4)
+            grid.addWidget(cb, idx // 4, idx % 4)
         layout.addLayout(grid)
 
         def toggle_all(state):
@@ -229,7 +237,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cb.stateChanged.connect(update_all)
 
         btn_layout = QtWidgets.QHBoxLayout()
-        ok_btn     = QtWidgets.QPushButton("OK")
+        ok_btn = QtWidgets.QPushButton("OK")
         cancel_btn = QtWidgets.QPushButton("Cancel")
         ok_btn.clicked.connect(dialog.accept)
         cancel_btn.clicked.connect(dialog.reject)
@@ -242,9 +250,13 @@ class MainWindow(QtWidgets.QMainWindow):
             sel = [i for i, cb in enumerate(self.checkboxes) if cb.isChecked()]
             if sel:
                 self.selected_channels = sel
-                chans = ', '.join(str(i+1) for i in sel)
+                chans = ', '.join(str(i + 1) for i in sel)
                 self.chat.log_event(f"Channels selected: {chans}")
-                self.build_database_view()
+                if self.data_type == "live":
+                    self.setup_live_graph()
+                else:
+                    self.build_database_view()
+
 
     def compute_features(self):
         mat = self.full_data[:, self.selected_channels]
@@ -299,21 +311,28 @@ class MainWindow(QtWidgets.QMainWindow):
             if w:
                 w.setParent(None)
 
-        labels = [f"Channel {i+1}" for i in range(len(self.live.channels))]
+        self.live.start()
+
+        labels = [f"Channel {i + 1}" for i in self.selected_channels]
+
         self.graph = GraphWidget(
-            read_func=self.live.read_latest,
-            num_channels=len(self.live.channels),
+            read_func=lambda: self.live.read_latest(self.selected_channels),
+            num_channels=len(self.selected_channels),
             channel_labels=labels,
             title="Live EMG",
             sample_rate=self.live.sample_rate,
             buffer_seconds=self.live.buffer_seconds
         )
+
+
         self.graph.misEnPause.connect(lambda: self.chat.log_event("Stream paused"))
         self.graph.repris.connect(lambda: self.chat.log_event("Stream resumed"))
 
         self.body_layout.addWidget(self.graph, 4)
         self.body_layout.addWidget(self.chat, 1)
+
         self.chat.log_event("Live mode started. Streaming from Arduino.")
+
 
     def save_logs(self):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(

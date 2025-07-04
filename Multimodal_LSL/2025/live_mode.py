@@ -9,11 +9,12 @@ class LiveMode:
 
     DEFAULT_PINS = ['a:0:i', 'a:1:i', 'a:2:i', 'a:3:i', 'a:4:i', 'a:5:i']
 
-    def __init__(self, port="/dev/ttyUSB0", channels=None,
+    def __init__(self, port="COM3", channels=None,
                  sample_rate=220, buffer_seconds=2):
         self.port = port
         self.channels = channels or self.DEFAULT_PINS
         self.sample_rate = sample_rate
+        self.buffer_seconds = buffer_seconds 
         self.buffer_len = sample_rate * buffer_seconds
 
         self.board = None
@@ -77,8 +78,10 @@ class LiveMode:
             raise RuntimeError("Must connect() before start()")
         self._stop_event.clear()
         for ch, pin in self.pins.items():
-            if not self.is_sensor_connected(pin):
+            if not self.is_sensor_connected(pin, threshold=10): 
+                print(f"Warning: Skipping {ch} – no signal detected.")
                 continue
+
             t = threading.Thread(target=self._acquire, args=(ch,), daemon=True)
             t.start()
             self._threads.append(t)
@@ -89,12 +92,15 @@ class LiveMode:
             t.join()
         self._threads.clear()
 
-    def read_latest(self):
+    def read_latest(self, selected_indices=None):
         values = []
         for ch in self.channels:
             buf = self._buffers[ch]
             values.append(buf[-1] if buf else 0.0)
-        return values[0] if len(values) == 1 else values
+        if selected_indices is not None:
+            return [values[i] for i in selected_indices]
+        return values
+
 
     def close(self):
         self.stop()
