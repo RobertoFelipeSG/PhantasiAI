@@ -1,8 +1,0 @@
-PyQT5
-pyqtgraph
-serial
-pyfirmata
-pylsl
-pysiology
-scipy
-setuptools

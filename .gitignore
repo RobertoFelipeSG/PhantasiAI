@@ -1,0 +1,4 @@
+__pycache__/
+*.prompt        
+.venv/
+.venv310/
