@@ -16,8 +16,9 @@ PhantasiAI/
 │   └── SRS/                # Software Requirements Specification folder
 ├── HW/                     # Hardware?
 ├── Multimodal_LSL/         # Multimodal Lab Streaming Layer components
-│  └── 2025/               # Current prototype
+│  └── 2025/                # Current prototype
 ├── RAG/                    # Retrieval-Augmented Generation module
+├── requirements.txt        # List of Python dependencies
 └── README.md               # This file
 ```
 
