@@ -15,7 +15,7 @@
 
 ## Introduction
 
-TODO : add une description
+TODO : add une description et aussi les features pour live mode
 
 ---
 
