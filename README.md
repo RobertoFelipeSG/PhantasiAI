@@ -18,7 +18,6 @@ PhantasiAI/
 ├── Multimodal_LSL/         # Multimodal Lab Streaming Layer components
     └── 2025/               # Current prototype
 ├── RAG/                    # Retrieval-Augmented Generation module
-├── requirements.txt        # List of Python dependencies
 └── README.md               # This file
 ```
 
