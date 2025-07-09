@@ -79,7 +79,9 @@ TODO : add une description et aussi les features pour live mode
 - **📏 Time scale**: Horizontal axis
 
 **🔲 Chatbot area:**
+- ![File informations](details.png)
 - **📄 File information**: 
+  
   - Name of the file
   - Date of creation of the file
 - **💬 Message history**: Chronological conversation log with timestamps showing interactions between user and chatbot
