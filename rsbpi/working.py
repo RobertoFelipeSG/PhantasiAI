@@ -125,7 +125,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # captures the Enter press to mark events in the recorded dat
     def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_Return:
+        if event.key() == QtCore.Qt.Key_M:
             self.recorder.mark_event()  
         super().keyPressEvent(event) 
 
@@ -202,9 +202,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # Connect data updates to recorder
         self.graph.thread.dataUpdated.connect(self.handle_data_update)
 
-        
-        self.body_layout.addWidget(self.graph, 4)
-        self.body_layout.addWidget(self.chat , 1)
+        # Only show graph in pro mode, always show chat
+        if self.mode == "pro":
+            self.body_layout.addWidget(self.graph, 4)
+            self.body_layout.addWidget(self.chat , 1)
+        else:
+            # Chat mode: hide graph but keep it running in background
+            self.body_layout.addWidget(self.chat, 1)
 
         chans = ", ".join(str(c+1) for c in self.selected_channels)
         self.chat.log_event(f"Graph initialized for channels: {chans}")
@@ -296,8 +300,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # Connect data updates to recorder
         self.graph.thread.dataUpdated.connect(self.handle_data_update)
 
-        self.body_layout.addWidget(self.graph, 4)
-        self.body_layout.addWidget(self.chat , 1)
+        # Only show graph in pro mode, always show chat
+        if self.mode == "pro":
+            self.body_layout.addWidget(self.graph, 4)
+            self.body_layout.addWidget(self.chat , 1)
+        else:
+            # Chat mode: hide graph but keep it running in background
+            self.body_layout.addWidget(self.chat, 1)
+
         self.chat.log_event("Live mode started. Streaming from Arduino.")
 
  
