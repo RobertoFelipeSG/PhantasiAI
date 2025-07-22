@@ -24,8 +24,8 @@ class EMGRecorder:
         # Go one directory up from current file
         parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-        # Path to "recordings" folder one level up
-        recordings_dir = os.path.join(parent_dir, "recordings")
+        # Path to "emg-recordings" folder one level up
+        recordings_dir = os.path.join(parent_dir, "emg-recordings")
 
         # Create it if it doesn't exist
         os.makedirs(recordings_dir, exist_ok=True)
