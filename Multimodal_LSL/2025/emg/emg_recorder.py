@@ -21,11 +21,13 @@ class EMGRecorder:
 
         timestamp = time.strftime("%Y%m%d_%H%M%S")
 
-        # Determine base directory (where main.py resides)
-        base_dir = os.path.dirname(os.path.abspath(__file__))
+        # Go one directory up from current file
+        parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
-        # Ensure "recordings" directory exists
-        recordings_dir = os.path.join(base_dir, "recordings")
+        # Path to "recordings" folder one level up
+        recordings_dir = os.path.join(parent_dir, "recordings")
+
+        # Create it if it doesn't exist
         os.makedirs(recordings_dir, exist_ok=True)
 
         # Full path to CSV file inside recordings folder
