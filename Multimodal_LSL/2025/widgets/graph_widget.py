@@ -1,69 +1,72 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 import pyqtgraph as pg
 import numpy as np
-from data_thread import DataThread
+from data.data_thread import DataThread
 
-ZOOM_FACTOR = 1.2
+# Adjust this for more aggressive zoom in/out
+ZOOM_FACTOR = 1.5
 
 class GraphWidget(QtWidgets.QWidget):
-
-    misEnPause   = QtCore.pyqtSignal()
-    repris       = QtCore.pyqtSignal()
-    zoomAvant    = QtCore.pyqtSignal()
-    zoomArriere  = QtCore.pyqtSignal()
+    # Custom signals to communicate with parent (e.g. for logs)
+    paused   = QtCore.pyqtSignal()
+    resumed       = QtCore.pyqtSignal()
+    zoomed_in    = QtCore.pyqtSignal()
+    zoomed_out  = QtCore.pyqtSignal()
 
     def __init__(self, read_func, num_channels=1, channel_labels=None,
                  title="EMG Visualization", sample_rate=220,
                  buffer_seconds=2, parent=None):
         super().__init__(parent)
-        self._manual_y = False
+        self._manual_y = False  # Tracks if user manually zoomed Y-axis
         self.num_channels = num_channels
+        self.scale_to_µV = True  # Convert from V to µV for display
 
         self.last_spike_time = 0
-        self.spike_interval = 5.0
+        self.spike_interval = 5.0  # Add spike line every 5 seconds
         self.spike_lines = []
 
-        # build labels
-        if channel_labels and len(channel_labels) == num_channels:
-            self.channel_labels = channel_labels
-        else:
-            self.channel_labels = [f"Ch {i+1}" for i in range(num_channels)]
+        # Fallback labels if none provided
+        self.channel_labels = channel_labels if (
+            channel_labels and len(channel_labels) == num_channels
+        ) else [f"Ch {i+1}" for i in range(num_channels)]
 
-        # compute a rough spacing from the very first sample:
+        # Estimate vertical spacing from initial data
         first = np.asarray(read_func())
         amp_range = float(np.max(first) - np.min(first))
         self.spacing = amp_range * 1.2 if amp_range > 0 else 1.0
 
-        # Data acquisition thread
+        # Data acquisition thread (async EMG reader)
         self.thread = DataThread(read_func, sample_rate, buffer_seconds,
                                  multi_channel=(num_channels > 1))
         self.thread.dataUpdated.connect(self.update_plot)
 
+        # Setup the plot widget
         self.plot = pg.PlotWidget()
-        self.plot.hideAxis('left')
         self.plot.setBackground("w")
-        window = buffer_seconds
-        self.plot.setXRange(0, window, padding=0)
+        self.plot.setLabel('left', 'Amplitude', units='µV')
+        self.plot.setLabel('bottom', 'Time', units='s')
+        self.plot.setXRange(0, buffer_seconds, padding=0)
         self.plot.showGrid(x=True, y=True, alpha=0.3)
-
         self.plot.addLegend(offset=(10, 10))
 
+        # Create a curve for each channel with visual offset
         self.curves = []
         self.offsets = []
         for idx in range(self.num_channels):
-            pen = pg.mkPen(pg.intColor(idx, self.num_channels), width=1)
+            color = pg.intColor(idx, self.num_channels)
+            pen = pg.mkPen(color, width=1.5)
             curve = self.plot.plot(pen=pen, name=self.channel_labels[idx])
             self.curves.append(curve)
             self.offsets.append(idx * self.spacing)
 
-        # Control buttons
-        btn_size = QtCore.QSize(160, 60)  
+        # --- Control Buttons ---
+        btn_size = QtCore.QSize(160, 60)
         font = QtGui.QFont("Segoe UI", 8)
 
         self.btn_pause      = QtWidgets.QPushButton("Pause")
         self.btn_zoom_in    = QtWidgets.QPushButton("+")
         self.btn_zoom_out   = QtWidgets.QPushButton("–")
-        self.btn_reset_zoom = QtWidgets.QPushButton("Reset")
+        self.btn_reset_zoom = QtWidgets.QPushButton("Auto Zoom")
 
         for btn in (self.btn_pause, self.btn_zoom_in,
                     self.btn_zoom_out, self.btn_reset_zoom):
@@ -71,13 +74,15 @@ class GraphWidget(QtWidgets.QWidget):
             btn.setFont(font)
             btn.setStyleSheet("QPushButton { font-size: 9pt; }")
 
+        # Connect buttons to actions
         self.btn_pause.clicked.connect(self.toggle_pause)
         self.btn_zoom_in.clicked.connect(self.zoom_in)
         self.btn_zoom_out.clicked.connect(self.zoom_out)
         self.btn_reset_zoom.clicked.connect(self.reset_zoom)
 
+        # Layout: buttons below graph
         ctl_layout = QtWidgets.QHBoxLayout()
-        ctl_layout.setContentsMargins(0,0,0,0)
+        ctl_layout.setContentsMargins(0, 0, 0, 0)
         ctl_layout.setSpacing(8)
         ctl_layout.addWidget(self.btn_pause)
         ctl_layout.addWidget(self.btn_zoom_in)
@@ -86,44 +91,43 @@ class GraphWidget(QtWidgets.QWidget):
         ctl_layout.addStretch()
 
         layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(4,4,4,4)
+        layout.setContentsMargins(4, 4, 4, 4)
         layout.addWidget(self.plot, stretch=1)
         layout.addLayout(ctl_layout)
 
-        # start acquisition
-        self.thread.start()
+        self.thread.start()  # Begin background reading
 
     @QtCore.pyqtSlot(np.ndarray, np.ndarray)
     def update_plot(self, t, y):
-        """ y shape = (N, num_channels) """
         if t.size == 0 or y.size == 0:
             return
 
-        # update each curve with its vertical offset
+        if self.scale_to_µV:
+            y = y * 1_000_000  # Convert V → µV
+
+
+        # Update each channel's curve with vertical offset
         for idx, curve in enumerate(self.curves):
             curve.setData(t, y[:, idx] + self.offsets[idx])
 
-        # scroll X to show only the last buffer_seconds
+        # Scroll X-axis to keep latest data in view
         t_last = t[-1]
         window = self.thread.buffer_len / self.thread.sample_rate
         self.plot.setXRange(t_last - window, t_last, padding=0)
 
-        # Add yellow spikes every 5 seconds
-        current_time = t[-1]
-        if current_time - self.last_spike_time >= self.spike_interval:
-            
-            window = self.thread.buffer_len / self.thread.sample_rate
+        # Add vertical marker every 5 seconds
+        if t_last - self.last_spike_time >= self.spike_interval:
             for line in self.spike_lines[:]:
-                if line.value() < current_time - window:
+                if line.value() < t_last - window:
                     self.plot.removeItem(line)
                     self.spike_lines.remove(line)
-            
-            spike_line = pg.InfiniteLine(pos=current_time, angle=90, pen=pg.mkPen('yellow', width=2))
+
+            spike_line = pg.InfiniteLine(pos=t_last, angle=90, pen=pg.mkPen('yellow', width=2))
             self.plot.addItem(spike_line)
             self.spike_lines.append(spike_line)
-            self.last_spike_time = current_time
-   
-        # Y auto-range only if user hasn't zoomed manually
+            self.last_spike_time = t_last
+
+        # Auto-range Y unless user zoomed manually
         if not self._manual_y:
             vb = self.plot.getViewBox()
             vb.enableAutoRange(axis=pg.ViewBox.YAxis)
@@ -132,23 +136,21 @@ class GraphWidget(QtWidgets.QWidget):
         if self.thread.isRunning():
             self.thread.stop()
             self.btn_pause.setText("Resume")
-            self.misEnPause.emit()
+            self.paused.emit()
         else:
             self.thread.start()
             self.btn_pause.setText("Pause")
-            self.repris.emit()
+            self.resumed.emit()
 
     def zoom_in(self):
-        vb = self.plot.getViewBox()
-        vb.scaleBy((1, 1/ZOOM_FACTOR))
+        self._adjust_y_range(scale=1 / ZOOM_FACTOR)
         self._manual_y = True
-        self.zoomAvant.emit()
+        self.zoomed_in.emit()
 
     def zoom_out(self):
-        vb = self.plot.getViewBox()
-        vb.scaleBy((1, ZOOM_FACTOR))
+        self._adjust_y_range(scale=ZOOM_FACTOR)
         self._manual_y = True
-        self.zoomArriere.emit()
+        self.zoomed_out.emit()
 
     def reset_zoom(self):
         vb = self.plot.getViewBox()
@@ -157,7 +159,16 @@ class GraphWidget(QtWidgets.QWidget):
         vb.enableAutoRange(axis=pg.ViewBox.YAxis)
         self._manual_y = False
 
-    def closeEvent(self, evt):
+    def _adjust_y_range(self, scale=1.0):
+        vb = self.plot.getViewBox()
+        y_min, y_max = vb.viewRange()[1]
+        y_center = (y_min + y_max) / 2
+        y_half = (y_max - y_min) / 2 * scale
+        vb.setYRange(y_center - y_half, y_center + y_half, padding=0)
+
+
+    def closeEvent(self, event):
+        # Make sure thread exits cleanly
         if self.thread.isRunning():
             self.thread.stop()
-        super().closeEvent(evt)
+        super().closeEvent(event)
