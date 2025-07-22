@@ -1,6 +1,7 @@
 
 #TODO: NEEDS TO BE UPDATED
 
+
 ## 🚀 Getting Started (Everything in `Multimodal_LSL/2025`)
 
 All setup and execution happens inside the `Multimodal_LSL/2025/` folder.
@@ -33,11 +34,21 @@ python3.10 --version
 
 #### 2. Set up the environment
 
+
+
 ```bash
 cd Multimodal_LSL
 cd 2025
 python3.10 -m venv .venv
 source .venv/bin/activate
+
+please comment the pyqt libraries on the requirements.txt
+
+command to install pyqt on venv 
+pip install pyqt5 --config-settings --confirm-license= --verbose
+
+
+
 pip install -r requirements.txt
 python3 main.py
 ```
