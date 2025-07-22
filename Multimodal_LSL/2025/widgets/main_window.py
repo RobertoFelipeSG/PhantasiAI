@@ -42,7 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Toolbar buttons: Open / Save / Channels / Record
         self.btn_open     = QtWidgets.QPushButton("Open")
-        self.btn_save     = QtWidgets.QPushButton("Save")
+        self.btn_save     = QtWidgets.QPushButton("Save Chat")
         self.btn_channels = QtWidgets.QPushButton("Channels")
         self.btn_record   = QtWidgets.QPushButton("Start Recording")
 
