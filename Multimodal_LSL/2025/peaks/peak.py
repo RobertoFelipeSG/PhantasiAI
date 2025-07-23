@@ -41,6 +41,7 @@ def get_latest_emg_file(folder_path="../emg-recordings"):
 
 
 def analyze_emg_peaks(csv_file_path=None, 
+                     folder_path="../emg-recordings",
                      sampling_rate=220,
                      height_percentile=98,
                      min_distance=3,
@@ -71,14 +72,27 @@ def analyze_emg_peaks(csv_file_path=None,
     
     # Get the CSV file path
     if csv_file_path is None:
-        csv_file_path = get_latest_emg_file()
+        csv_file_path = get_latest_emg_file(folder_path)
         print(f"Using latest EMG file: {csv_file_path}")
     
     # Load EMG Data
     df_emg = pd.read_csv(csv_file_path)
     
     # Extract and convert EMG signal from mV to µV
-    emg_signal = df_emg['emg'].dropna().values * 1e3  # mV → µV
+    # Extract EMG signal - handle different column naming conventions
+    emg_column = None
+    if 'emg' in df_emg.columns:
+        # Old format (mV → µV conversion needed)
+        emg_signal = df_emg['emg'].dropna().values * 1e3  # mV → µV
+    elif 'ch1 (µV)' in df_emg.columns:
+        # New format (already in µV)
+        emg_signal = df_emg['ch1 (µV)'].dropna().values
+    elif any(col.startswith('ch') and '(µV)' in col for col in df_emg.columns):
+        # Find first channel column
+        ch_cols = [col for col in df_emg.columns if col.startswith('ch') and '(µV)' in col]
+        emg_signal = df_emg[ch_cols[0]].dropna().values
+    else:
+        raise ValueError(f"No EMG column found. Available columns: {df_emg.columns.tolist()}")
     time_vector = df_emg['timestamp'].iloc[:len(emg_signal)].values
     
     # Create MNE Raw Object
@@ -170,5 +184,3 @@ def analyze_emg_peaks(csv_file_path=None,
 
 if __name__ == "__main__":
     results = analyze_emg_peaks()
-    
- 

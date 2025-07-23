@@ -2,7 +2,15 @@ import time
 import csv
 import numpy as np
 import os
-from ..peaks.peak import analyze_emg_peaks
+import sys
+from pathlib import Path
+
+# Add the parent directory to sys.path to allow imports from sibling directories
+parent_dir = Path(__file__).parent.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+
+from peaks.peak import analyze_emg_peaks
 
 class EMGRecorder:
     def __init__(self, parent):
@@ -88,7 +96,11 @@ class EMGRecorder:
             self.csv_writer = None
             self.recording = False
             self.parent.chat.log_event("Recording stopped")
-            analyze_emg_peaks()
+            
+            # Get the recordings directory path (one level up from current file)
+            recordings_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "emg-recordings")
+            # Disable plots when called from recorder to avoid GUI issues
+            analyze_emg_peaks(folder_path=recordings_dir, show_plots=False)
 
         except Exception as e:
             print(f"[Recorder] Failed to stop recording: {e}")
