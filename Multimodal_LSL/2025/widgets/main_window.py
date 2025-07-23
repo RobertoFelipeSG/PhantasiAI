@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 # Internal module imports
 from widgets.graph_widget import GraphWidget
 from widgets.chat_widget import ChatWidget
-from data.live_mode import LiveMode
+from data.real_time_data import RealTimeData
 from emg.emg_recorder import EMGRecorder
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -94,7 +94,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """
         Initialize the Arduino connection and start live data stream.
         """
-        self.live = LiveMode(port="COM3", sample_rate=220, buffer_seconds=2)
+        self.live = RealTimeData(port="COM3", sample_rate=220, buffer_seconds=2)
         if not self.live.connect():
             QtWidgets.QMessageBox.critical(
                 self, "Connection Error",

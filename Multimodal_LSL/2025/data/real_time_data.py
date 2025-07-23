@@ -5,7 +5,7 @@ import serial
 from pyfirmata import Arduino, util
 from pylsl import StreamInfo, StreamOutlet
 
-class LiveMode:
+class RealTimeData:
     """
     Manages live data acquisition from an Arduino using PyFirmata.
     Streams data over Lab Streaming Layer (LSL).
