@@ -4,6 +4,7 @@ import os
 import numpy as np
 import sys
 from PyQt5 import QtWidgets, QtGui, QtCore
+import pyqtgraph as pg
 
 # Internal module imports
 from widgets.graph_widget import GraphWidget
@@ -298,12 +299,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.recorder.record_data_point(latest_time, emg_vector)
 
     def keyPressEvent(self, event):
-        """
-        Keyboard shortcut: Press 'M' to mark a timestamped event during recording.
-        """
         if event.key() == QtCore.Qt.Key_M:
-            self.recorder.mark_event()
+            if hasattr(self, 'graph') and hasattr(self.graph, 'curves') and self.graph.curves:
+                # On prend la première courbe (ou adapte selon tes besoins multi-canaux)
+                curve = self.graph.curves[0]
+                data = curve.getData()
+                if data[0].size > 0:
+                    t_last = data[0][-1]  # Dernier temps
+                    spike_line = pg.InfiniteLine(pos=t_last, angle=90, pen=pg.mkPen('yellow', width=2))
+                    self.graph.plot.addItem(spike_line)
+                    self.chat.log_event(f"🟡 Marqueur ajouté à {t_last:.2f} s")
+                    self.recorder.mark_event()
         super().keyPressEvent(event)
+
+
 
     def save_logs(self):
         """
