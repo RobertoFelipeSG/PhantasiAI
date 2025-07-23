@@ -2,6 +2,7 @@ import time
 import csv
 import numpy as np
 import os
+from ..peaks.peak import analyze_emg_peaks
 
 class EMGRecorder:
     def __init__(self, parent):
@@ -87,6 +88,8 @@ class EMGRecorder:
             self.csv_writer = None
             self.recording = False
             self.parent.chat.log_event("Recording stopped")
+            analyze_emg_peaks()
+
         except Exception as e:
             print(f"[Recorder] Failed to stop recording: {e}")
 
