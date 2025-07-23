@@ -3,14 +3,10 @@ import pandas as pd
 import time
 import neurokit2 as nk
 import scipy.signal
+from utils.scipy_patch import patch_scipy_welch
 
 # Patch: Replace deprecated 'hanning' window with 'hann' in scipy.signal.welch
-_original_welch = scipy.signal.welch
-def patched_welch(*args, **kwargs):
-    if 'window' in kwargs and kwargs['window'] == 'hanning':
-        kwargs['window'] = 'hann'
-    return _original_welch(*args, **kwargs)
-scipy.signal.welch = patched_welch
+scipy.signal.welch = patch_scipy_welch
 
 # Import custom EMG feature functions from pysiology
 from pysiology.electromyography import (
