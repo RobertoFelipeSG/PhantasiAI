@@ -6,41 +6,33 @@ import sys
 from pathlib import Path
 
 # Add the parent directory to sys.path to allow imports from sibling directories
-parent_dir = Path(__file__).parent.parent
-if str(parent_dir) not in sys.path:
-    sys.path.insert(0, str(parent_dir))
+from utils.path_utils import add_parent_to_syspath
+add_parent_to_syspath(1) 
 
-from peaks.peak import analyze_emg_peaks
+from emg.emg_peak_analyzer import EMGPeakAnalyzer
 
 class EMGRecorder:
     def __init__(self, parent):
         self.parent = parent
-        self.recording = False                # Is recording active
-        self.csv_file = None                  # File handle
-        self.csv_writer = None                # CSV writer
-        self.event_times = []                 # Manually marked timestamps
-        self.filename = None                  # Full path to file
-        self._index = 0                       # Sample counter
-        self.channel_count = 0                # Number of channels
+        self.recording = False
+        self.csv_file = None
+        self.csv_writer = None
+        self.event_times = []
+        self.filename = None
+        self.session_dir = None
+        self._index = 0
+        self.channel_count = 0
 
     def start_recording(self):
-        """Start a new recording session and write the CSV header."""
         if self.recording:
             return
 
-        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        timestamp = time.strftime("%Y-%m-%d_%Hh-%Mm-%Ss")
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        self.session_dir = os.path.join(base_dir, "emg-recordings", timestamp)
+        os.makedirs(self.session_dir, exist_ok=True)
 
-        # Go one directory up from current file
-        parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-        # Path to "emg-recordings" folder one level up
-        recordings_dir = os.path.join(parent_dir, "emg-recordings")
-
-        # Create it if it doesn't exist
-        os.makedirs(recordings_dir, exist_ok=True)
-
-        # Full path to CSV file inside recordings folder
-        self.filename = os.path.join(recordings_dir, f"emg_recording_{timestamp}.csv")
+        self.filename = os.path.join(self.session_dir, "emg.csv")
 
         try:
             self.csv_file = open(self.filename, 'w', newline='', encoding='utf-8')
@@ -57,28 +49,21 @@ class EMGRecorder:
             print(f"[Recorder] Failed to start recording: {e}")
             self.recording = False
 
-
     def record_data_point(self, timestamp, emg_values):
-        """Record a single EMG sample with optional event flag."""
         if not self.recording or not self.csv_writer:
             return
 
         try:
-            # Convert to µV from V
             if isinstance(emg_values, (np.ndarray, list)):
                 emg_values = [float(v) * 1_000_000 for v in emg_values]
             else:
                 emg_values = [float(emg_values) * 1_000_000]
 
-            # Check if this timestamp matches a marked event
             event_flag = any(abs(timestamp - t) < 0.001 for t in self.event_times)
-
-            # Build and write row
             emg_values = emg_values[:self.channel_count]
             row = [f"{timestamp:.8f}"] + [f"{v:.5f}" for v in emg_values] + [int(event_flag)]
             self.csv_writer.writerow(row)
 
-            # Periodic flush
             if self._index % 10 == 0:
                 self.csv_file.flush()
             self._index += 1
@@ -86,7 +71,6 @@ class EMGRecorder:
             print(f"[Recorder] Failed to record data point: {e}")
 
     def stop_recording(self):
-        """Safely stop recording and close file."""
         if not self.recording:
             return
         try:
@@ -96,17 +80,15 @@ class EMGRecorder:
             self.csv_writer = None
             self.recording = False
             self.parent.chat.log_event("Recording stopped")
-            
-            # Get the recordings directory path (one level up from current file)
-            recordings_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "emg-recordings")
-            # Disable plots when called from recorder to avoid GUI issues
-            analyze_emg_peaks(folder_path=recordings_dir, show_plots=False)
+
+            if self.filename:
+                analyzer = EMGPeakAnalyzer(csv_path=self.filename)
+                analyzer.run(show_plots=False, save_results=True)
 
         except Exception as e:
             print(f"[Recorder] Failed to stop recording: {e}")
 
     def mark_event(self):
-        """Mark the current timestamp for event flagging."""
         if not self.recording:
             return
         try:
@@ -121,5 +103,4 @@ class EMGRecorder:
             print(f"[Recorder] Failed to mark event: {e}")
 
     def close(self):
-        """Ensure recording is stopped before exiting."""
         self.stop_recording()

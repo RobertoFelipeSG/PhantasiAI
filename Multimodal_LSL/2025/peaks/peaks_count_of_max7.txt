@@ -1,6 +1,0 @@
-EMG File: ../emg-recordings/max7.csv
-Number of peaks: 26
-Height percentile: 98
-Min distance: 3 seconds
-Sampling rate: 220 Hz
-Signal duration: 130.05 seconds

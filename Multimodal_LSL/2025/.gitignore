@@ -1,4 +1,6 @@
 __pycache__/
 *.prompt        
 .venv/
-emg-recordings/
+emg-recordings/*
+!emg-recordings/.gitkeep
+

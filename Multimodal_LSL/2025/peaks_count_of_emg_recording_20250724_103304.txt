@@ -1,0 +1,6 @@
+EMG File: C:\Users\skan2\OneDrive\Documentos\GitHub\PhantasiAI\Multimodal_LSL\2025\emg-recordings\emg_recording_20250724_103304.csv
+Number of peaks: 1
+Height percentile: 98
+Min distance: 3 seconds
+Sampling rate: 220 Hz
+Signal duration: 0.98 seconds
