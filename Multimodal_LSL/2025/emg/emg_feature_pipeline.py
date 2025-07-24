@@ -14,7 +14,7 @@ from pysiology.electromyography import (
     getVAR, getLOG, getPSD, getMNF, getMDF
 )
 
-class EMGFeaturePipeline:
+class emgFeaturePipeline:
     """
     A pipeline to process and extract EMG signal features from .npz or .txt files.
     Handles loading, preprocessing, segmentation, feature extraction, and saving output.
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     start = time.time()
 
     # Initialize the pipeline
-    extractor = EMGFeaturePipeline(
+    extractor = emgFeaturePipeline(
         file_path=file_path,
         from_npz=from_npz
     )
