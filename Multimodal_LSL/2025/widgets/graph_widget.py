@@ -193,6 +193,17 @@ class GraphWidget(QtWidgets.QWidget):
         y_center = (y_min + y_max) / 2
         y_half = (y_max - y_min) / 2 * scale
         vb.setYRange(y_center - y_half, y_center + y_half, padding=0)
+    
+    def add_marker(self, t, label=None):
+        """
+        Add a vertical line marker at time `t`.
+        Optionally display a label in the log.
+        """
+        spike_line = pg.InfiniteLine(pos=t, angle=90, pen=pg.mkPen('yellow', width=2))
+        self.plot.addItem(spike_line)
+        self.spike_lines.append(spike_line)
+        
+
 
     def closeEvent(self, event):
         """
