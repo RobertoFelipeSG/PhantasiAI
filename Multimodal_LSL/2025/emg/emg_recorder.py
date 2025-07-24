@@ -27,7 +27,7 @@ class EMGRecorder:
         if self.recording:
             return
 
-        timestamp = time.strftime("%Y-%m-%d_%Hh-%Mm-%Ss")
+        timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         self.session_dir = os.path.join(base_dir, "emg-recordings", timestamp)
         os.makedirs(self.session_dir, exist_ok=True)
