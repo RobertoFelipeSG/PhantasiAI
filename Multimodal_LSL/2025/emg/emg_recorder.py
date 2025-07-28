@@ -11,6 +11,8 @@ add_parent_to_syspath(1)
 
 from emg.emg_peak_analyzer import EMGPeakAnalyzer
 
+
+
 class EMGRecorder:
     def __init__(self, parent):
         self.parent = parent
@@ -22,6 +24,7 @@ class EMGRecorder:
         self.session_dir = None
         self._index = 0
         self.channel_count = 0
+
 
     def start_recording(self):
         if self.recording:
@@ -104,3 +107,4 @@ class EMGRecorder:
 
     def close(self):
         self.stop_recording()
+

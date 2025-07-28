@@ -51,7 +51,6 @@ The CSV should contain:
 
 """
 
-
 class EMGPeakAnalyzer:
     def __init__(self, csv_path, sampling_rate=220, height_percentile=98, min_distance=3):
         """
@@ -116,8 +115,16 @@ class EMGPeakAnalyzer:
         output_file = self.csv_path.with_name("peaks.txt")
 
         # relative paths for display
-        relative_csv_path = self.csv_path.relative_to(Path.cwd())
-        relative_output_path = output_file.relative_to(Path.cwd())
+        try:
+            relative_csv_path = self.csv_path.relative_to(Path.cwd())
+        except ValueError:
+            relative_csv_path = self.csv_path
+
+        try:
+            relative_output_path = output_file.relative_to(Path.cwd())
+        except ValueError:
+            relative_output_path = output_file
+
 
         with open(output_file, 'w') as f:
             f.write(f"EMG File: {relative_csv_path}\n")
