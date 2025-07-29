@@ -128,3 +128,16 @@ class ChatWidget(QtWidgets.QFrame):
         entry = f"[{timestamp}] {message}"
         self.logs.append(entry)
         self.log.append(entry)
+    
+    def set_mode(self, mode):
+        """
+        Adjust visibility based on data mode.
+        In 'live' mode, hide file and date labels.
+        """
+        if mode == "live":
+            self.file_label.hide()
+            self.date_label.hide()
+        else:
+            self.file_label.show()
+            self.date_label.show()
+

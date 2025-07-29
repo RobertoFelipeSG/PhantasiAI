@@ -5,6 +5,8 @@ import serial
 from pyfirmata import Arduino, util
 from pylsl import StreamInfo, StreamOutlet
 
+from config.config_manager import load_config  # import config loader
+
 class RealTimeData:
     """
     Manages live data acquisition from an Arduino using PyFirmata.
@@ -14,17 +16,23 @@ class RealTimeData:
     # Default analog input pins A0–A5 in PyFirmata format
     DEFAULT_PINS = ['a:0:i', 'a:1:i', 'a:2:i', 'a:3:i', 'a:4:i', 'a:5:i']
 
-    def __init__(self, port="COM3", channels=None,
+    def __init__(self, port=None, channels=None,
                  sample_rate=220, buffer_seconds=2):
         """
         Initialize the live mode acquisition system.
 
         Parameters:
         - port: Serial port of the Arduino (e.g., "COM3" or "/dev/ttyACM0").
+                If None, loaded from config file.
         - channels: List of analog pins to use (PyFirmata format).
         - sample_rate: Number of samples per second.
         - buffer_seconds: Number of seconds to keep in memory.
         """
+        # If no port provided, fetch from config
+        if port is None:
+            cfg = load_config()
+            port = cfg.get("arduino_port")
+
         self.port = port
         self.channels = channels or self.DEFAULT_PINS
         self.sample_rate = sample_rate

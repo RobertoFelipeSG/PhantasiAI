@@ -56,7 +56,6 @@ class EMGRecorder:
             self.csv_file.flush()
 
             self.recording = True
-            self.parent.chat.log_event(f"Recording started: {os.path.basename(self.filename)}")
         except Exception as e:
             print(f"[Recorder] Failed to start recording: {e}")
             self.recording = False
@@ -105,7 +104,6 @@ class EMGRecorder:
 
             self.csv_writer = None
             self.recording = False
-            self.parent.chat.log_event("Recording stopped")
 
             # Run EMG peak analysis after recording ends
             if self.filename:
@@ -138,3 +136,12 @@ class EMGRecorder:
         Ensures recording is stopped cleanly when the recorder is closed or discarded.
         """
         self.stop_recording()
+
+    def get_session_folder_name(self):
+        """
+        Returns just the timestamped folder name for this recording session,
+        or None if no session has started yet.
+        """
+        if self.session_dir:
+            return Path(self.session_dir).name
+        return None
