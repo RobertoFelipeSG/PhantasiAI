@@ -1,7 +1,16 @@
+"""
+EMG Peak Analysis Tool (GUI File Selector)
+
+This script allows the user to select an EMG CSV file via a file dialog,
+and then performs peak detection and analysis using the EMGPeakAnalyzer class.
+
+To use: just run the script and select a CSV file when prompted.
+"""
+
 import tkinter as tk
 from tkinter import filedialog
 import platform
-from emg_peak_analyzer import EMGPeakAnalyzer 
+from emg_peak_analyzer import EMGPeakAnalyzer  # Import your custom EMG analysis class
 
 def select_csv_file():
     root = tk.Tk()
