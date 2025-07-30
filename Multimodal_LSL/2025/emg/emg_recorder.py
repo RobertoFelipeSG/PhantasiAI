@@ -71,9 +71,9 @@ class EMGRecorder:
         try:
             # Convert signal to microvolts
             if isinstance(emg_values, (np.ndarray, list)):
-                emg_values = [float(v) * 1_000_000 for v in emg_values]
+                emg_values = [float(v) for v in emg_values]
             else:
-                emg_values = [float(emg_values) * 1_000_000]
+                emg_values = [float(emg_values)]
 
             # Check if an event was marked at this timestamp
             event_flag = any(abs(timestamp - t) < 0.001 for t in self.event_times)

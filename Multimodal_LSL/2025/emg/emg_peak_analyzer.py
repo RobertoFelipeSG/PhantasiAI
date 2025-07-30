@@ -25,27 +25,25 @@ class EMGPeakAnalyzer:
 
     def _load_data(self):
         """
-        Load EMG data from CSV and convert it to MNE RawArray format.
+        Load EMG data (assumed in uV) from CSV and wrap in an MNE RawArray.
         """
         self.df_emg = pd.read_csv(self.csv_path)
 
-        # Try to find the EMG signal column based on common naming conventions
-        if 'emg' in self.df_emg.columns:
-            emg_signal = self.df_emg['emg'].dropna().values * 1e3  # Convert to µV
-        elif 'ch1 (µV)' in self.df_emg.columns:
-            emg_signal = self.df_emg['ch1 (µV)'].dropna().values
-        elif any(col.startswith('ch') and '(µV)' in col for col in self.df_emg.columns):
-            ch_cols = [col for col in self.df_emg.columns if col.startswith('ch') and '(µV)' in col]
-            emg_signal = self.df_emg[ch_cols[0]].dropna().values
-        else:
-            raise ValueError(f"No EMG column found. Available columns: {self.df_emg.columns.tolist()}")
+        # Pick the first column that looks like EMG
+        emg_col = None
+        for c in self.df_emg.columns:
+            if 'emg' in c.lower() or c.lower().startswith('ch'):
+                emg_col = c
+                break
+        if emg_col is None:
+            raise ValueError(f"No EMG column found. Available: {self.df_emg.columns.tolist()}")
 
-        # Get the time vector corresponding to the EMG signal
-        self.time_vector = self.df_emg['timestamp'].iloc[:len(emg_signal)].values
+        emg_uv = self.df_emg[emg_col].dropna().astype(np.float64).values
+        self.times = self.df_emg['timestamp'].values[:len(emg_uv)]
 
-        # Create MNE Info object and RawArray for signal processing
-        info = create_info(ch_names=['EMG'], sfreq=self.sampling_rate, ch_types=['emg'])
-        self.raw = RawArray(emg_signal.reshape(1, -1).astype(np.float64), info)
+        # Convert µV to V for MNE
+        info = create_info(ch_names=['EMG (uV)'], sfreq=self.sampling_rate, ch_types=['emg'])
+        self.raw = RawArray((emg_uv * 1e-6).reshape(1, -1), info)
 
     def _filter_data(self):
         """
@@ -56,28 +54,29 @@ class EMGPeakAnalyzer:
 
     def _detect_peaks(self):
         """
-        Detect EMG peaks using the specified percentile and minimum distance.
+        Detect peaks on the filtered signal, but do all math in uV.
         """
-        # Get filtered data and corresponding times
-        start_idx = 0
-        stop_idx = self.raw_filtered.n_times
-        data, self.times = self.raw_filtered[:, start_idx:stop_idx]
+        # get filtered data (in V) and times
+        data_v, _ = self.raw_filtered[:, :]
+        data_uv = data_v.squeeze() * 1e6          # V → µV
+        data_uv -= data_uv.mean()                # center around zero
 
-        # Center the data around zero
-        data -= data.mean()
+        threshold = np.percentile(data_uv, self.height_percentile)
+        min_dist_samples = int(self.min_distance * self.sampling_rate)
 
-        # Find peaks that exceed the height threshold and meet distance criteria
         self.peaks = find_peaks(
-            data.squeeze(),
-            height=np.percentile(data.squeeze(), self.height_percentile),
-            distance=self.min_distance * self.sampling_rate  # Convert seconds to samples
+            data_uv,
+            height=threshold,
+            distance=min_dist_samples
         )[0]
 
     def _analyze_peaks_per_minute(self):
         """
         Analyze peaks in 6-second windows to summarize peak locations.
         """
-        data = self.raw_filtered.get_data().squeeze()
+        # 1) grab the filtered data (in volts) and convert to µV
+        data_v = self.raw_filtered.get_data().squeeze()
+        data_uv = data_v * 1e6          # V → µV
         times = self.times
 
         duration = times[-1]  # Total duration of the signal in seconds
@@ -88,9 +87,9 @@ class EMGPeakAnalyzer:
         num_segments = int(np.ceil(duration / 6))
         for i in range(num_segments):
             start_idx = i * samples_per_6s
-            end_idx = min((i + 1) * samples_per_6s, len(data))
+            end_idx = min((i + 1) * samples_per_6s, len(data_uv))
 
-            segment_data = data[start_idx:end_idx]
+            segment_data = data_uv[start_idx:end_idx]
             segment_times = times[start_idx:end_idx]
 
             if len(segment_data) == 0:
@@ -98,15 +97,15 @@ class EMGPeakAnalyzer:
 
             # Identify the maximum peak within the segment
             peak_idx = np.argmax(segment_data)
-            peak_value = segment_data[peak_idx]
+            peak_value = segment_data[peak_idx]    # already in µV
             peak_time = segment_times[peak_idx]
 
             results.append({
-                'segment': i + 1,
+                'segment':    i + 1,
                 'start_time': segment_times[0],
-                'end_time': segment_times[-1],
-                'peak_time': peak_time,
-                'peak_value': peak_value
+                'end_time':   segment_times[-1],
+                'peak_time':  peak_time,
+                'peak_value': peak_value            # µV
             })
 
         return results
@@ -147,7 +146,8 @@ class EMGPeakAnalyzer:
                 end = result['end_time']
                 peak_t = result['peak_time']
                 peak_v = result['peak_value']
-                f.write(f"  Segment {seg} ({start:.2f} to {end:.2f}s): Peak at {peak_t:.2f}s = {peak_v:.2f} uV\n")
+                f.write(f"  Segment {seg} ({start:.2f} to {end:.2f}s): "
+                        f"Peak at {peak_t:.2f}s = {peak_v:.2f} uV\n")
 
         print(f"[PeakAnalyzer] Results saved to: {relative_output_path}")
 
@@ -157,12 +157,14 @@ class EMGPeakAnalyzer:
         """
         fig, ax = plt.subplots(1, 1, layout="constrained")
 
-        # Subtract mean for visual clarity
-        ax.plot(self.times, self.raw_filtered.get_data().squeeze() - self.raw_filtered.get_data().mean(), label='Filtered EMG')
+        # Subtract mean for visual clarity (in µV)
+        data_v = self.raw_filtered.get_data().squeeze()
+        data_uv = data_v * 1e6
+        ax.plot(self.times, data_uv - data_uv.mean(), label='Filtered EMG')
 
-        # Mark peak locations
+        # Mark detected peak locations
         for peak in self.peaks:
-            ax.axvline(self.times[peak], color='red', linestyle='--', alpha=0.6)
+            ax.axvline(self.times[peak], linestyle='--', alpha=0.6)
 
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Amplitude (µV)")
@@ -175,7 +177,7 @@ class EMGPeakAnalyzer:
         Main method to execute the full peak analysis pipeline.
         """
         print(f"[PeakAnalyzer] Analyzing: {self.csv_path}")
-        
+
         self._load_data()       # Load and format EMG data
         self._filter_data()     # Apply filtering
         self._detect_peaks()    # Detect peaks in the signal
