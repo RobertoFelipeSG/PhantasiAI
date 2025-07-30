@@ -17,6 +17,7 @@ class GraphWidget(QtWidgets.QWidget):
     resumed     = QtCore.pyqtSignal()
     zoomed_in   = QtCore.pyqtSignal()
     zoomed_out  = QtCore.pyqtSignal()
+    countdown_updated = QtCore.pyqtSignal(str)  # Signal to update countdown in main window
 
     def __init__(self, read_func, num_channels=1, channel_labels=None,
                  title="EMG Visualization", sample_rate=220,
@@ -30,6 +31,7 @@ class GraphWidget(QtWidgets.QWidget):
         self.last_spike_time = 0         # Time when last spike marker was added
         self.spike_interval = 5.0        # Add spike every N seconds
         self.spike_lines = []            # Store spike lines for cleanup
+        self.auto_spike_enabled = True   # Whether automatic spikes are enabled
 
         # Set channel labels or default to "Ch 1", "Ch 2", etc.
         self.channel_labels = channel_labels if (
@@ -58,8 +60,26 @@ class GraphWidget(QtWidgets.QWidget):
         # Create one curve per channel with color and vertical offset
         self.curves = []
         self.offsets = []
+        
+        # Custom color sequence: blue, violet, red, yellow, green, cyan, orange, dark blue, etc.
+        custom_colors = [
+            (0, 0, 255),      # Blue
+            (138, 43, 226),   # Violet (BlueViolet)
+            (255, 0, 0),      # Red
+            (255, 255, 0),    # Yellow
+            (0, 255, 0),      # Green
+            (0, 255, 255),    # Cyan
+            (255, 165, 0),    # Orange
+            (0, 0, 139),      # Dark Blue
+            (139, 0, 0),      # Dark Red
+            (0, 139, 0),      # Dark Green
+        ]
+        
         for idx in range(self.num_channels):
-            color = pg.intColor(idx, self.num_channels)
+            # Use custom colors, cycling through if more channels than colors
+            color_rgb = custom_colors[idx % len(custom_colors)]
+            color = pg.mkColor(color_rgb)
+            
             pen = pg.mkPen(color, width=1.5)
             curve = self.plot.plot(pen=pen, name=self.channel_labels[idx])
             self.curves.append(curve)
@@ -126,15 +146,27 @@ class GraphWidget(QtWidgets.QWidget):
         t_last = t[-1]
         window = self.thread.buffer_len / self.thread.sample_rate
         self.plot.setXRange(t_last - window, t_last, padding=0)
+        
+        # Update countdown timer for next marker and emit to main window
+        time_since_last_spike = t_last - self.last_spike_time
+        time_until_next_spike = self.spike_interval - time_since_last_spike
+        
+        if self.auto_spike_enabled and time_until_next_spike > 0:
+            countdown_seconds = int(time_until_next_spike) + 1
+            self.countdown_updated.emit(f"Next marker: {countdown_seconds}s")
+        elif self.auto_spike_enabled:
+            self.countdown_updated.emit("Next marker: 0s")
+        else:
+            self.countdown_updated.emit("Auto markers: OFF")
 
-        # Add vertical spike markers every N seconds
-        if t_last - self.last_spike_time >= self.spike_interval:
+        # Add vertical spike markers every N seconds (only if auto spike is enabled)
+        if self.auto_spike_enabled and t_last - self.last_spike_time >= self.spike_interval:
             for line in self.spike_lines[:]:
                 if line.value() < t_last - window:
                     self.plot.removeItem(line)
                     self.spike_lines.remove(line)
 
-            spike_line = pg.InfiniteLine(pos=t_last, angle=90, pen=pg.mkPen('yellow', width=2))
+            spike_line = pg.InfiniteLine(pos=t_last, angle=90, pen=pg.mkPen('pink', width=2))
             self.plot.addItem(spike_line)
             self.spike_lines.append(spike_line)
             self.last_spike_time = t_last
@@ -199,9 +231,22 @@ class GraphWidget(QtWidgets.QWidget):
         Add a vertical line marker at time `t`.
         Optionally display a label in the log.
         """
-        spike_line = pg.InfiniteLine(pos=t, angle=90, pen=pg.mkPen('yellow', width=2))
+        spike_line = pg.InfiniteLine(pos=t, angle=90, pen=pg.mkPen('pink', width=2))
         self.plot.addItem(spike_line)
         self.spike_lines.append(spike_line)
+    
+    def set_auto_spike_enabled(self, enabled):
+        """Enable or disable automatic spike markers."""
+        self.auto_spike_enabled = enabled
+        if enabled:
+            # Reset the timer to start fresh
+            if hasattr(self, 'thread') and hasattr(self.thread, '_index'):
+                current_time = self.thread._index / self.thread.sample_rate
+                self.last_spike_time = current_time
+    
+    def set_spike_interval(self, interval):
+        """Set the interval for automatic spike markers."""
+        self.spike_interval = float(interval)
         
 
 

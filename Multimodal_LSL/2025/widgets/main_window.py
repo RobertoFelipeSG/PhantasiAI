@@ -69,10 +69,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_record        = QtWidgets.QPushButton("Start Recording")
         self.btn_toggle_view   = QtWidgets.QPushButton("Switch to Graph Mode")
         self.btn_retry_arduino = QtWidgets.QPushButton("Reconnect")
+        self.btn_spike_mode    = QtWidgets.QPushButton("Disable Auto Markers")
+        
+        # Create countdown label for top toolbar
+        self.countdown_label = QtWidgets.QLabel("Next marker: 5s")
+        self.countdown_label.setStyleSheet("QLabel { color: red; font-weight: bold; font-size: 11pt; }")
+        self.countdown_label.setAlignment(QtCore.Qt.AlignCenter)
 
         for btn in (
             self.btn_open, self.btn_save, self.btn_channels,
-            self.btn_record, self.btn_toggle_view, self.btn_retry_arduino
+            self.btn_record, self.btn_toggle_view, self.btn_retry_arduino, self.btn_spike_mode
         ):
             btn.setFixedSize(QtCore.QSize(160, 60))
             btn.setFont(QtGui.QFont("Segoe UI", 7))
@@ -82,10 +88,11 @@ class MainWindow(QtWidgets.QMainWindow):
         toolbar = QtWidgets.QHBoxLayout()
         for btn in (
             self.btn_open, self.btn_save, self.btn_channels,
-            self.btn_record, self.btn_toggle_view, self.btn_retry_arduino
+            self.btn_record, self.btn_toggle_view, self.btn_retry_arduino, self.btn_spike_mode
         ):
             toolbar.addWidget(btn)
         toolbar.addStretch()
+        toolbar.addWidget(self.countdown_label)  # Add countdown to the right
         self.main_layout.addLayout(toolbar)
 
         # Body: chat + graph area
@@ -102,6 +109,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.btn_record.clicked.connect(self.toggle_recording)
         self.btn_toggle_view.clicked.connect(self.toggle_display_mode)
         self.btn_retry_arduino.clicked.connect(self.retry_arduino_connection)
+        self.btn_spike_mode.clicked.connect(self.toggle_spike_mode)
 
     def _init_live(self):
         """Attempt Arduino live connection or fallback to dummy graph."""
@@ -167,6 +175,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         # Connect data update only; omit pause/resume logging
         self.graph.thread.dataUpdated.connect(self.handle_data_update)
+        self.graph.countdown_updated.connect(self.update_countdown)
 
         self.body_layout.insertWidget(0, self.graph, 4)
         self._apply_view_mode()
@@ -223,6 +232,7 @@ class MainWindow(QtWidgets.QMainWindow):
             buffer_seconds=self.buffer_seconds
         )
         self.graph.thread.dataUpdated.connect(self.handle_data_update)
+        self.graph.countdown_updated.connect(self.update_countdown)
 
         self.body_layout.insertWidget(0, self.graph, 4)
         self._apply_view_mode()
@@ -364,6 +374,42 @@ class MainWindow(QtWidgets.QMainWindow):
             latest_time = times[-1]
             emg_vector = values[-1, :] if values.ndim > 1 else [values[-1]]
             self.recorder.record_data_point(latest_time, emg_vector)
+
+    def update_countdown(self, countdown_text):
+        """Update the countdown label in the top toolbar."""
+        self.countdown_label.setText(countdown_text)
+    
+    def toggle_spike_mode(self):
+        """Toggle automatic spike markers on/off."""
+        if not hasattr(self, 'graph') or not self.graph:
+            QtWidgets.QMessageBox.warning(self, "Warning", "Please initialize a graph first.")
+            return
+        
+        if self.graph.auto_spike_enabled:
+            # Disable auto spikes
+            self.graph.set_auto_spike_enabled(False)
+            self.btn_spike_mode.setText("Enable Auto Markers")
+            self.chat.log_event("Automatic markers disabled")
+        else:
+            # Enable auto spikes - first ask for interval
+            interval, ok = QtWidgets.QInputDialog.getDouble(
+                self, 
+                "Set Marker Interval", 
+                "Enter interval between markers (seconds):",
+                value=self.graph.spike_interval,
+                min=0.1,
+                max=60.0,
+                decimals=1
+            )
+            
+            if ok:
+                self.graph.set_spike_interval(interval)
+                self.graph.set_auto_spike_enabled(True)
+                self.btn_spike_mode.setText("Disable Auto Markers")
+                self.chat.log_event(f"Automatic markers enabled (every {interval}s)")
+            else:
+                # User cancelled, don't change state
+                return
 
     def keyPressEvent(self, event):
         """Press 'M' to add a marker at latest timestamp."""
