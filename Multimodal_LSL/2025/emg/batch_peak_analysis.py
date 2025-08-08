@@ -164,11 +164,11 @@ class BatchPeakAnalyzer:
                 'temp_csv_path': temp_csv_path
             })
             
-            print(f"  ✅ Found {results['num_peaks']} peaks in {results['signal_duration']:.2f}s")
+            print(f"  Found {results['num_peaks']} peaks in {results['signal_duration']:.2f}s")
             return results
             
         except Exception as e:
-            print(f"  ❌ Error analyzing {subject}, MVC={mvc}%, Trial={trial}: {str(e)}")
+            print(f"  Error analyzing {subject}, MVC={mvc}%, Trial={trial}: {str(e)}")
             return None
         finally:
             # Clean up temporary file
