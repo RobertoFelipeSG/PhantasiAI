@@ -3,4 +3,4 @@ __pycache__/
 .venv/
 emg-recordings/*
 !emg-recordings/.gitkeep
-
+dataset/*

@@ -55,7 +55,13 @@ class BatchPeakAnalyzer:
         """Create output directory for results."""
         if self.output_dir is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            self.output_dir = Path(f"batch_peak_analysis_{timestamp}")
+            # Create output in a 'dataset' folder outside the current directory
+            # Go up two levels from emg folder to get to 2025, then create dataset folder
+            parent_dir = Path(__file__).parent.parent.parent  # Go up to 2025's parent
+            dataset_dir = parent_dir / "dataset"
+            dataset_dir.mkdir(exist_ok=True)  # Create dataset folder if it doesn't exist
+            
+            self.output_dir = dataset_dir / f"batch_peak_analysis_{timestamp}"
         
         self.output_dir.mkdir(exist_ok=True)
         print(f"Results will be saved to: {self.output_dir}")
