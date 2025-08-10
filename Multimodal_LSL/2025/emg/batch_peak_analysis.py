@@ -1,89 +1,103 @@
+
+#!/usr/bin/env python3
+"""
+Fixed Batch Peak Analysis for Combined EMG Dataset
+=================================================
+
+This script processes the combined_emg_dorsiflex.csv dataset using the corrected
+EMGPeakAnalyzerFixed to properly detect peaks in each trial.
+
+The script will:
+1. Load the combined dataset
+2. Extract individual trials (Subject, MVC, Trial combinations)
+3. Run peak detection on each trial using the fixed analyzer
+4. Save results in the correct format
+"""
+
 import pandas as pd
 import numpy as np
-import os
-import sys
-from pathlib import Path
-from emg_peak_analyzer import EMGPeakAnalyzer
 import tempfile
-import json
+import os
+from pathlib import Path
 from datetime import datetime
+import warnings
+warnings.filterwarnings('ignore')
+
+# Import the fixed peak analyzer
+from emg_peak_analyzer_fixed import EMGPeakAnalyzerFixed
 
 class BatchPeakAnalyzer:
-    def __init__(self, dataset_path, output_dir=None):
+    def __init__(self, dataset_path, sampling_rate=220, height_percentile=98, min_distance=3):
         """
-        Initialize the batch peak analyzer.
+        Initialize the batch analyzer.
         
         Parameters:
         -----------
-        dataset_path : str
-            Path to the combined EMG dataset CSV file
-        output_dir : str, optional
-            Directory to save results. If None, creates a timestamped directory
+        dataset_path : str or Path
+            Path to the combined_emg_dorsiflex.csv file
+        sampling_rate : int
+            Sampling rate of EMG data (Hz)
+        height_percentile : float
+            Threshold for peak detection (percentile of signal amplitude)
+        min_distance : float
+            Minimum time (in seconds) between peaks
         """
         self.dataset_path = Path(dataset_path)
-        self.output_dir = Path(output_dir) if output_dir else None
+        self.sampling_rate = sampling_rate
+        self.height_percentile = height_percentile
+        self.min_distance = min_distance
         
-        # Define the expected data structure
-        self.subjects = [f"S0{i}" for i in range(1, 8)]
-        self.mvcs = [10, 25, 50]
-        self.trials = [1, 2, 3]
+        self.df = None
+        self.output_dir = None
         
-        # Analysis parameters
-        self.sampling_rate = 220
-        self.height_percentile = 98
-        self.min_distance = 3
-        
-        # Results storage
-        self.results = {}
-        
-    def load_dataset(self):
+    def load_data(self):
         """Load the combined dataset."""
-        print(f"Loading dataset from: {self.dataset_path}")
+        print(f"Loading dataset: {self.dataset_path}")
+
         self.df = pd.read_csv(self.dataset_path)
         print(f"Dataset shape: {self.df.shape}")
         print(f"Columns: {self.df.columns.tolist()}")
         
-        # Verify expected columns
-        expected_columns = ['Time', 'fwEMG 3', 'Subject', 'MVC', 'Trial']
-        missing_columns = [col for col in expected_columns if col not in self.df.columns]
-        if missing_columns:
-            raise ValueError(f"Missing expected columns: {missing_columns}")
-            
-        print("Dataset loaded successfully!")
+
+        # Check data structure
+        subjects = sorted(self.df['Subject'].unique())
+        mvcs = sorted(self.df['MVC'].unique())
+        trials = sorted(self.df['Trial'].unique())
         
+        print(f"Subjects: {subjects}")
+        print(f"MVC levels: {mvcs}")
+        print(f"Trials: {trials}")
+        
+        # Verify expected structure
+        expected_subjects = [f"S0{i}" for i in range(1, 8)]
+        expected_mvcs = [10, 25, 50]
+        expected_trials = [1, 2, 3]
+        
+        if subjects != expected_subjects:
+            print(f"Warning: Unexpected subjects. Expected: {expected_subjects}, Got: {subjects}")
+        
+        if mvcs != expected_mvcs:
+            print(f"Warning: Unexpected MVC levels. Expected: {expected_mvcs}, Got: {mvcs}")
+            
+        if trials != expected_trials:
+            print(f"Warning: Unexpected trials. Expected: {expected_trials}, Got: {trials}")
+    
     def create_output_directory(self):
         """Create output directory for results."""
-        if self.output_dir is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            # Create output in a 'dataset' folder outside the current directory
-            # Go up two levels from emg folder to get to 2025, then create dataset folder
-            parent_dir = Path(__file__).parent.parent.parent  # Go up to 2025's parent
-            dataset_dir = parent_dir / "dataset"
-            dataset_dir.mkdir(exist_ok=True)  # Create dataset folder if it doesn't exist
-            
-            self.output_dir = dataset_dir / f"batch_peak_analysis_{timestamp}"
+        # Use the existing dataset directory inside 2025
+        dataset_dir = self.dataset_path.parent
+        dataset_dir.mkdir(exist_ok=True)
         
+        # Create timestamped output folder
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.output_dir = dataset_dir / f"batch_peak_analysis_{timestamp}"
         self.output_dir.mkdir(exist_ok=True)
-        print(f"Results will be saved to: {self.output_dir}")
         
+        print(f"Output directory: {self.output_dir}")
+    
     def extract_trial_data(self, subject, mvc, trial):
-        """
-        Extract data for a specific trial.
-        
-        Parameters:
-        -----------
-        subject : str
-            Subject identifier (e.g., 'S01')
-        mvc : int
-            MVC percentage (10, 25, or 50)
-        trial : int
-            Trial number (1, 2, or 3)
-            
-        Returns:
-        --------
-        pandas.DataFrame : Trial data with 'timestamp' and 'emg' columns
-        """
-        # Filter data for specific trial
+        """Extract data for a specific trial."""
+
         trial_data = self.df[
             (self.df['Subject'] == subject) & 
             (self.df['MVC'] == mvc) & 
@@ -93,61 +107,44 @@ class BatchPeakAnalyzer:
         if trial_data.empty:
             print(f"No data found for {subject}, MVC={mvc}%, Trial={trial}")
             return None
-            
-        # Rename columns to match EMGPeakAnalyzer expectations
-        trial_data = trial_data.rename(columns={
-            'Time': 'timestamp',
-            'fwEMG 3': 'emg'
-        })
+
         
-        # Select only the required columns
-        trial_data = trial_data[['timestamp', 'emg']].reset_index(drop=True)
+        # Store the original start time before resetting
+        original_start_time = trial_data['Time'].iloc[0]
+        
+        # Reset time to start from 0 for this trial
+        trial_data = trial_data.reset_index(drop=True)
+        trial_data['Time'] = trial_data['Time'] - original_start_time
+        
+        # Store the original start time for later use
+        trial_data.attrs['original_start_time'] = original_start_time
         
         return trial_data
-        
-    def save_trial_csv(self, trial_data, subject, mvc, trial):
-        """
-        Save trial data to a temporary CSV file for analysis.
-        
-        Returns:
-        --------
-        str : Path to the temporary CSV file
-        """
-        # Create temporary file
-        temp_file = tempfile.NamedTemporaryFile(
-            mode='w', 
-            suffix='.csv', 
-            delete=False,
-            dir=self.output_dir
-        )
-        
-        # Save trial data
+    
+    def save_temporary_csv(self, trial_data, subject, mvc, trial):
+        """Save trial data to a temporary CSV file."""
+        temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False)
         trial_data.to_csv(temp_file.name, index=False)
-        temp_file.close()
-        
         return temp_file.name
-        
+    
     def analyze_trial(self, subject, mvc, trial):
-        """
-        Analyze a single trial.
-        
-        Returns:
-        --------
-        dict : Analysis results or None if no data
-        """
+        """Analyze a single trial using the fixed peak analyzer."""
+
         print(f"Analyzing {subject}, MVC={mvc}%, Trial={trial}...")
         
         # Extract trial data
         trial_data = self.extract_trial_data(subject, mvc, trial)
         if trial_data is None:
             return None
-            
+
+        
         # Save to temporary CSV
-        temp_csv_path = self.save_trial_csv(trial_data, subject, mvc, trial)
+        temp_csv_path = self.save_temporary_csv(trial_data, subject, mvc, trial)
         
         try:
             # Run peak analysis
-            analyzer = EMGPeakAnalyzer(
+            analyzer = EMGPeakAnalyzerFixed(
+
                 csv_path=temp_csv_path,
                 sampling_rate=self.sampling_rate,
                 height_percentile=self.height_percentile,
@@ -156,228 +153,209 @@ class BatchPeakAnalyzer:
             
             results = analyzer.run(show_plots=False, save_results=False)
             
-            # Add metadata
-            results.update({
-                'subject': subject,
-                'mvc': mvc,
-                'trial': trial,
-                'temp_csv_path': temp_csv_path
-            })
+
+            # Clean up temporary file
+            os.unlink(temp_csv_path)
             
-            print(f"  Found {results['num_peaks']} peaks in {results['signal_duration']:.2f}s")
-            return results
+            return {
+                'Subject': subject,
+                'MVC': mvc,
+                'Trial': trial,
+                'num_peaks': results['num_peaks'],
+                'peak_times': results['peak_times'],
+                'peak_amplitudes': results['peak_amplitudes'],
+                'highest_peak_time': results['highest_peak_time'],
+                'highest_peak_amplitude': results['highest_peak_amplitude'],
+                'signal_duration': results['signal_duration'],
+                'trial_data': trial_data  # Keep original trial data for verification
+            }
             
         except Exception as e:
-            print(f"  Error analyzing {subject}, MVC={mvc}%, Trial={trial}: {str(e)}")
-            return None
-        finally:
+            print(f"Error analyzing {subject}, MVC={mvc}%, Trial={trial}: {e}")
             # Clean up temporary file
-            try:
+            if os.path.exists(temp_csv_path):
                 os.unlink(temp_csv_path)
-            except:
-                pass
+            return None
+    
+    def save_summary_results(self, all_results):
+        """Save the highest peak for each trial in the required format."""
+        print("Saving summary results...")
+        
+        summary_data = []
+        
+        for result in all_results:
+            if result is not None and result['num_peaks'] > 0:
+                # Get the highest peak
+                highest_peak_time = result['highest_peak_time']
+                highest_peak_amplitude = result['highest_peak_amplitude']
                 
-    def run_batch_analysis(self):
-        """
-        Run peak analysis for all trials in the dataset.
-        """
-        print("Starting batch peak analysis...")
-        print(f"Subjects: {self.subjects}")
-        print(f"MVC levels: {self.mvcs}")
-        print(f"Trials: {self.trials}")
-        print(f"Total combinations: {len(self.subjects) * len(self.mvcs) * len(self.trials)}")
-        print("-" * 50)
+                # Convert back to absolute time (add the original trial start time)
+                original_start_time = result['trial_data'].attrs['original_start_time']
+                absolute_peak_time = original_start_time + highest_peak_time
+                
+                summary_data.append({
+                    'Time': absolute_peak_time,
+                    'fwEMG 3': highest_peak_amplitude,
+                    'Subject': result['Subject'],
+                    'MVC': result['MVC'],
+                    'Trial': result['Trial']
+                })
+            else:
+                # No peaks detected - use the maximum value from the trial
+                trial_data = result['trial_data']
+                max_idx = trial_data['fwEMG 3'].idxmax()
+                # Convert back to absolute time
+                original_start_time = trial_data.attrs['original_start_time']
+                relative_max_time = trial_data.loc[max_idx, 'Time']
+                absolute_max_time = original_start_time + relative_max_time
+                max_amplitude = trial_data.loc[max_idx, 'fwEMG 3']
+                
+                summary_data.append({
+                    'Time': absolute_max_time,
+                    'fwEMG 3': max_amplitude,
+                    'Subject': result['Subject'],
+                    'MVC': result['MVC'],
+                    'Trial': result['Trial']
+                })
+        
+        # Create DataFrame and save
+        summary_df = pd.DataFrame(summary_data)
+        summary_path = self.output_dir / "peak_analysis_results.csv"
+        summary_df.to_csv(summary_path, index=False)
+        
+        print(f"Summary results saved to: {summary_path}")
+        print(f"Total trials processed: {len(summary_data)}")
+        
+        return summary_df
+    
+    def save_detailed_results(self, all_results):
+        """Save detailed results including all peaks for each trial."""
+        print("Saving detailed results...")
+        
+        detailed_data = []
+        
+        for result in all_results:
+            if result is not None:
+                subject = result['Subject']
+                mvc = result['MVC']
+                trial = result['Trial']
+                
+                if result['num_peaks'] > 0:
+                    # Add all detected peaks
+                    for i, (peak_time, peak_amplitude) in enumerate(zip(result['peak_times'], result['peak_amplitudes'])):
+                        # Convert back to absolute time
+                        original_start_time = result['trial_data'].attrs['original_start_time']
+                        absolute_peak_time = original_start_time + peak_time
+                        
+                        detailed_data.append({
+                            'Time': absolute_peak_time,
+                            'fwEMG 3': peak_amplitude,
+                            'Subject': subject,
+                            'MVC': mvc,
+                            'Trial': trial,
+                            'Peak_Number': i + 1,
+                            'Is_Highest': (i == np.argmax(result['peak_amplitudes']))
+                        })
+                else:
+                    # No peaks detected - use the maximum value
+                    trial_data = result['trial_data']
+                    max_idx = trial_data['fwEMG 3'].idxmax()
+                    # Convert back to absolute time
+                    original_start_time = trial_data.attrs['original_start_time']
+                    relative_max_time = trial_data.loc[max_idx, 'Time']
+                    absolute_max_time = original_start_time + relative_max_time
+                    max_amplitude = trial_data.loc[max_idx, 'fwEMG 3']
+                    
+                    detailed_data.append({
+                        'Time': absolute_max_time,
+                        'fwEMG 3': max_amplitude,
+                        'Subject': subject,
+                        'MVC': mvc,
+                        'Trial': trial,
+                        'Peak_Number': 1,
+                        'Is_Highest': True
+                    })
+        
+        # Create DataFrame and save
+        detailed_df = pd.DataFrame(detailed_data)
+        detailed_path = self.output_dir / "detailed_peak_analysis.csv"
+        detailed_df.to_csv(detailed_path, index=False)
+        
+        print(f"Detailed results saved to: {detailed_path}")
+        
+        return detailed_df
+    
+    def run(self):
+        """Run the complete batch analysis."""
+        print("=" * 60)
+        print("Fixed Batch Peak Analysis")
+        print("=" * 60)
+        
+        # Load data
+        self.load_data()
         
         # Create output directory
         self.create_output_directory()
         
-        # Initialize results
-        self.results = {
-            'analysis_parameters': {
-                'sampling_rate': self.sampling_rate,
-                'height_percentile': self.height_percentile,
-                'min_distance': self.min_distance
-            },
-            'trials': {}
-        }
+        # Get all unique combinations
+        combinations = self.df.groupby(['Subject', 'MVC', 'Trial']).size().reset_index()
+        print(f"\nFound {len(combinations)} unique trial combinations")
         
         # Analyze each trial
-        for subject in self.subjects:
-            self.results['trials'][subject] = {}
-            
-            for mvc in self.mvcs:
-                self.results['trials'][subject][mvc] = {}
-                
-                for trial in self.trials:
-                    trial_key = f"{subject}_MVC{mvc}_Trial{trial}"
-                    result = self.analyze_trial(subject, mvc, trial)
-                    
-                    if result:
-                        self.results['trials'][subject][mvc][trial] = result
-                    else:
-                        self.results['trials'][subject][mvc][trial] = None
-                        
-        # Save summary results
-        self.save_summary_results()
+        all_results = []
         
-        print("\n" + "=" * 50)
-        print("BATCH ANALYSIS COMPLETE")
-        print("=" * 50)
-        self.print_summary()
+        for _, row in combinations.iterrows():
+            subject, mvc, trial = row['Subject'], row['MVC'], row['Trial']
+            result = self.analyze_trial(subject, mvc, trial)
+            all_results.append(result)
         
-    def save_summary_results(self):
-        """Save summary results to JSON file and CSV file with same structure as input."""
-        # Create summary without raw data objects
-        summary = {
-            'analysis_parameters': self.results['analysis_parameters'],
-            'summary_stats': {},
-            'trial_results': {}
+        # Save results
+        summary_df = self.save_summary_results(all_results)
+        detailed_df = self.save_detailed_results(all_results)
+        
+        # Print summary statistics
+        print(f"\n=== Analysis Summary ===")
+        print(f"Total trials: {len(all_results)}")
+        successful_analyses = sum(1 for r in all_results if r is not None)
+        print(f"Successful analyses: {successful_analyses}")
+        
+        if successful_analyses > 0:
+            total_peaks = sum(r['num_peaks'] for r in all_results if r is not None)
+            print(f"Total peaks detected: {total_peaks}")
+            avg_peaks_per_trial = total_peaks / successful_analyses
+            print(f"Average peaks per trial: {avg_peaks_per_trial:.2f}")
+        
+        print(f"\nResults saved to: {self.output_dir}")
+        print("=" * 60)
+        
+        return {
+            'summary_df': summary_df,
+            'detailed_df': detailed_df,
+            'all_results': all_results,
+            'output_dir': self.output_dir
         }
-        
-        total_peaks = 0
-        total_duration = 0
-        successful_trials = 0
-        
-        # Prepare data for CSV output
-        csv_data = []
-        
-        for subject in self.subjects:
-            summary['trial_results'][subject] = {}
-            
-            for mvc in self.mvcs:
-                summary['trial_results'][subject][mvc] = {}
-                
-                for trial in self.trials:
-                    trial_result = self.results['trials'][subject][mvc][trial]
-                    
-                    if trial_result:
-                        summary['trial_results'][subject][mvc][trial] = {
-                            'num_peaks': trial_result['num_peaks'],
-                            'signal_duration': trial_result['signal_duration'],
-                            'peak_times': trial_result['peak_times'].tolist() if len(trial_result['peak_times']) > 0 else []
-                        }
-                        
-                        # Add to CSV data - keep only the highest peak per trial
-                        if len(trial_result['peak_times']) > 0:
-                            # Get the original trial data to find peak amplitudes
-                            trial_data = self.extract_trial_data(subject, mvc, trial)
-                            if trial_data is not None:
-                                # Find the highest peak amplitude
-                                peak_amplitudes = []
-                                for peak_time in trial_result['peak_times']:
-                                    # Find the closest timestamp in the original data
-                                    time_diff = np.abs(trial_data['timestamp'] - peak_time)
-                                    closest_idx = np.argmin(time_diff)
-                                    peak_amplitude = trial_data.iloc[closest_idx]['emg']
-                                    peak_amplitudes.append(peak_amplitude)
-                                
-                                # Find the highest peak
-                                max_peak_idx = np.argmax(peak_amplitudes)
-                                max_peak_time = trial_result['peak_times'][max_peak_idx]
-                                max_peak_amplitude = peak_amplitudes[max_peak_idx]
-                                
-                                csv_data.append({
-                                    'Time': max_peak_time,           # Timestamp of highest peak
-                                    'fwEMG 3': max_peak_amplitude,   # Amplitude of highest peak
-                                    'Subject': subject,
-                                    'MVC': mvc,
-                                    'Trial': trial
-                                })
-                            else:
-                                # Fallback: use first peak if we can't get original data
-                                csv_data.append({
-                                    'Time': trial_result['peak_times'][0],
-                                    'fwEMG 3': 1,  # Default amplitude
-                                    'Subject': subject,
-                                    'MVC': mvc,
-                                    'Trial': trial
-                                })
-                        else:
-                            # No peaks detected in this trial
-                            csv_data.append({
-                                'Time': 0.0,
-                                'fwEMG 3': 0,  # No peaks detected
-                                'Subject': subject,
-                                'MVC': mvc,
-                                'Trial': trial
-                            })
-                        
-                        total_peaks += trial_result['num_peaks']
-                        total_duration += trial_result['signal_duration']
-                        successful_trials += 1
-                    else:
-                        summary['trial_results'][subject][mvc][trial] = None
-                        
-                        # Add row for failed trial with NaN values
-                        csv_data.append({
-                            'Time': 0.0,
-                            'fwEMG 3': 0,  # No peaks detected
-                            'Subject': subject,
-                            'MVC': mvc,
-                            'Trial': trial
-                        })
-                        
-        summary['summary_stats'] = {
-            'total_trials_analyzed': successful_trials,
-            'total_peaks_detected': total_peaks,
-            'total_duration_analyzed': total_duration,
-            'average_peaks_per_trial': total_peaks / successful_trials if successful_trials > 0 else 0,
-            'average_duration_per_trial': total_duration / successful_trials if successful_trials > 0 else 0
-        }
-        
-        # Save to JSON file
-        summary_file = self.output_dir / "batch_analysis_summary.json"
-        with open(summary_file, 'w') as f:
-            json.dump(summary, f, indent=2)
-            
-        print(f"Summary saved to: {summary_file}")
-        
-        # Save to CSV file with same structure as input
-        csv_df = pd.DataFrame(csv_data)
-        csv_file = self.output_dir / "peak_analysis_results.csv"
-        csv_df.to_csv(csv_file, index=False)
-        
-        print(f"CSV results saved to: {csv_file}")
-        print(f"CSV shape: {csv_df.shape}")
-        print(f"CSV columns: {csv_df.columns.tolist()}")
-        print(f"CSV dtypes:\n{csv_df.dtypes}")
-        
-    def print_summary(self):
-        """Print a summary of the analysis results."""
-        successful_trials = 0
-        total_peaks = 0
-        total_duration = 0
-        
-        for subject in self.subjects:
-            for mvc in self.mvcs:
-                for trial in self.trials:
-                    result = self.results['trials'][subject][mvc][trial]
-                    if result:
-                        successful_trials += 1
-                        total_peaks += result['num_peaks']
-                        total_duration += result['signal_duration']
-                        
-        print(f"Successful trials: {successful_trials}")
-        print(f"Total peaks detected: {total_peaks}")
-        print(f"Total duration analyzed: {total_duration:.2f} seconds")
-        print(f"Average peaks per trial: {total_peaks / successful_trials:.1f}" if successful_trials > 0 else "No successful trials")
-        print(f"Results saved to: {self.output_dir}")
-
 
 def main():
-    """Main function to run batch analysis."""
-    # Default dataset path
-    default_dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex.csv"
+    """Main function to run the batch analysis."""
+    # Path to the combined dataset
+    dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex.csv"
     
-    if not default_dataset_path.exists():
-        print(f"Default dataset not found at: {default_dataset_path}")
-        print("Please provide the path to your dataset.")
+    if not dataset_path.exists():
+        print(f"Error: Dataset not found at {dataset_path}")
         return
-        
-    # Initialize and run batch analysis
-    batch_analyzer = BatchPeakAnalyzer(default_dataset_path)
-    batch_analyzer.load_dataset()
-    batch_analyzer.run_batch_analysis()
+    
+    # Create and run the batch analyzer
+    analyzer = BatchPeakAnalyzer(
+        dataset_path=dataset_path,
+        sampling_rate=220,
+        height_percentile=95,  # Slightly lower threshold for better detection
+        min_distance=2  # Minimum 2 seconds between peaks
+    )
+    
+    results = analyzer.run()
+    
+    print(f"\nBatch analysis complete!")
+    print(f"Check the results in: {results['output_dir']}")
 
 
 if __name__ == "__main__":
