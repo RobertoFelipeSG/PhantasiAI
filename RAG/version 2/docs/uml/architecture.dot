@@ -1,0 +1,24 @@
+digraph "embedding_service.py" {
+
+splines  = ortho;
+fontname = "Inconsolata";
+
+node [colorscheme = ylgnbu4];
+edge [colorscheme = dark28, dir = both];
+
+"main.RAGApplication"                         [shape = record, pos = "1.722,10.181!"    , label = "{ main.RAGApplication |  rag_service : \l| __init__(self) : \l  initialize_database(self) : \l  run_interactive(self) : \l  query(self, question: str) : \l }"];
+object                                        [shape = record, pos = "3.969,21.833!"    , label = "{ object |  __doc__ : \l  __dict__ : \l  __module__ : \l  __annotations__ : \l| __class__(self) : \l  __class__(self, __type: type[object]) : \l  __init__(self) : \l  __new__(cls) : \l  __setattr__(self, __name: str, __value: Any) : \l  __delattr__(self, __name: str) : \l  __eq__(self, __value: object) : \l  __ne__(self, __value: object) : \l  __str__(self) : \l  __repr__(self) : \l  __hash__(self) : \l  __format__(self, __format_spec: str) : \l  __getattribute__(self, __name: str) : \l  __sizeof__(self) : \l  __reduce__(self) : \l  __reduce_ex__(self, __protocol: SupportsIndex) : \l  __getstate__(self) : \l  __dir__(self) : \l  __init_subclass__(cls) : \l  __subclasshook__(cls, __subclass: type) : \l }"];
+"services.embedding_service.EmbeddingService" [shape = record, pos = "3.378,6.833!"     , label = "{ services.embedding_service.EmbeddingService |  model_name : \l  model : \l| __init__(self, model_name: str = "all-MiniLM-L6-v2") : \l  get_embeddings(self) : \l  embed_documents(self, texts: list[str]) : \l  embed_query(self, text: str) : \l }"];
+"services.llm_service.LLMService"             [shape = record, pos = "-2.819,10.167!"   , label = "{ services.llm_service.LLMService |  model : \l  prompt : \l| __init__(self) : \l  get_llm(self) : \l  get_prompt(self) : \l }"];
+"services.rag_service.RAGService"             [shape = record, pos = "10.889,10.833!"   , label = "{ services.rag_service.RAGService |  embedding_service : \l  vector_store_service : \l  text_splitter : \l  llm_service : \l| __init__(self) : \l  setup_vector_db(self, file_path: str) : \l  create_rag_chain(self) : \l }"];
+"services.vector_store.VectorStoreService"    [shape = record, pos = "5.028,12.167!"    , label = "{ services.vector_store.VectorStoreService |  _vector_store : \l  embedding_function : \l  db_path : \l| __init__(self, embedding_service) : \l  vector_store(self) : \l  add_documents(self, documents: List[Document]) : \l  add_texts(self, texts: List[str], metadatas: Optional[List[Dict[str, Any]]] = None) : \l  similarity_search(self, query: str, k: int = None) : \l  get_retriever(self, search_type: str = "similarity", **kwargs) : \l  clear(self) : \l  get_collection_stats(self) : \l }"];
+"typing.Hashable"                             [shape = record, pos = "5.066,23.264!"    , label = "{ typing.Hashable |  __hash__(self) : \l }"];
+
+"main.RAGApplication"                         -> object                                        [color = "#595959", style = solid , arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+object                                        -> "typing.Hashable"                             [color = "#595959", style = dashed, arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+"services.embedding_service.EmbeddingService" -> object                                        [color = "#595959", style = solid , arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+"services.llm_service.LLMService"             -> object                                        [color = "#595959", style = solid , arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+"services.rag_service.RAGService"             -> object                                        [color = "#595959", style = solid , arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+"services.vector_store.VectorStoreService"    -> object                                        [color = "#595959", style = solid , arrowtail = normal  , arrowhead = none    , taillabel = "", label = "", headlabel = ""];
+
+}

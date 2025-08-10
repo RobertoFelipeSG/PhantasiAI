@@ -1,0 +1,2769 @@
+brain
+sciences
+Article
+
+Transcutaneous Spinal Cord Stimulation Enhances Walking
+Performance and Reduces Spasticity in Individuals with
+Multiple Sclerosis
+Ursula S. Hofstoetter 1, * , Brigitta Freundl 2 , Peter Lackner 2 and Heinrich Binder 2
+1
+2
+
+*
+
+
+
+Citation: Hofstoetter, U.S.; Freundl,
+B.; Lackner, P.; Binder, H.
+Transcutaneous Spinal Cord
+Stimulation Enhances Walking
+Performance and Reduces Spasticity
+
+Center for Medical Physics and Biomedical Engineering, Medical University of Vienna, 1090 Vienna, Austria
+Neurological Center, Klinik Penzing—Wiener Gesundheitsverbund, 1140 Vienna, Austria;
+brigitta.freundl@gesundheitsverbund.at (B.F.); peter.lackner@gesundheitsverbund.at (P.L.);
+heinrich.dr.binder@outlook.com (H.B.)
+Correspondence: ursula.hofstoetter@meduniwien.ac.at
+
+Abstract: Gait dysfunction and spasticity are common debilitating consequences of multiple sclerosis
+(MS). Improvements of these motor impairments by lumbar transcutaneous spinal cord stimulation
+(tSCS) have been demonstrated in spinal cord injury. Here, we explored for the first time the motor
+effects of lumbar tSCS applied at 50 Hz for 30 min in 16 individuals with MS and investigated
+their temporal persistence post-intervention. We used a comprehensive protocol assessing walking
+ability, different presentations of spasticity, standing ability, manual dexterity, and trunk control.
+Walking ability, including walking speed and endurance, was significantly improved for two hours
+beyond the intervention and returned to baseline after 24 h. Muscle spasms, clonus duration, and
+exaggerated stretch reflexes were reduced for two hours, and clinically assessed lower-extremity
+muscle hypertonia remained at improved levels for 24 h post-intervention. Further, postural sway
+during normal standing with eyes open was decreased for two hours. No changes were detected in
+manual dexterity and trunk control. Our results suggest that transcutaneous lumbar SCS can serve
+as a clinically accessible method without known side effects that holds the potential for substantial
+clinical benefit across the disability spectrum of MS.
+
+in Individuals with Multiple Sclerosis.
+Brain Sci. 2021, 11, 472. https://
+doi.org/10.3390/brainsci11040472
+
+Keywords: gait dysfunction; human; non-invasive; multiple sclerosis; neuromodulation; spasticity;
+spinal cord stimulation; standing ability; transcutaneous; walking function
+
+Academic Editor: Linard Filli
+Received: 1 March 2021
+
+1. Introduction
+
+Accepted: 6 April 2021
+
+The enabling of lost motor function following chronic spinal cord injury (SCI) by
+epidural spinal cord stimulation (eSCS) has triggered a resurgence of interest in the therapeutic potential of this intervention [1–5]. A parallel advancement in the field was the
+development of transcutaneous spinal cord stimulation (tSCS), a surface-electrode based
+neuromodulation method generating currents partially crossing the vertebral canal and
+affecting spinal segments innervating the lower extremities [6–8]. When applied over the
+lumbar spinal cord, neurophysiological and computer modelling studies have complementarily suggested the activation of large- to medium-diameter afferent fibers within
+the posterior roots, which are also the principal neural targets of lumbar eSCS for motor
+effects [6,7,9–12]. Independent studies have pointed at the potential of tSCS to augment
+residual voluntary motor function [13–16] and to decrease lower-extremity spasticity in
+SCI [17–19]. Importantly, the effects on spasticity were shown to last for several hours
+beyond the application [17–19]. Such carry-over effects present a pivotal requirement for a
+wider use of tSCS, since the surface-electrode based method cannot be applied chronically
+and the activated neural structures depend on body position [20].
+While recent research has put the spotlight on people with traumatic SCI, individuals
+with multiple sclerosis (MS) were the first and most studied patient cohort in the early
+
+Published: 8 April 2021
+
+Publisher’s Note: MDPI stays neutral
+with regard to jurisdictional claims in
+published maps and institutional affiliations.
+
+Copyright: © 2021 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license (https://
+creativecommons.org/licenses/by/
+4.0/).
+
+Brain Sci. 2021, 11, 472. https://doi.org/10.3390/brainsci11040472
+
+https://www.mdpi.com/journal/brainsci
+
+Brain Sci. 2021, 11, 472
+
+2 of 20
+
+investigations of eSCS in motor disorders [21,22]. Attainable improvements included
+facilitation of standing and walking function as well as amelioration of spasticity—effects
+that surpassed those achieved by any other intervention available at that time [22–27].
+Indeed, spasticity is highly prevalent in MS, with those affected facing higher levels of
+disability in functional domains [28,29]. Another debilitating consequence affecting the
+vast majority of individuals with MS is impaired walking function [30]. Notably, the early
+investigations in MS had applied eSCS over thoracic and cervical levels [31–34], and no
+study so far has specifically targeted the lumbar spinal cord. Further, tSCS in MS has not
+yet been investigated.
+The objective of the present study was to gain, for the first time, insights into potential
+motor effects of lumbar tSCS in individuals with MS as well as their persistence after a single intervention. We used a comprehensive set of complementary tests of lower-extremity
+spasticity, walking and standing ability, and manual dexterity conducted at different time
+points before and after a 30-min session of 50-Hz tSCS in a statistically sound sample of
+16 individuals with MS. Based on previous experience gained in SCI [18,19], we hypothesized that a single intervention would intermediately, i.e., for two hours post-intervention,
+ameliorate spasticity and associated symptoms and improve walking performance. We further hypothesized that after 24 h, measures would have returned to pre-intervention levels.
+2. Materials and Methods
+2.1. Participants
+Sixteen individuals (mean age ± standard deviation (SD): 56.1 ± 12 years; nine females) with confirmed diagnosis of primary or secondary progressive MS (19.1 ± 13.1 years
+post initial diagnosis) were enrolled and all completed the study (Table 1). Expanded Disability Status Scale (EDSS) scores ranged from 3.5 to 8.5 [32,35]. Participants 12 to 16 were
+unable to walk. Participants 4, 7, 9, 12, and 13 were on oral anti-spasticity medication
+(cf. Table 1) and took the last dose either 12 to 15 h or 36 h (participant 13) prior to the
+intervention day (Figure 1a). Among the exclusion criteria were acute relapses of MS as
+well as active and passive implants at T9 or more caudal vertebral levels. None of the
+participants had any previous experience with tSCS. The study was approved by the Ethics
+Committee of the City of Vienna, Austria (EK 17-186-1017), and conducted in accordance
+with the Declaration of Helsinki. All participants signed written informed consent prior to
+their enrollment into the study.
+Table 1. Clinical characteristics of study participants.
+Part.
+Nr.
+
+Sex
+
+Age
+(y)
+
+Time Since
+Diag. (y)
+
+EDSS
+Score
+
+WISCI II
+Score
+
+LEMS
+Total
+
+PPSS L1 to
+L2
+
+LTSS L1 to
+L2
+
+Anti-spasticity Medication
+(Daily Dosage)
+
+1
+2
+3
+4
+5
+6
+7
+8
+
+F
+F
+M
+M
+F
+F
+F
+F
+
+52
+66
+30
+44
+65
+71
+51
+64
+
+24
+1
+6
+7
+24
+49
+24
+29
+
+3.5
+5
+5
+6
+6
+6
+6.5
+6.5
+
+20
+20
+20
+19
+19
+19
+16
+16
+
+38
+37
+36
+39
+31
+39
+34
+36
+
+28
+28
+25
+28
+28
+28
+28
+28
+
+28
+28
+22
+28
+28
+28
+28
+28
+
+9
+
+F
+
+57
+
+30
+
+6.5
+
+13
+
+43
+
+24
+
+24
+
+10
+11
+
+M
+M
+
+39
+61
+
+18
+9
+
+6.5
+6.5
+
+12
+9
+
+38
+28
+
+24
+28
+
+28
+28
+
+12
+
+M
+
+48
+
+3
+
+7.0
+
+0
+
+8
+
+21
+
+28
+
+13
+14
+15
+16
+
+F
+M
+F
+M
+
+56
+76
+64
+54
+
+19
+20
+8
+35
+
+7.5
+7.5
+8
+8.5
+
+0
+0
+0
+0
+
+19
+8
+10
+17
+
+28
+28
+14
+22
+
+28
+28
+14
+22
+
+None
+None
+None
+100 mg baclofen
+None
+None
+75 mg baclofen
+None
+62.5 mg baclofen,
+12 mg tizanidine
+None
+None
+95 mg baclofen,
+300 mg pregabalin
+10 mg baclofen
+None
+None
+None
+
+Diag., diagnosis; EDSS, Expanded Disability Status Scale; LEMS, lower extremity motor score (max. 50); LTSS, light touch sensory sub-score
+(max. 28); Part., participant; PPSS, pin prick sensory sub-score (max. 28); for LEMS, LTSS, and PPSS, see [36]; WISCI, Walking Index for
+Spinal Cord Injury [37,38]; y, years.
+
+Brain Sci. 2021, 11, 472
+
+tion of lower-extremity muscle hypertonia based on the Modified Ashworth Scale (MAS)
+[33]; and, in the ambulatory participants (n = 11), the timed 10-m walk test, the timed upand-go test, and the 2-min walk test. Supplementary tests performed in Base and Inter
+comprised the assessment of upright standing postural control (conducted in B1, I1, and
+I2); as well as a surface-electromyography (EMG) based assessment of lower-extremity
+3 of 20
+spasticity [19,34,35], the trunk control test, and the timed nine-hole-peg test (all conducted
+in B2, I1, and I2).
+
+Figure 1.
+1. Overview
+Overview of
+of the
+the methodology.
+methodology. (a)
+(a) Study
+Study protocol
+protocol comprising
+comprising aa baseline
+baseline evaluation
+evaluation (Base)
+(Base) with
+with two
+two assessments,
+assessments,
+Figure
+one conducted ~24 h (B1) and the other one immediately (B2) before a 30-min session of 50-Hz transcutaneous (transcut.)
+one conducted ~24 h (B1) and the other one immediately (B2) before a 30-min session of 50-Hz transcutaneous (transcut.)
+spinal cord stimulation; an evaluation of intermediate carry-over effects (Inter) with two assessments, one conducted
+spinal cord stimulation; an evaluation of intermediate carry-over effects (Inter) with two assessments, one conducted
+immediately (I1) and the other one two hours (I2) post-intervention; and an evaluation of longer-lasting carry-over
+effects (Long) of the stimulation conducted ~24 h post-intervention. Each assessment included, as core tests, the clinical
+determination of lower-extremity muscle hypertonia based on the Modified Ashworth Scale (MAS) and, in the ambulatory
+participants, the timed 10-m walk test, the timed up-and-go test, and the 2-min walk test. Supplementary (supplem.) tests
+were conducted as indicated in B1 or B2 as well as in I1 and I2, and included standing tasks, the trunk control test, the
+timed nine-hole-peg test, and a surface-EMG (sEMG) based assessment of lower-extremity spasticity. Transcutaneous spinal
+cord stimulation was applied with the participants lying supine. First, effective electrode (el.) placement (cf. (b)) over
+the lumbosacral spinal cord was confirmed based on the elicitation of posterior root-muscle reflexes (PRMRs; cf. (c)) in
+lower-extremity myotomes. Second, for the intervention, transcutaneous spinal cord stimulation was applied for 30 min at
+50 Hz and with an amplitude corresponding to 90% of the lowest PRMR threshold. n.t., not tested. (b) Electrode setup
+with the active paraspinal electrode placed longitudinally over the spine, covering T11 and T12 spinal processes, and a
+pair of interconnected indifferent electrodes on the lower abdomen. (c) Verification of effective stimulation site over the
+lumbosacral spinal cord by the elicitation of PRMRs in rectus femoris (RF), biceps femoris (BF), tibialis anterior (TA), and
+triceps surae (TS), which demonstrate a characteristic suppression at interstimulus-intervals (ISIs) of 30 ms and 50 ms
+when tested by paired pulses [39]. At interstimulus-intervals of 100 ms, the responses to the second stimulus had partially
+recovered. Shaded backgrounds mark times of stimulus application. Three repetitions each superimposed; participant 5.
+
+2.2. Study Protocol
+We studied intermediate (i.e., lasting for at least two hours post-intervention [19]) and
+longer-lasting (~24 h post-intervention) carry-over effects of a single 30-min session of tSCS
+by comprehensive evaluations conducted before and after the stimulation (Figure 1a). The
+study protocol included a baseline evaluation (Base), comprising two assessments, one
+conducted ~24 h (B1) and the other one immediately (B2) pre-intervention; an evaluation
+of intermediately lasting carry-over effects (Inter), comprising two assessments performed
+immediately (I1) and two hours (I2) post-intervention; and an evaluation of longer-lasting
+
+Brain Sci. 2021, 11, 472
+
+4 of 20
+
+carry-over effects (Long) conducted ~24 h post-intervention. All five assessments (B1, B2,
+I1, I2, and Long) included the following core tests: the clinical determination of lowerextremity muscle hypertonia based on the Modified Ashworth Scale (MAS) [33]; and, in
+the ambulatory participants (n = 11), the timed 10-m walk test, the timed up-and-go test,
+and the 2-min walk test. Supplementary tests performed in Base and Inter comprised the
+assessment of upright standing postural control (conducted in B1, I1, and I2); as well as a
+surface-electromyography (EMG) based assessment of lower-extremity spasticity [19,34,35],
+the trunk control test, and the timed nine-hole-peg test (all conducted in B2, I1, and I2).
+The MAS-based evaluation of muscle hypertonia comprised flexion, extension, abduction, adduction, as well as internal and external rotation of the hip; flexion and extension
+of the knee with the hip in an extended position; and ankle dorsiflexion with the hip and
+knee in a flexed position as well as dorsiflexion, plantar flexion, and pronation of the ankle
+with the hip and knee in an extended position (twelve separate tests per side) [19]. In each
+participant, all five assessments were conducted by the same examiner who was otherwise
+not involved in the study.
+For the walk tests, individually required walking aids were unchanged across assessments (cf. Walking Index for Spinal Cord Injury II (WISCI II) Score in Table 1). None of the
+participants required assistance by physiotherapists. For the timed up-and-go test, participants started sitting on a chair with armrests, stood up on command, walked a distance of
+three meters, turned around a cone, walked back to the chair and sat down [40,41]. For the
+timed 10-m walk test [42] and the 2-min walk test [43,44], participants started in a standing
+position. For the 2-min walk test, participants walked back and forth on a 20-m course,
+turning around cones at each end.
+For the standing tasks, participants were first asked to assume a normal standing
+position for 30 s, with their bare feet approximately hip width apart, each placed on a
+separate force plate (type 9284, KISTLER Instrumente AG, Winterthur, Switzerland), and
+their hands placed to the sides. Subsequently, with both feet placed on a single force
+plate, mean postural sway was assessed during 30 s of normal stance as well as during
+Romberg’s test [45], each conducted first with eyes open and then closed. For Romberg’s
+test, participants stood with their feet close together and their arms straight forward.
+The surface-EMG based assessment of different presentations of spasticity was conducted with the participants lying supine and included three repetitions per side of slow,
+passive unilateral hip and knee flexion-extension movements (3 s each for flexion, holding
+hip and knee flexed at 90◦ , and extension), the attempt to elicit an Achilles clonus by a brisk
+manual ankle dorsiflexion, and cutaneous-input evoked spasms by non-noxious mechanical plantar stimulation with a blunt rod [19]. Care was taken to ensure that participants
+were relaxed without detectable EMG activity before each repetition of the tests (minimum
+time between repetitions: 10 s).
+Manual dexterity was assessed using the timed nine-hole-peg test [46]. Participants
+sat at a table and were asked to pick pegs from a container, one-by-one, place them into the
+holes of a standardized board, then remove them, one by one, and put them back into the
+container. The test was repeated twice per side.
+The trunk control test was used to assess the ability to roll to the (i) weak and (ii)
+strong side while lying supine; (iii) to sit up from the supine position; and (iv) to maintain
+balance for 30 s while in a sitting position [47].
+2.3. Transcutaneous Lumbar Spinal Cord Stimulation
+Transcutaneous lumbar SCS was applied through self-adhesive surface electrodes
+(Schwamedico GmbH, Ehringshausen, Germany), with one electrode (5 × 9 cm) placed
+longitudinally over the spine covering the T11 and T12 spinal processes and a pair of
+interconnected electrodes (each 8 × 13 cm) on the lower abdomen, in symmetry with the
+umbilicus (Figure 1b). A current-controlled stimulator (Stimulette r2x-S1, Dr. Schuhfried
+Medizintechnik GmbH, Moedling, Austria) was set to deliver charge-balanced, symmetrical, biphasic rectangular pulses of 1 ms width per phase. Such relatively long pulse width
+
+Brain Sci. 2021, 11, 472
+
+5 of 20
+
+was used to exploit the difference in the strength–duration properties between sensory
+and motor axons and hence to favor afferent stimulation [48,49]. With reference to the
+abdominal electrodes, the paraspinal electrode acted as the anode for the first and as the
+cathode for the second phase of the pulse, thereby activating neural structures following
+the change in polarity of the biphasic pulse [50]. For the intervention, the targeted spinal
+cord segments were those innervating the lower extremities. Effective stimulation of the
+respective segmental afferents was neurophysiologically confirmed in the supine position
+by the elicitation of posterior root-muscle (PRM) reflexes bilaterally in L2 to S2 innervated
+myotomes, i.e., in rectus femoris (RF), the hamstrings (Ham) muscle group, tibialis anterior
+(TA), and the triceps surae (TS) muscle group (Figure 1c). Afferent stimulation was verified by testing post-stimulation depression of the evoked responses with double pulses
+at interstimulus intervals of 30 ms and 50 ms [6,19,50,51]. At interstimulus intervals of
+100 ms, the responses typically showed partial recovery [39]. Across participants, the mean
+PRM-reflex threshold of the first muscle to respond ± SD was 53.9 ± 21.0 mA (per phase
+of the biphasic stimulation pulse), with a range of 30 mA to 110 mA.
+For the intervention, participants remained in the supine position, with additional
+pillows placed below their knee joints to avoid a completely extended position of the
+legs, which could exacerbate spasticity [18]. The stimulation mode was changed to the
+application of tonic stimulation at 50 Hz, a frequency chosen in accordance with previous
+studies that had used eSCS [52] and tSCS [19] to control spinal spasticity. The stimulation
+amplitude was slowly increased from 0 mA up to a target intensity of 90% of the PRM-reflex
+threshold and subsequently applied for 30 min [19].
+2.4. Electromyographic Recordings
+Surface-EMG activity was acquired bilaterally from RF, BF, TA, and TS with pairs of
+silver-silver chloride electrodes (Intec Medizintechnik GmbH, Klagenfurt, Austria), placed
+with an inter-electrode distance of 3 cm [34,50]. A common ground electrode was placed
+over the fibular head of the right leg. Abrasive paste (Nuprep, Weaver and Company,
+Aurora, CO, USA) was used for skin preparation to reduce EMG electrode resistance below
+5 kΩ. EMG signals were recorded using the Phoenix multichannel EMG system (EMSHandels GmbH, Korneuburg, Austria) set to a gain of 502 over a bandwidth of 10 Hz to
+1000 Hz and digitized at 2048 samples per second and channel. EMG data were additionally
+bandpass-filtered offline between 10 Hz and 1 kHz using a second order Butterworth filter
+(Matlab 2017b, The MathWorks, Inc., Natick, MA, USA).
+2.5. Data Analysis and Statistics
+Data were analyzed offline using Matlab 2017b (The Math-Works, Inc., Natick, MA,
+USA) and IBM SPSS Statistics 26.0 (IBM Corporation, Armonk, NY, USA). Assumptions of
+normality were tested using Shapiro-Wilk test. Datasets were transformed if necessary (log
+transformations). α-errors of p < 0.05 were considered significant. Descriptive statistics of
+all data were reported as median and interquartile range (IQR).
+The MAS-based evaluation of spastic hypertonia resulted in a single score per assessment, the MAS sum score [19]. This was calculated as the sum of the individual MAS
+scores gained from the twelve different movements tested on each side (with a value of
+1.5 for the 1+ scoring category) and could attain a maximum of 96. Individual scores were,
+0, no increase in muscle tone; 1, slight increase in muscle tone (catch and release or minimal
+resistance at the end of the range of motion, ROM); 1+, slight increase in muscle tone (catch
+and minimal resistance throughout the remaining ROM); 2, marked increase in muscle
+tone through most of the ROM; 3, considerable increase in muscle tone, passive movement
+difficult; and 4, affected part rigid in flexion or extension. Changes in individual MAS
+scores in the evaluations Inter and Long compared to Base were classified as clinically
+meaningful improvement if reduced by ≥ 1 [19,53,54]; as improvement if reduced by 0.5;
+unchanged; and increase. For the eleven ambulatory participants, relative improvements
+
+Brain Sci. 2021, 11, 472
+
+6 of 20
+
+of the MAS sum score in Inter compared to Base were additionally calculated and ranked
+from most (rank 1) to least improvement (rank 11).
+The times required to complete the timed 10-m walk test, the timed up-and-go test,
+as well as the first 20-m course length of the 2-min walk test were measured in each
+assessment. For the timed 10-m walk test, the walking speed was additionally calculated.
+For the 2-min walk test, the total distance covered was acquired. Relative improvements of
+the tests (10-m walk test, timed up-and-go test, time required for the first 20 m and distance
+covered in the 2-min walk test) in Inter compared to Base were calculated and ranked.
+Symmetry of lower limb loading during 30 s of upright standing with each foot on a
+separate force plate was assessed by obtaining the difference in average load (kg) per limb
+and normalizing this value to the body weight using the BioWareTM Biomechanical Software Analysis System (type 2812A1-20, KISTLER AG, Winterthur, Switzerland). Postural
+equilibrium during upright standing on a single force plate was assessed, separately for
+normal standing and Romberg’s test, each with eyes open and closed, by quantifying the
+movement of the center of pressure in anterior-posterior and medial-lateral dimensions
+(sway area) using the BioWareTM Biomechanical Software Analysis System.
+Data of the surface-EMG based assessment of spasticity were evaluated by calculating
+the total activity of the muscles of the examined lower extremity as the sum of the root
+mean square (RMS) values of the EMG of each muscle, calculated for the passive multi-joint
+movements from movement onset to offset and for the Achilles clonus and cutaneous-input
+evoked spasms during 3-s time windows following the onset of the respective stimuli [19].
+Additionally, the duration of clonus was measured from onset to the last detectable bout of
+EMG activity. For each of the three tests, mean EMG-RMS values and clonus durations,
+respectively, per assessment were obtained by averaging over the three repetitions per
+leg. For the eleven ambulatory participants, relative improvements of the tests (passive
+multi-joint movements, Achilles clonus and its duration, and spasms) were additionally
+calculated and ranked.
+The time to complete the nine-hole-peg test was measured and the mean value considering the two repetitions per side (four values) was obtained per assessment.
+The trunk control test assigned the following scores to each of the four items tested:
+0, if the participant was unable to perform the task; 12, if the participant performed the
+task, yet with non-muscular help, in an abnormal style, or using the arms for stabilization;
+and 25, if the participant completed the task without any assistance [55,56]. The total trunk
+control test score per assessment could range from 0 to 100.
+To test for carry-over effects of tSCS on the different outcome measures, separate
+linear mixed models with time point of evaluation (Base, Inter, and, if tested, Long) as fixed
+effect, and between subject differences as random effect, were run, thereby Base comprising
+assessments B1 and B2, and Inter comprising assessments I1 and I2. All post-hoc tests
+were Bonferroni corrected. Results of B1 and B2 as well as of I1 and I2 were additionally
+compared using separate Wilcoxon signed-rank tests. Effect sizes were reported by the
+partial eta-squared ( 2p ) for linear mixed models or by the correlation coefficient r. For the
+ambulatory participants, the ranked results of the walk tests were additionally correlated
+to their WISCI II scores (cf. Table 1) using Spearman’s rank correlation and to the ranked
+results of the tests assessing different presentations of spasticity (MAS sum score, passive
+multi-joint movement, Achilles clonus and its duration, and spasms) using Pearson’s
+correlation, respectively.
+3. Results
+Transcutaneous SCS at 50 Hz was applied for 30 min with a mean amplitude of
+47.6 ± 18.1 mA, ranging from 27 mA to 100 mA, and corresponding to 88.6% ± 4.6% of the
+PRM-reflex threshold. The stimulation was well tolerated by all participants. Nine of the
+16 participants reported the perception of paraesthesias (tingling sensations) in bilateral
+L2 to S2 innervated dermatomes during the intervention (Figure A1 in Appendix A) [19].
+No discomfort related to the stimulation was reported, nor was there any adverse event.
+
+3. Results
+
+Brain Sci. 2021, 11, 472
+
+Transcutaneous SCS at 50 Hz was applied for 30 min with a mean amplitude of 47.6
+± 18.1 mA, ranging from 27 mA to 100 mA, and corresponding to 88.6% ± 4.6% of the PRMreflex threshold. The stimulation was well tolerated by all participants. Nine of the 16
+7 ofL2
+20
+participants reported the perception of paraesthesias (tingling sensations) in bilateral
+to S2 innervated dermatomes during the intervention (Figure A1 in Appendix A) [19]. No
+discomfort related to the stimulation was reported, nor was there any adverse event. On
+the intervention day, which lasted ~5 h, the participants reported increasing levels of perOn the intervention day, which lasted ~5 h, the participants reported increasing levels of
+ceived fatigue (not systematically assessed). Compared to baseline, the intervention properceived fatigue (not systematically assessed). Compared to baseline, the intervention
+duced
+significant
+carry-over
+effects
+onon
+thethe
+individuals’
+spasticity,
+produced
+significant
+carry-over
+effects
+individuals’
+spasticity,walking
+walkingfunction,
+function,and,
+and,
+partially,
+on
+their
+standing
+ability.
+partially, on their standing ability.
+3.1.
+3.1. Results
+Results of
+ofCore
+Core Tests
+Tests
+3.1.1. MAS-Based
+MAS-Based Evaluation
+Evaluation of
+of Lower-Extremity
+Lower-Extremity Muscle
+Muscle Hypertonia
+3.1.1.
+Transcutaneous SCS
+improved
+lower-extremity
+muscle
+hypertonia,
+quanTranscutaneous
+SCSsignificantly
+significantly
+improved
+lower-extremity
+muscle
+hypertonia,
+tified basedbased
+on the
+sum score
+both intermediately
+as wellasaswell
+~24 as
+h post-intervention
+quantified
+onMAS
+the MAS
+sum score
+both intermediately
+~24 h post-inter(Figure 2a,
+Table2a,
+2).Table
+The linear
+mixed
+evaluation
+(Base, Inter,
+Long)
+as
+vention
+(Figure
+2). The
+linearmodel
+mixedrevealed
+model revealed
+evaluation
+(Base,
+Inter,
+2
+significant
+factor, F(2;54.121)
+= 14.698, p=<14.698,
+0.001, pp <= 0.001,
+0.352. ŋPost-hoc
+comparisons
+showed
+Long)
+as significant
+factor, F(2;54.121)
+= 0.352.
+Post-hoc comparia significant
+of thedecrease
+MAS sum
+fromsum
+Basescore
+to both
+Inter
+(p <to0.001)
+sons
+showeddecrease
+a significant
+of score
+the MAS
+from
+Base
+both and
+InterLong
+(p <
+(p = 0.007),
+with no
+difference
+between
+Inter andbetween
+Long (pInter
+= 1.000).
+partic0.001)
+and Long
+(p =statistical
+0.007), with
+no statistical
+difference
+and Per
+Long
+(p =
+ipant, MAS
+sum scoresMAS
+in Inter
+Base
+decreased
+median
+−4.13by(−median
+6.06 to
+1.000).
+Per participant,
+sumcompared
+scores in to
+Inter
+compared
+to by
+Base
+decreased
+−
+1.19)
+and
+in
+Long
+by
+−
+1.00
+(
+−
+6.87
+to
+0.13).
+Of
+all
+single
+MAS
+scores
+assessed
+in
+Inter,
+−4.13 (−6.06 to −1.19) and in Long by −1.00 (−6.87 to 0.13). Of all single MAS scores assessed
+37.3%
+were
+improved
+compared
+to
+Base,
+with
+6.0%
+rated
+as
+clinically
+meaningful
+improvein Inter, 37.3% were improved compared to Base, with 6.0% rated as clinically meaningful
+ment [19,53,54],
+54.2% were
+unchanged,
+and 8.6% and
+increased
+(Figure 2b).
+Of the2b).
+MAS
+improvement
+[19,53,54],
+54.2%
+were unchanged,
+8.6% increased
+(Figure
+Ofsum
+the
+scoressum
+obtained
+Long, 31.6%
+were31.6%
+improved,
+8.3% rated
+clinically
+meaningful
+MAS
+scoresinobtained
+in Long,
+were with
+improved,
+with as
+8.3%
+rated as
+clinically
+improvement,
+58.2% unchanged,
+and 10.0% increased.
+meaningful
+improvement,
+58.2% unchanged,
+and 10.0% increased.
+
+Figure
+Figure 2.
+2. Intermediate
+Intermediate and
+and longer-lasting
+longer-lasting carry-over
+carry-over effects
+effects of
+of transcutaneous
+transcutaneous spinal
+spinal cord
+cord stimulation
+stimulation on
+on the
+the Modified
+Modified
+Ashworth Scale (MAS)-based evaluation of lower-extremity muscle hypertonia. (a) Group results of (i) MAS sum scores
+Ashworth Scale (MAS)-based evaluation of lower-extremity muscle hypertonia. (a) Group results of (i) MAS sum scores
+obtained in Base, Inter, and Long; and (ii) changes in MAS sum scores per participant in Inter and Long compared to Base,
+obtained in Base, Inter, and Long; and (ii) changes in MAS sum scores per participant in Inter and Long compared
+illustrated by box plots. Bold horizontal lines within boxes are medians; boxes span the interquartile range. Whiskers
+to Base,toillustrated
+box
+plots.values
+Bold horizontal
+within
+boxes are
+boxes
+span the
+interquartile
+range.
+extend
+the lowestby
+and
+largest
+that are notlines
+outliers
+(illustrated
+asmedians;
+circles; see
+Methods).
+Brackets
+and asterisks
+Whiskers
+extend
+to
+the
+lowest
+and
+largest
+values
+that
+are
+not
+outliers
+(illustrated
+as
+circles;
+see
+Methods).
+Brackets
+and
+denote significant results of post-hoc pairwise comparisons (*, p < 0.05; **, p < 0.001). (b) Changes in individual MAS scores
+asterisks
+denote
+significant
+results
+of
+post-hoc
+pairwise
+comparisons
+(*,
+p
+<
+0.05;
+**,
+p
+<
+0.001).
+(b)
+Changes
+in
+individual
+(one score per movement, limb, and participant) in Inter and Long compared to Base. Stacked bar charts show percentage
+MAS
+scoresclassified
+(one score
+movement,
+limb, and
+participant)
+in Inter and
+compared
+to Base.
+Stacked
+bar charts
+of
+changes
+as per
+clinically
+meaningful
+improvement
+(reduction
+by ≥Long
+1; magenta
+sections
+of bars);
+improvement
+(reduction
+by 0.5;oflight
+magenta);
+unchanged
+(grey);
+and increase
+(black). Base,
+baseline
+comprising
+two
+asshow percentage
+changes
+classified
+as clinically
+meaningful
+improvement
+(reduction
+byevaluation
+≥ 1; magenta
+sections of
+bars);
+sessments
+conducted
+~24byh0.5;
+andlight
+immediately
+evaluation
+of intermediate
+comimprovement
+(reduction
+magenta); pre-intervention;
+unchanged (grey);Inter,
+and increase
+(black).
+Base, baselinecarry-over
+evaluationeffects
+comprising
+prising
+two assessments
+immediately
+two hourspre-intervention;
+post-intervention;
+Long,
+evaluation
+longer-lasting
+carry-over
+eftwo assessments
+conducted
+~24 h andand
+immediately
+Inter,
+evaluation
+of of
+intermediate
+carry-over
+effects
+fects conducted ~24 h after the stimulation session; MAS, Modified Ashworth Scale.
+comprising two assessments immediately and two hours post-intervention; Long, evaluation of longer-lasting carry-over
+effects conducted ~24 h after the stimulation session; MAS, Modified Ashworth Scale.
+Table 2. Group results of core tests.
+Test
+MAS sum score
+10mWT (s)
+
+Base
+
+Inter
+
+20.0
+(16.5 to 24.5)
+18.2
+(12.0 to 29.6)
+
+18.0
+(13.3 to 21.8)
+16.0
+(11.4 to 23.8)
+
+Range of Changes
+Base vs. Inter
+
+−11.5 to +3.5
+−14.6 to +1.3
+
+Long
+19.0
+(12.3 to 22.0)
+17.7
+(10.4 to 28.0)
+
+Range of Changes
+Base vs. Long
+
+−12.5 to +1.5
+−9.3 to +1.7
+
+Brain Sci. 2021, 11, 472
+
+8 of 20
+
+Table 2. Cont.
+Test
+10mWT (m/s)
+TUG (s)
+2minWT, distance (m)
+2minWT, first 20 m (s)
+
+Base
+
+Inter
+
+0.55
+(0.34 to 0.84)
+20.6
+(14.4 to 25.0)
+62.5
+(37.5 to 98.8)
+33.7
+(21.4 to 55.6)
+
+0.63
+(0.42 to 0.88)
+18.4
+(14.9 to 24.2)
+72.5
+(40.9 to 96.6)
+31.2
+(22.0 to 46.8)
+
+Range of Changes
+Base vs. Inter
+
+−0.04 to +0.20
+−12.1 to +1.5
+−4.8 to +29.0
+−25.1 to +0.7
+
+Long
+0.56
+(0.35 to 1.00)
+17.7
+(11.2 to 34.0)
+59.0
+(35.6 to 100.8)
+35.1
+(19.6 to 60.1)
+
+Range of Changes
+Base vs. Long
+
+−0.06 to +0.19
+−6.3 to +3.8
+−10.0 to +16.6
+−5.7 to +6.7
+
+Base, baseline evaluation comprising two assessments conducted ~24 h and immediately pre-intervention; Inter, evaluation of intermediate
+carry-over effects comprising two assessments immediately and two hours post-intervention; Long, evaluation of longer-lasting carry-over
+effects conducted ~24 h post-intervention; MAS, Modified Ashworth Scale; 2minWT, 2-min walk test; 10mWT, 10-m walk test; TUG, timed
+up-and-go test. Values are medians and interquartile ranges.
+
+3.1.2. Walk Tests
+Transcutaneous SCS intermediately decreased the times needed to walk 10 m and
+20 m as well as to complete the timed up-and-go test and increased the distance covered
+in two minutes (Figure 3, Table 2). All group results obtained in Inter, but not Long, were
+significantly improved compared to Base. The separate linear mixed model analyses revealed evaluation (Base, Inter, Long) as a significant factor; specifically, timed 10-m walk
+test, F(2;38.055) = 3.671, p = 0.035, 2p = 0.162; timed up-and-go test, F(2;35.136) = 5.201,
+p = 0.011, 2p = 0.228; 2-min walk test, time required to complete the first 20-m course
+length, F(2;36.059) = 6.894, p = 0.003, 2p = 0.277; and 2-min walk test, distance covered
+F(2;38.031) = 3.506, p = 0.040, 2p = 0.156. Post-hoc comparisons of Base vs. Inter demonstrated significantly reduced times to complete the timed 10-m walk test, p = 0.030; the
+timed up-and-go test, p = 0.008; and the first 20-m course length, p = 0.003; as well as
+significantly increased distances covered during the 2-min walk test, p = 0.036. None of the
+Base vs. Long or Inter vs. Long post-hoc comparisons were significant, timed 10-m walk
+test, Base vs. Long, p = 0.821; and Inter vs. Long, p = 1.000; timed up-and-go test, p = 1.000
+and p = 0.595; first 20-m course length, p = 1.000 and p = 0.101; distance covered during the
+2-min walk test, p = 0.630 and p = 1.000.
+When comparing the individual results obtained in Inter to those in Base (Figure 3d(i)),
+72.8% of the timed 10-m walk tests as well as of the timed up-and-go tests conducted across
+participants were improved. 45.5% showed clinically relevant improvements in the timed
+10-m walk test (walking speed increased by at least 0.05 m/s [57]), and 36.4% in the
+timed up-and-go test (time required to complete the test decreased by at least 15% [58,59]).
+Distances covered during the 2-min walk test were increased in 81.8%, with 36.4% showing
+clinically relevant improvements of at least 6.8 m [60]. Of all participants, the best results in
+Inter were obtained in participant 9 with an EDSS score of 6.5, who increased her walking
+speed in the timed 10-m walk test from 0.28 m/s to 0.49 m/s, reduced the time required to
+complete the timed up-and-go test from 31.4 s to 19.3 s, and increased the distance covered
+in the 2-min walk test from 31.5 m to 60.5 m.
+Across participants and walk tests, the ranked results of the walk tests correlated with
+the WISCI II scores, Spearman’s ρ = 0.317, p = 0.036. Individuals with WISCI II scores of
+13 (requiring a walker) and 16 (2 crutches) benefitted the most, while individuals with lower
+scores of 9 (walker and braces) and 12 (two crutches and braces) or higher scores of 19 (one
+cane) and 20 (no assistive device) showed less improvement. The ranked results of the walk
+tests correlated negatively with the ranked results of the tests assessing spasticity (MAS sum
+score, surface-EMG based evaluation), Pearson’s r = −0.422, p = 0.004. Hence, individuals
+with less improvement in walking performance had a stronger anti-spasticity effect.
+
+Brain Sci. 2021, 11, 472
+Brain Sci. 2021, 11, x FOR PEER REVIEW
+
+9 of 20
+9 of 20
+
+Figure 3.
+3. Intermediate
+Figure
+Intermediate and
+and longer-lasting
+longer-lasting carry-over
+carry-over effects
+effects of
+of transcutaneous
+transcutaneous spinal
+spinal cord
+cord stimulation
+stimulation on
+on walking
+walking function.
+function.
+Group
+results
+of
+the
+evaluations
+Base,
+Inter,
+and
+Long
+of
+(a)
+the
+timed
+10-m
+walk
+test;
+(b)
+the
+timed
+up-and-go
+test; and
+and
+Group results of the evaluations Base, Inter, and Long of (a) the timed 10-m walk test; (b) the timed up-and-go test;
+(c)
+(i)
+distance
+of
+the
+2-min
+walk
+test
+as
+well
+as
+(ii)
+time
+required
+to
+cover
+the
+first
+20-m
+course
+length,
+illustrated
+by
+box
+(c) (i) distance of the 2-min walk test as well as (ii) time required to cover the first 20-m course length, illustrated by box
+plots. Bold horizontal lines within boxes are medians; boxes span the interquartile range. Whiskers extend to the lowest
+plots. Bold horizontal lines within boxes are medians; boxes span the interquartile range. Whiskers extend to the lowest and
+and largest values that are not outliers (illustrated as circles; see Methods). Brackets and asterisks denote significant results
+largest values that are not outliers (illustrated as circles; see Methods). Brackets and asterisks denote significant results of
+of post-hoc pairwise comparisons (*, p < 0.05). (d) Individual changes in walk tests in (i) Inter and (ii) Long compared to
+post-hoc
+pairwise
+comparisons
+(*, p < 10-m
+0.05). meter
+(d) Individual
+in walk
+tests in
+(i) Inter and
+Longand
+compared
+to walk
+Base.
+Base. Stacked
+bar charts
+of the timed
+walk testchanges
+(10mWT),
+the timed
+up-and-go
+test (ii)
+(TUG)
+the 2-min
+Stacked
+bar charts
+of the
+timed 10-m
+meter walk
+test (10mWT),
+the relevant
+timed up-and-go
+test (TUG)
+and increase
+the 2-minofwalk
+test
+test (2minWT)
+show
+percentage
+of changes
+classified
+as clinically
+improvement
+(10mWT,
+walking
+(2minWT)
+percentage
+of changes
+classified
+as clinically
+relevant
+improvement
+(10mWT,
+increase
+of walking speed
+by
+speed by ≥show
+0.05 m/s;
+TUG, time
+reduced
+by ≥ 15%;
+and 2minWT,
+distance
+increased
+by ≥ 6.8
+m), improvement,
+and decrease.
+Base,TUG,
+baseline
+assessments
+conducted
+h and
+immediately
+pre-intervention;
+≥
+0.05 m/s;
+timeevaluation
+reduced bycomprising
+≥ 15%; andtwo
+2minWT,
+distance
+increased~24
+by ≥
+6.8 m),
+improvement,
+and decrease. Inter,
+Base,
+evaluation
+of intermediate
+carry-over
+effects comprising
+two
+assessments
+conducted
+immediately and
+two
+hours postbaseline
+evaluation
+comprising
+two assessments
+conducted
+~24
+h and immediately
+pre-intervention;
+Inter,
+evaluation
+of
+intervention;carry-over
+Long, evaluation
+of longer-lasting
+carry-over conducted
+effects conducted
+~24 h and
+post-intervention.
+intermediate
+effects comprising
+two assessments
+immediately
+two hours post-intervention; Long,
+evaluation of longer-lasting carry-over effects conducted ~24 h post-intervention.
+
+When comparing the individual results obtained in Inter to those in Base (Figure
+3d(i)),
+72.8%
+of the timed
+walk results
+tests asobtained
+well as of
+timed
+up-and-go
+tests
+conWhen
+comparing
+the 10-m
+individual
+in the
+Long
+to those
+obtained
+in Base
+ducted across
+showed
+clinically
+relevant
+(Figure
+3d(ii)), participants
+66.7% of the were
+timedimproved.
+10-m walk45.5%
+tests were
+improved,
+with
+55.6% improveshowing
+ments
+in therelevant
+timed 10-m
+walk test (walking
+speedup-and-go
+increased by
+at least
+0.05
+m/simproved,
+[57]), and
+a clinically
+improvement.
+Of the timed
+tests,
+57.1%
+were
+36.4%28.6%
+in the of
+timed
+up-and-go test (time
+torelevant.
+complete In
+the66.7%
+test decreased
+by atwalk
+least
+with
+the improvements
+beingrequired
+clinically
+of the 2-min
+tests,[58,59]).
+distances
+coveredcovered
+were increased,
+33.3%
+changes.
+all
+15%
+Distances
+during thewith
+2-min
+walkclinically
+test wererelevant
+increased
+in 81.8%,Ofwith
+participants,
+theclinically
+best results
+of the
+timed 10-m walk
+test and
+the[60].
+2-min
+walk
+test were
+36.4% showing
+relevant
+improvements
+of at least
+6.8 m
+Of all
+participants,
+obtained
+in participant
+4 (EDSS
+score in
+of participant
+6.0), who increased
+walking
+the
+best results
+in Inter were
+obtained
+9 with anhis
+EDSS
+score speed
+of 6.5, from
+who
+0.96 m/s to
+1.16
+m/s and
+the distance
+covered
+104.4
+to 121.0
+of them/s,
+timed
+increased
+her
+walking
+speed
+in the timed
+10-mfrom
+walk
+testm
+from
+0.28 m,
+m/sand
+to 0.49
+reup-and-go
+test
+in
+participant
+7
+(EDSS
+score
+of
+6.5),
+who
+reduced
+the
+time
+required
+from
+duced the time required to complete the timed up-and-go test from 31.4 s to 19.3 s, and
+23.8 s to 17.6
+increased
+thes.distance covered in the 2-min walk test from 31.5 m to 60.5 m.
+Across participants and walk tests, the ranked results of the walk tests correlated
+3.2. Results
+of Supplementary
+Tests
+with
+the WISCI
+II scores, Spearman’s
+ρ = 0.317, p = 0.036. Individuals with WISCI II scores
+3.2.1.
+Standing
+Tasks
+of 13 (requiring a walker) and 16 (2 crutches) benefitted the most, while individuals with
+SCS intermediately
+improved
+balance during
+normal
+eyes
+lowerTranscutaneous
+scores of 9 (walker
+and braces) and
+12 (two crutches
+and braces)
+or stance
+higherwith
+scores
+of
+open
+compared
+to
+B1,
+while
+no
+changes
+were
+observed
+in
+the
+other
+standing
+tasks
+(Figure
+4,
+19 (one cane) and 20 (no assistive device) showed less improvement. The ranked results
+Table
+Specifically,
+the areanegatively
+of posturalwith
+swaythe
+(Figure
+4a)results
+was significantly
+in spasInter
+of the3).
+walk
+tests correlated
+ranked
+of the testsreduced
+assessing
+compared
+B1 during
+normal standing
+with
+eyes open,Pearson’s
+F(1;16.146)
+15.700, pp == 0.004.
+0.001,
+ticity
+(MAStosum
+score, surface-EMG
+based
+evaluation),
+r ==−0.422,
+2 = 0.492, but neither during normal standing with eyes closed, F(1;17) = 0.791, p = 0.386,
+Hence,
+individuals with less improvement in walking performance had a stronger antip
+2 = 0.044, nor during Romberg’s test with eyes open, F(1;17) = 0.469, p = 0.503, 2 = 0.027,
+spasticity
+effect.
+p
+p
+2 = obtained
+WhenF(1;15.193)
+comparing=the
+individual
+results
+in
+Long
+to
+those
+obtained
+in Inter
+Base
+or closed,
+3.232,
+p = 0.092,
+0.175.
+No
+difference
+between
+B1
+and
+p
+(Figure 3d(ii)), 66.7% of the timed 10-m walk tests were improved, with 55.6% showing a
+
+3.2.1. Standing Tasks
+
+Brain Sci. 2021, 11, 472
+
+Transcutaneous SCS intermediately improved balance during normal stance with
+eyes open compared to B1, while no changes were observed in the other standing tasks
+(Figure 4, Table 3). Specifically, the area of postural sway (Figure 4a) was significantly
+10 of 20=
+reduced in Inter compared to B1 during normal standing with eyes open, F(1;16.146)
+15.700, p = 0.001, ŋ = 0.492, but neither during normal standing with eyes closed, F(1;17)
+= 0.791, p = 0.386, ŋ = 0.044, nor during Romberg’s test with eyes open, F(1;17) = 0.469, p
+= 0.503, ŋ = 0.027, or closed, F(1;15.193) = 3.232, p = 0.092, ŋ = 0.175. No difference bewas found for the weight distribution between lower extremities during 30 s of normal
+tween B1 and Inter was found for the weight distribution between lower extremities durstanding, F(1;24) = 0.031, p = 0.862, 2p = 0.001 (Figure 4b).
+ing 30 s of normal standing, F(1;24) = 0.031, p = 0.862, ŋ = 0.001 (Figure 4b).
+
+Figure4.4.Intermediate
+Intermediate carry-over
+carry-over effects
+effects of
+oftranscutaneous
+transcutaneous spinal
+spinal cord
+cord stimulation
+stimulation on
+on standing
+standing ability.
+ability. (a)
+(a) (i)
+(i)Trajectories
+Trajectories
+Figure
+of the center of pressure in anterior–posterior and medial–lateral directions recorded during 30 s of normal standing with
+of the center of pressure in anterior–posterior and medial–lateral directions recorded during 30 s of normal standing
+eyes open in B1 and assessments I1 and I2 of Inter; participant 10. Group results in B1 and Inter of postural sway during
+with eyes open in B1 and assessments I1 and I2 of Inter; participant 10. Group results in B1 and Inter of postural sway
+(ii) normal standing and (iii) Romberg’s test for 30 s with eyes open and eyes closed as indicated. (b) Difference in weight
+during
+(ii) normal
+standing
+and (iii)
+Romberg’s
+test
+for 30
+s with eyes
+open30and
+closed
+as indicated.
+(b)open
+Difference
+distribution
+(percentage
+of body
+weight)
+between
+lower
+extremities
+during
+s ofeyes
+normal
+standing
+with eyes
+shown
+in
+(percentage
+of body
+weight) between
+lower extremities
+during
+30 sevaluation;
+of normal standing
+with eyes
+forweight
+B1 anddistribution
+Inter. B1, baseline
+assessment
+conducted
+~24 h pre-intervention;
+Base,
+baseline
+Inter, evaluation
+of
+open
+shown for
+B1 and Inter.
+B1,
+baseline assessment
+conducted
+~24 h immediately
+pre-intervention;
+Base,
+baseline
+evaluation;
+Inter,
+intermediate
+carry-over
+effects
+comprising
+two assessments
+conducted
+(I1) and
+two
+hours (I2)
+post-intervenevaluation
+of intermediate
+assessments
+conducted
+(I1)
+and span
+two hours
+(I2)
+tion. All group
+results are carry-over
+illustrated effects
+by boxcomprising
+plots. Bold two
+horizontal
+lines within
+boxesimmediately
+are medians;
+boxes
+the interquartile range. Whiskers
+extend
+to the
+andby
+largest
+valuesBold
+thathorizontal
+are neitherlines
+outliers
+(illustrated
+circles) nor
+extreme
+post-intervention.
+All group
+results
+are lowest
+illustrated
+box plots.
+within
+boxes areasmedians;
+boxes
+span
+values
+(asterisks).
+Bracket
+and asterisk
+post-hoc
+comparisons
+(*, p < 0.05;
+p < 0.001).
+the
+interquartile
+range.
+Whiskers
+extenddenote
+to the significant
+lowest andresults
+largestof
+values
+thatpairwise
+are neither
+outliers (illustrated
+as**,
+circles)
+nor
+extreme values (asterisks). Bracket and asterisk denote significant results of post-hoc pairwise comparisons (*, p < 0.05;
+**, p < 0.001).
+Table 3. Group results of complementary tests.
+Standing Tasks
+
+B1
+
+Inter
+
+Normal stance, eyes open, sway area (cm2 )
+Normal stance, eyes closed, sway area (cm2 )
+Romberg’s test, eyes open, sway area (cm2 )
+Romberg’s test, eyes closed, sway area (cm2 )
+Diff. in weight dist. between lower extremities (%)
+
+11.0 (5.8 to 19.5)
+22.0 (9.5 to 56.0)
+18.0 (11.5 to 20.5)
+20.0 (12.5 to 28.5)
+8.5 (2.5 to 12.8)
+
+8.0 (4.3 to 10.4)
+22.5 (13.6 to 38.3)
+16.0 (10.6 to 23.8)
+33.0 (21.0 to 59.0)
+9.0 (3.5 to 13.9)
+
+Surface-EMG Based Evaluation of Spasticity
+
+B2
+
+Inter
+
+Passive multi-joint movement, EMG-RMS (µV)
+Achilles clonus, EMG-RMS (µV)
+Achilles clonus, duration (s)
+Muscle spasms, EMG-RMS (µV)
+
+30.5 (23.4 to 37.0)
+35.3 (25.9 to 45.9)
+1.5 (0.8 to 9.4)
+41.8 (29.6 to 73.6)
+
+26.8 (17.9 to 31.9)
+29.7 (23.0 to 36.2)
+0.9 (0.4 to 3.7)
+27.5 (18.8 to 43.8)
+
+B1, baseline assessment conducted ~24 h pre-intervention; B2, baseline assessment conducted immediately pre-intervention; diff., difference;
+dist., distribution; EMG, electromyography; Inter, evaluation of intermediate carry-over effects comprising two assessments immediately
+and two hours post-intervention; RMS, root mean square. Values are medians and interquartile ranges.
+
+3.2.2. EMG-Based Assessment of Lower-Extremity Spasticity
+Transcutaneous SCS significantly reduced lower-extremity muscle hypertonia, spasms,
+and duration of clonus assessed by means of surface-EMG (Figure 5, Table 3). EMG-RMS
+
+B1, baseline assessment conducted ~24 h pre-intervention; B2, baseline assessment conducted immediately pre-intervention; diff., difference; dist., distribution; EMG, electromyography; Inter, evaluation of intermediate carry-over effects comprising two assessments immediately and two hours post-intervention; RMS, root mean square. Values are medians and
+interquartile ranges.
+Brain Sci. 2021, 11, 472
+
+3.2.2. EMG-Based Assessment of Lower-Extremity Spasticity
+
+11 of 20
+
+Transcutaneous SCS significantly reduced lower-extremity muscle hypertonia,
+spasms, and duration of clonus assessed by means of surface-EMG (Figure 5, Table 3).
+EMG-RMS
+valueswith
+associated
+with tonic
+stretch
+reflexes
+elicited
+passive
+hip and
+knee
+values associated
+tonic stretch
+reflexes
+elicited
+by passive
+hipby
+and
+knee flexion
+and
+exflexion
+and
+extension
+movements,
+F(1;31)
+=
+10.684,
+p
+=
+0.003,
+ŋ
+=
+0.256,
+as
+well
+as
+associ2
+tension movements, F(1;31) = 10.684, p = 0.003, p = 0.256, as well as associated with spasms
+ated
+withby
+spasms
+inducedmechanical
+by non-noxious
+mechanical
+of the F(1;31)
+plantar=surface,
+induced
+non-noxious
+stimulation
+of thestimulation
+plantar surface,
+26.954,
+2
+F(1;31)
+= 26.954,
+p < 0.001,
+ŋsignificantly
+= 0.465, were
+significantly
+decreased
+from
+B2case
+to Inter.
+In the
+=
+0.465,
+were
+decreased
+from
+B2
+to
+Inter.
+In
+the
+of
+Achilles
+p < 0.001,
+p
+case
+of
+Achilles
+clonus,
+no
+effect
+on
+the
+EMG-RMS
+was
+detected,
+F(1;31)
+=
+3.305,
+p
+=
+0.079,
+2
+clonus, no effect on the EMG-RMS was detected, F(1;31) = 3.305, p = 0.079, p = 0.096,
+yet,
+ŋ = 0.096, yet, clonus duration was significantly reduced, F(1;31) = 11.317,
+p
+=
+0.002,
+ŋ =
+clonus duration was significantly reduced, F(1;31) = 11.317, p = 0.002, 2p = 0.267.
+0.267.
+
+Figure 5. Intermediate carry-over effects of transcutaneous spinal cord stimulation on various presentations of lowerFigure 5. Intermediate carry-over effects of transcutaneous spinal cord stimulation on various presentations of lowerextremity spasticity assessed with surface-electromyography. (a) Lower-extremity muscle activation through tonic stretch
+extremity spasticity assessed with surface-electromyography. (a) Lower-extremity muscle activation through tonic stretch
+reflexes during passive unilateral hip and knee flexion (flex.) and extension (ext.) movements. (i) Electromyographic (EMG)
+recordings derived from rectus femoris (RF), biceps femoris (BF), tibialis anterior (TA), and triceps surae (TS) in assessments
+B2 as well as I1 and I2; participant 2. (ii) Group results of the root mean square (RMS) values of the EMG in B2 and Inter.
+(b) Achilles clonus elicited by a brisk manual dorsiflexion. (i) EMG recordings of TS in B2 as well as I1 and I2; participant
+12. Arrows mark onsets of the tests. (ii) Group results of the EMG-RMS values (left) and clonus duration (right) in B2 and
+Inter. (c) Cutaneous-input evoked lower-extremity spasms. (i) EMG recordings of TA and TS in B2 as well as I1 and I2;
+participant 1. Arrows mark onsets of the tests. (ii) Group results of the EMG-RMS values in B2 and Inter. B2, baseline
+assessment conducted immediately pre-intervention; Base, baseline evaluation; Inter, evaluation of intermediate carry-over
+effects comprising two assessments immediately (I1) and two hours (I2) post-intervention. All group results are illustrated
+by box plots. Bold horizontal lines within boxes are medians; boxes span the interquartile range. Whiskers extend to the
+lowest and largest values that are not outliers (illustrated as circles; see Methods) or extreme values (asterisks). Brackets and
+asterisks denote significant results of post-hoc pairwise comparisons (*, p < 0.05).
+
+3.2.3. Timed Nine-Hole-Peg Test
+No statistical difference was detected between the times required to perform the ninehole-peg test in B2, 29.3 s (24.4 to 43.1 s), and Inter, 22.4 s (27.9 to 37.3 s), F(1;31) = 1.165,
+p = 0.289, 2p = 0.036.
+
+Brain Sci. 2021, 11, 472
+
+12 of 20
+
+3.2.4. Trunk Control Test
+Across participants, scores of the trunk control test remained unchanged from B2,
+87.0 (39.3 to 100.0), to Inter, 87.0 (42.5 to 100.0), F(1;31) = 2.067, p = 0.161, 2p = 0.063. Only
+two single score changes were observed, both in participant 8, who improved her scores in
+rolling to the weak and strong sides when lying supine from 12 in B2 to 25 in Inter.
+3.2.5. Comparisons between Assessments B1 and B2 and between Assessments I1 and I2
+None of the tests performed in B1 or in B2 demonstrated statistical differences
+(Table A1). Of the 16 tests performed in I1 and I2, the results of two, i.e., of the passive hip-and-knee flexion-extension segment of the EMG-based assessment as well as
+of Romberg’s test with eyes closed, differed statistically, with the respective values in I1
+further improved in I2 (Table A2).
+4. Discussion
+The intervention, 30 min of tSCS at 50 Hz with the targeted intensity, was successfully delivered to all 16 participants. The stimulation reduced lower-extremity muscle
+hypertonia, clinically determined by the MAS, both intermediately (0 to 2 h) as well as for
+24 h beyond its application. The intermediate alleviation was affirmed by the EMG-based
+evaluation of tonic stretch reflexes during imposed multi-joint movements. Measures of
+walking ability, including the assessment of walking speed by the 10-m walk test, mobility
+and fall risk by the timed up-and-go test, and fatigability by the 2-min walk test, were all
+improved in the intermediate term, but not for 24 h post-intervention. Individuals with
+greatest improvements in walking performance had comparatively less effect with regard
+to spasticity alleviation and vice versa. Supplementary tests demonstrated an intermediate
+decrease in postural sway during normal standing with eyes open, as well as a suppression of muscle spasms, and reduced clonus durations. No changes were found in the
+upper-extremity nine-hole-peg test nor in the trunk control test.
+Transcutaneous lumbar SCS was applied here analogously to previous studies investigating the neuromodulative effects on lower-extremity spasticity in individuals with
+SCI [17–19]. The dorso-ventral electrode montage generates currents through all intervening tissues, with partial current flow across the spine, permitted by the electrical
+conductivity of its ligaments and intervertebral discs [8,61]. A fraction of the total current
+is channeled through the vertebral canal, largely through the cerebrospinal fluid in which
+the spinal roots are immersed, while poorly penetrating the spinal cord [7]. Large- to
+medium-diameter proprioceptive and cutaneous fibers within the posterior roots have by
+far the lowest electrical excitation thresholds [11]. The target neural structures of tSCS are
+hence the same as those largely responsible for the initiation of motor effects by lumbar
+eSCS [5,6,10,50,62]. The sustained stimulation of lumbar and upper sacral afferent input
+structures during the intervention was corroborated by the elicitation of paraesthesias in
+distant dermatomes, here as well as in previous studies [18,19]. Perception of paraesthesias
+results from the electrical stimulation of A-beta/group II afferents from skin mechanoreceptors [63,64]. Hence, group I afferents with lager axon diameters and lower excitation
+thresholds must also have been recruited [65–67], likely in numbers insufficient to evoke
+reflex responses in the lower-extremities detectable by surface-EMG [68,69]. Neural activity
+in spinal and possibly supra-spinal circuits [70] are caused trans-synaptically by the tonic
+afferent inflow. While the specific circuits recruited remain to be elucidated, they may
+include last-order inhibitory interneurons [71], interneurons underlying the generation of
+spasms [72], and those potentiating coordinated motor pattern generation [13,15,73–75].
+To account for the carry-over effects, the triggered mechanisms must have temporarily
+altered the transmission through some of the circuits that were sustainedly activated for
+30 min [19]. Such persistent effects have been repeatedly reported with stimulation of
+afferents within peripheral nerves of the lower extremities [76–78] as well as with lumbar
+tSCS in SCI [18,19]. Yet, no study so far has specifically addressed memory mechanisms
+underlying the temporarily persisting spinal motor effects.
+
+Brain Sci. 2021, 11, 472
+
+13 of 20
+
+Inflammatory and neurodegenerative demyelination and atrophic processes that can
+affect white and gray matter at multiple regions of the CNS contribute to the pathology
+of MS [79]. Among the consequences are spasticity, muscle weakness, and the loss of
+fine coordination [80]. A primary, life-altering feature of MS that corresponds with the
+accumulation of CNS damage over time [81–83] is impaired walking function, affecting
+over 90% of individuals within ten years of diagnosis [30]. The walk tests conducted in
+the present study assessed different aspects of compromised ambulation in MS [84], i.e.,
+walking speed over short distances by the 10-m walk test [85,86], endurance by the 2-min
+walk test [87], and independent functional mobility by the timed up-and-go test [41]. The
+intervention significantly improved all walk tests across participants in the intermediate
+term–despite increasing levels of perceived fatigue during the course of the intervention
+day. Neurological disability of the eleven ambulatory participants, when classified based
+on EDSS scores [83,84], was mild in one participant (EDSS score of 3.5), moderate in two
+(5.0), and severe in eight (6.0 and 6.5). Remarkably, across participants, the best ranked
+results of all walk tests, both in the evaluation of intermediate and longer-lasting effects,
+were achieved in individuals with severe disability related to MS. The detected statistical
+correlation between WISCI II scores [38] and ranked results of the walk tests may hint at
+the necessity for a critical residual walking ability to be present for the intervention to be
+effective, while WISCI II scores of 19 and 20 may leave less space for further intermediate
+improvement [15]. Notably, within the group of eight individuals with severe disability,
+WISCI II scores showed a wide range from 9 (walker and braces) to 19 (one cane). A
+priori identification of treatment responders may still remain challenging [70] because of
+differences in the individual pathophysiology of MS, including affected CNS sites, even
+with same EDSS and WISCI II scores. Importantly, individuals with the best improvements
+in walking performance were lower ranked with respect to improvements in spasticity,
+implying that partially different mechanisms were engaged in the movement-enhancing
+and the anti-spasticity effects of tSCS.
+The intermediate carry-over effects on lower-extremity spasticity in the present study
+were reminiscent of those previously demonstrated in individuals with SCI [17–19]. The
+complementary tests employed here assessed different presentations of spasticity, i.e.,
+hypertonia, clonus, and muscle spasms that are associated with the altered activity of
+partially distinct spinal circuits [88]. The exaggerated activation of muscles to externally
+imposed stretch results from adaptive changes of spinal neural networks and intrinsic
+properties in spinal motoneurons following chronic lesions to descending spinal pathways.
+These changes result in a decrease in presynaptic inhibition of Ia terminals [89], reduced
+homosynaptic depression in the stretch–reflex pathways [90,91], and a reduced strength
+of post-synaptic inhibition [92,93]. Partially different mechanisms may be involved in
+the generation of clonus. It is generally assumed that a reduction in motoneuron firing
+thresholds and re-excitation of stretch reflexes results in the sustained oscillations typically
+occurring at 5 Hz to 8 Hz [94], while the involvement of a spinal central oscillator was also
+suggested [95,96]. Contradictory findings exist about the level to which afferent inputs may
+interfere with clonus [95–97]. Spasms are characterized by their preferential elicitation by
+cutaneous rather than muscle afferent inputs, their long durations, and complex activation
+patterns across multiple muscles. Animal models of SCI and human studies have suggested
+an essential role of enhanced activation of persistent inward currents in motoneurons,
+secondary to the chronic loss of serotonergic innervation, resulting in plateau potentials
+and self-sustained firing [98–100]. Recent studies in mice have demonstrated that the
+activation of premotor spinal circuits including locomotor-related excitatory interneurons
+are essentially contributing to the generation of spasms in chronic SCI [72,101]. Given the
+rich afferent spinal projections, the multi-segmental input generated by tSCS may interact
+with any of these targets involved in spasticity [19,72,102–104].
+Early studies using chronic mid-thoracic eSCS in individuals with MS had reported
+striking effects on upper extremity function, including improved fine hand coordination [21,23]. In a recent study, six weeks of repetitively applied lumbar tSCS in an individ-
+
+Brain Sci. 2021, 11, 472
+
+14 of 20
+
+ual with incomplete cervical SCI improved manual dexterity [19]. Such effects could be
+mediated via long propriospinal pathways that couple the lumbar spinal cord with the
+cervical enlargement, or via facilitation of supraspinal circuits by activity in ascending
+tracts supplied by the stimulated lumbar posterior roots [105–107]. We had hence included
+the timed nine-hole-peg test in our protocol despite the discrepancy between the site of
+stimulation over the lumbar spinal cord and the spinal segments innervating the upper extremities. A possible explanation for the lack of changes in manual dexterity here could be
+that such secondary effects would have required repetitive applications of the intervention.
+The study protocol comprised two baseline assessments conducted on consecutive
+days to account for spontaneous variations in spasticity and walking function [108,109].
+Across participants, all measures obtained in the two assessments were stable, with no
+statistical differences detected. In order to minimize the overall strain introduced by the duration of the comprehensive evaluations, not all of the supplementary tests were conducted
+in both baseline assessments and in the assessment conducted 24 h post-intervention.
+Yet, for each measure, the comparison between baseline and intermediate conditions was
+secured. The absence of effects on distant upper extremity motor function suggests that
+a placebo effect or motivation alone did not play a predominant causative role in the
+improvements seen in walking performance and lower-extremity spasticity. The lack of
+changes in the trunk control test could be related to its relatively coarse rating scales, which
+may have resulted in information loss.
+5. Conclusions
+Given the profound heterogeneity in the pathophysiology of MS, its clinical course,
+and responsiveness to a particular treatment [110], a critical area for future research will
+be the prediction of responders to electrical neuromodulation of the spinal cord and
+to investigate whether attainable effects could be further augmented by personalized
+stimulation settings [111]. Even before these points will have been ultimately addressed,
+tSCS, as a non-invasive and clinically accessible method without known side effects that
+holds the potential for substantial clinical improvement in treatment responders, can be
+readily applied across the disability spectrum of MS. Responders could further benefit from
+regular tSCS application over a longer period of time, even in a home-based setting [19].
+Author Contributions: Conceptualization, U.S.H., B.F., and H.B.; methodology, U.S.H. and B.F.;
+validation, U.S.H. and B.F.; formal analysis, U.S.H.; resources, B.F., H.B., and P.L.; data curation,
+B.F. and U.S.H.; writing—original draft preparation, U.S.H.; writing—review and editing, U.S.H.;
+visualization, U.S.H.; supervision, B.F., H.B., and P.L.; project administration, B.F. and U.S.H.; funding acquisition, U.S.H. and H.B. All authors have read and agreed to the published version of
+the manuscript.
+Funding: The study was supported by the Austrian Society for Neurorehabilitation (OeGNR).
+Institutional Review Board Statement: The study was approved by the Ethics Committee of the
+City of Vienna (EK 17-186-1017).
+Informed Consent Statement: All participants signed written informed consent prior to their enrollment into the study.
+Data Availability Statement: The data presented in this study are available in the article.
+Acknowledgments: Open Access Funding by the Austrian Society for Neurorehabilitation (OeGNR).
+Conflicts of Interest: The authors declare no conflict of interest.
+
+Informed Consent Statement: All participants signed written informed consent prior to their enrollment into the study.
+Data Availability Statement: The data presented in this study are available in the article.
+Brain Sci. 2021, 11, 472
+
+15 of 20
+Acknowledgments: Open Access Funding by the Austrian Society for Neurorehabilitation
+(OeGNR).
+
+Conflicts of Interest: The authors declare no conflict of interest.
+
+Appendix A
+Appendix A
+
+Figure A1. Verification of afferent fiber stimulation during transcutaneous spinal cord stimulation at 50 Hz by the elicitaFigure A1. Verification of afferent fiber stimulation during transcutaneous spinal cord stimulation at 50 Hz by the elicitation
+tion of paraesthesias in L2 to S2 innervated lower-extremity dermatomes. Exemplary distribution of paraesthesias (shaded
+of
+paraesthesias
+in L2
+S2 innervated
+lower-extremity
+areas)
+as perceived
+by to
+participants
+1, 5, and
+10 during thedermatomes.
+intervention.Exemplary distribution of paraesthesias (shaded
+areas) as perceived by participants 1, 5, and 10 during the intervention.
+Table A1. Group results and statistical comparisons of tests conducted in assessments B1 and B2.
+Table A1. Group results and statistical comparisons of tests conducted in assessments B1 and B2.
+Test
+B1
+B2
+Wilcoxon Signed Rank Test
+MASTest
+sum score
+20.0 (16.0B1
+to 24.5)
+20.8 (18.3 to 25.5)
+Z = −1.230,
+p = 0.219,
+r = Rank
+0.318 Test
+B2
+Wilcoxon
+Signed
+10mWT
+(s)
+19.3
+(10.5
+to
+30.0)
+17.2
+(12.1
+to
+31.4)
+Z
+=
+−0.533,
+p
+=0.594,
+r
+=
+0.178
+MAS sum score
+20.0 (16.0 to 24.5)
+20.8 (18.3 to 25.5)
+Z = −1.230, p = 0.219, r = 0.318
+TUG (s)
+20.4
+20.6 (14.4
+to 30.1)
+Z = −1.400,
+p = 0.161,
+r = 0.495
+10mWT
+(s)
+19.3(14.4
+(10.5toto24.7)
+30.0)
+17.2
+(12.1 to 31.4)
+Z = −0.533,
+p = 0.594,
+r = 0.178
+2minWT,
+distance
+(m)
+59.0
+(33.5
+to
+98.5)
+66.0
+(37.0
+to
+100.0)
+Z
+=
+−1.599,
+p
+=
+0.110,
+r
+= 0.533
+TUG (s)
+20.4 (14.4 to 24.7)
+20.6 (14.4 to 30.1)
+Z = −1.400, p = 0.161,
+r = 0.495
+2minWT,distance
+first 20 (m)
+m (s)
+33.2
+33.7 (20.2
+to (37.0
+58.5) to 100.0)
+Z =−0.845,
+p = 0.398,
+r = 0.299
+2minWT,
+59.0(23.5
+(33.5toto48.4)
+98.5)
+66.0
+Z = −1.599,
+p = 0.110,
+r = 0.533
+2minWT,
+firstassessment
+20 m (s) conducted 33.2
+to 48.4)
+33.7assessment
+(20.2 to 58.5)
+Z = −0.845, p pre-interven= 0.398, r = 0.299
+B1, baseline
+~24 h(23.5
+pre-intervention;
+B2, baseline
+conducted immediately
+tion.
+MAS,assessment
+Modifiedconducted
+Ashworth
+2minWT, 2-min
+walkassessment
+test; 10mWT,
+10-mimmediately
+walk test; pre-intervention.
+TUG, timed up-and-go
+test.
+B1,
+baseline
+~24Scale;
+h pre-intervention;
+B2, baseline
+conducted
+MAS, Modified
+Values are
+medians
+and
+interquartile
+ranges.10-m walk test; TUG, timed up-and-go test. Values are medians and interquartile ranges.
+Ashworth
+Scale;
+2minWT,
+2-min
+walk test; 10mWT,
+Table
+Table A2.
+A2. Group
+Group results
+results and
+and statistical
+statistical comparisons
+comparisons of
+oftests
+tests conducted
+conductedin
+inassessments
+assessmentsI1
+I1and
+andI2.
+I2.
+
+Test
+B1
+B2
+Wilcoxon
+Signed
+RankRank
+Test Test
+Test
+B1
+B2
+Wilcoxon
+Signed
+MAS sum score
+18.3 (13.3 to 23.9)
+17.5 (13.3 to 19.4)
+Z = −0.910, p = 0.363, r = 0.228
+MAS sum score
+18.3 (13.3 to 23.9)
+17.5 (13.3 to 19.4)
+Z = −0.910, p = 0.363, r = 0.228
+10mWT 10mWT
+(s)
+16.0 (12.7 to 23.3)
+(11.4 to 25.3)
+p = 0.075,
+r = 0.536
+(s)
+16.0 (12.7 to16.0
+23.3)
+16.0 (11.4 to 25.3) Z = −1.778,
+Z = −1.778,
+p = 0.075,
+r = 0.536
+TUG (s) TUG (s)
+18.6 (15.3 to 23.9)
+18.3
+(13.8
+to
+25.3)
+Z
+=
+−0.089,
+p
+=
+0.929,
+r = 0.027
+18.6 (15.3 to 23.9)
+18.3 (13.8 to 25.3)
+Z = −0.089, p = 0.929,
+r = 0.027
+2minWT,2minWT,
+distancedistance
+(m)
+(40.5 to 100.0)
+p = 0.449,
+r = 0.228
+(m) 73.0 (41.0 to 95.5)
+73.0 (41.0 to72.0
+95.5)
+72.0 (40.5 to 100.0)Z = −0.756,
+Z = −0.756,
+p = 0.449,
+r = 0.228
+first
+31.0 (22.5 to31.4
+43.6)
+31.4 (20.5 to 49.8) Z =Z−0.663,
+= −0.663,
+p = 0.508,
+2minWT,2minWT,
+first 20 m
+(s) 20 m (s) 31.0 (22.5 to 43.6)
+(20.5 to 49.8)
+p = 0.508,
+r = 0.r = 0.000
+27.1 (21.0 to 31.9)
+23.9 (16.3 to 31.1)
+Z = −2.224, p = 0.026, r = 0.556
+Passive multi-joint movement, EMG-RMS (µV)
+27.1 (21.0 to 31.9)
+(16.3 to 31.1)
+p = 0.026,
+r = 0.556
+Achilles clonus,
+30.0 (25.5 to23.9
+36.4)
+29.7 (16.7 to 36.2) Z = −2.224,
+Z = −1.190,
+p = 0.234,
+r = 0.298
+EMG-RMS
+(µV) EMG-RMS (µV)
+Achilles
+clonus, duration
+(s)30.0 (25.5 to 36.4) 0.9 (0.5 to 29.7
+4.4) (16.7 to 36.2)
+0.9 (0.4 to 3.7) Z = −1.190,
+Z = −1.138,
+p = 0.255,
+r = 0.285
+Achilles clonus,
+EMG-RMS
+(µV)
+p = 0.234,
+r = 0.298
+Spasms, EMG-RMS (µV)
+27.3 (21.6 to 46.9)
+31.7 (17.8 to 43.8)
+Z = −0.879, p = 0.379, r = 0.220
+8.1 (4.1 to 11.1)
+7.3 (4.3 to 10.4)
+Z = −0.422, p = 0.673, r = 0.149
+Normal stance, eyes open, postural sway (cm2 )
+23.0 (7.2 to 41.0)
+22.0 (19.0 to 35.0)
+Z = −0.652, p = 0.515, r = 0.217
+Normal stance, eyes closed, postural sway (cm2 )
+16.0 (9.5 to 24.5)
+16.0 (21.1 to 23.0)
+Z = −0.059, p = 0.953, r = 0.020
+Romberg’s test, eyes open, postural sway (cm2 )
+33.5 (23.8 to 67.3)
+23.0 (15.2 to 54.5)
+Z = −2.313, p = 0.021, r = 0.818
+Romberg’s test, eyes closed, postural sway (cm2 )
+Normal stance, eyes open, load difference (%)
+10.0 (4.5 to 16.6)
+8.0 (3.0 to 12.5)
+Z = −0.845, p = 0.398, r = 0.282
+Timed nine-hole-peg test (s)
+30.2 (22.6 to 37.3)
+27.4 (21.6 to 37.4)
+Z = −1.113, p = 0.266, r = 0.278
+Trunk control test
+87.0 (42.5 to 100.0)
+87.0 (42.5 to 100.0)
+Z = 0.000, p = 1.000, r = 0.000
+EMG, electromyography; I1, assessment of intermediate carry-over effects conducted immediately post-intervention; I2, assessment of
+intermediate carry-over effects conducted two hours post-intervention; MAS, Modified Ashworth Scale; RMS, root mean square; 2minWT,
+2-min walk test; 10mWT, 10-m walk test; TUG, timed up-and-go test. Values are medians and interquartile ranges.
+
+Brain Sci. 2021, 11, 472
+
+16 of 20
+
+References
+1.
+
+2.
+3.
+4.
+
+5.
+
+6.
+7.
+
+8.
+9.
+10.
+
+11.
+12.
+13.
+
+14.
+
+15.
+
+16.
+17.
+18.
+19.
+
+20.
+21.
+22.
+23.
+24.
+25.
+
+Harkema, S.; Gerasimenko, Y.; Hodes, J.; Burdick, J.; Angeli, C.; Chen, Y.; Ferreira, C.; Willhite, A.; Rejc, E.; Grossman, R.G.; et al.
+Effect of epidural stimulation of the lumbosacral spinal cord on voluntary movement, standing, and assisted stepping after motor
+complete paraplegia: A case study. Lancet 2011, 377, 1938–1947. [CrossRef]
+Angeli, C.A.; Edgerton, V.R.; Gerasimenko, Y.P.; Harkema, S.J. Altering spinal cord excitability enables voluntary movements
+after chronic complete paralysis in humans. Brain 2014, 137, 1394–1409. [CrossRef] [PubMed]
+Angeli, C.A.; Boakye, M.; Morton, R.A.; Vogt, J.; Benton, K.; Chen, Y.; Ferreira, C.K.; Harkema, S.J. Recovery of Over-Ground
+Walking after Chronic Motor Complete Spinal Cord Injury. N. Engl. J. Med. 2018, 379, 1244–1250. [CrossRef]
+Gill, M.L.; Grahn, P.J.; Calvert, J.S.; Linde, M.B.; Lavrov, I.A.; Strommen, J.A.; Beck, L.A.; Sayenko, D.G.; Van Straaten, M.G.;
+Drubach, D.I.; et al. Neuromodulation of lumbosacral spinal networks enables independent stepping after complete paraplegia.
+Nat. Med. 2018, 24, 1677–1682. [CrossRef] [PubMed]
+Wagner, F.B.; Mignardot, J.-B.; Le Goff-Mignardot, C.G.; Demesmaeker, R.; Komi, S.; Capogrosso, M.; Rowald, A.; Seáñez, I.;
+Caban, M.; Pirondini, E.; et al. Targeted neurotechnology restores walking in humans with spinal cord injury. Nature 2018, 563,
+65–71. [CrossRef]
+Minassian, K.; Persy, I.; Rattay, F.; Dimitrijevic, M.R.; Hofer, C.; Kern, H. Posterior root-muscle reflexes elicited by transcutaneous
+stimulation of the human lumbosacral cord. Muscle Nerve 2007, 35, 327–336. [CrossRef] [PubMed]
+Ladenbauer, J.; Minassian, K.; Hofstoetter, U.S.; Dimitrijevic, M.R.; Rattay, F. Stimulation of the human lumbar spinal cord
+with implanted and surface electrodes: A computer simulation study. IEEE Trans. Neural Syst. Rehabil. Eng. 2010, 18, 637–645.
+[CrossRef] [PubMed]
+Hofstoetter, U.S.; Danner, S.M.; Minassian, K. Paraspinal Magnetic and Transcutaneous Electrical Stimulation. In Encyclopedia of
+Computational Neuroscience; Jaeger, D., Jung, R., Eds.; Springer: New York, NY, USA, 2014; pp. 1–21.
+Rattay, F.; Minassian, K.; Dimitrijevic, M.R. Epidural electrical stimulation of posterior structures of the human lumbosacral cord:
+2. quantitative analysis by computer modeling. Spinal Cord 2000, 38, 473–489. [CrossRef]
+Capogrosso, M.; Wenger, N.; Raspopovic, S.; Musienko, P.; Beauparlant, J.; Bassi Luciani, L.; Courtine, G.; Micera, S. A
+computational model for epidural electrical stimulation of spinal sensorimotor circuits. J. Neurosci. Off. J. Soc. Neurosci. 2013, 33,
+19326–19340. [CrossRef] [PubMed]
+Danner, S.M.; Hofstoetter, U.S.; Ladenbauer, J.; Rattay, F.; Minassian, K. Can the human lumbar posterior columns be stimulated
+by transcutaneous spinal cord stimulation? A modeling study. Artif. Organs 2011, 35, 257–262. [CrossRef]
+Hofstoetter, U.S.; Perret, I.; Bayart, A.; Lackner, P.; Binder, H.; Freundl, B.; Minassian, K. Spinal motor mapping by epidural
+stimulation of lumbosacral posterior roots in humans. iScience 2020, 24, 101930. [CrossRef] [PubMed]
+Hofstoetter, U.S.; Krenn, M.; Danner, S.M.; Hofer, C.; Kern, H.; McKay, W.B.; Mayr, W.; Minassian, K. Augmentation of Voluntary
+Locomotor Activity by Transcutaneous Spinal Cord Stimulation in Motor-Incomplete Spinal Cord-Injured Individuals. Artif.
+Organs 2015, 39, E176–E186. [CrossRef] [PubMed]
+Calvert, J.S.; Grahn, P.J.; Strommen, J.A.; Lavrov, I.A.; Beck, L.A.; Gill, M.L.; Linde, M.B.; Brown, D.A.; Van Straaten, M.G.; Veith,
+D.D.; et al. Electrophysiological Guidance of Epidural Electrode Array Implantation over the Human Lumbosacral Spinal Cord
+to Enable Motor Function after Chronic Paralysis. J. Neurotrauma 2019, 36, 1451–1460. [CrossRef] [PubMed]
+Meyer, C.; Hofstoetter, U.S.; Hubli, M.; Hassani, R.H.; Rinaldo, C.; Curt, A.; Bolliger, M. Immediate Effects of Transcutaneous
+Spinal Cord Stimulation on Motor Function in Chronic, Sensorimotor Incomplete Spinal Cord Injury. J. Clin. Med. 2020, 9, 3541.
+[CrossRef]
+Al’joboori, Y.; Massey, S.J.; Knight, S.L.; Donaldson, N.D.; Duffell, L.D. The Effects of Adding Transcutaneous Spinal Cord
+Stimulation (tSCS) to Sit-To-Stand Training in People with Spinal Cord Injury: A Pilot Study. J. Clin. Med. 2020, 9, 2765. [CrossRef]
+Hofstoetter, U.S.; McKay, W.B.; Tansey, K.E.; Mayr, W.; Kern, H.; Minassian, K. Modification of spasticity by transcutaneous spinal
+cord stimulation in individuals with incomplete spinal cord injury. J. Spinal Cord Med. 2014, 37, 202–211. [CrossRef]
+Estes, S.P.; Iddings, J.A.; Field-Fote, E.C. Priming Neural Circuits to Modulate Spinal Reflex Excitability. Front. Neurol. 2017, 8, 17.
+[CrossRef]
+Hofstoetter, U.S.; Freundl, B.; Danner, S.M.; Krenn, M.J.; Mayr, W.; Binder, H.; Minassian, K. Transcutaneous Spinal Cord
+Stimulation Induces Temporary Attenuation of Spasticity in Individuals with Spinal Cord Injury. J. Neurotrauma 2020, 37, 481–493.
+[CrossRef]
+Danner, S.M.; Krenn, M.; Hofstoetter, U.S.; Toth, A.; Mayr, W.; Minassian, K. Body Position Influences Which Neural Structures
+Are Recruited by Lumbar Transcutaneous Spinal Cord Stimulation. PLoS ONE 2016, 11, e0147479. [CrossRef]
+Cook, A.W.; Weinstein, S.P. Chronic dorsal column stimulation in multiple sclerosis. Preliminary report. N. Y. State J. Med. 1973,
+73, 2868–2872.
+Siegfried, J.; Lazorthes, Y.; Broggi, G. Electrical spinal cord stimulation for spastic movement disorders. Appl. Neurophysiol. 1981,
+44, 77–92. [CrossRef]
+Cook, A.W. Electrical stimulation in multiple sclerosis. Hosp. Pract. 1976, 11, 51–58. [CrossRef]
+Illis, L.S.; Oygar, A.E.; Sedgwick, E.M.; Awadalla, M.A. Dorsal-column stimulation in the rehabilitation of patients with multiple
+sclerosis. Lancet 1976, 1, 1383–1386. [CrossRef]
+Dooley, D.M.; Sharkey, J. Electrostimulation of the nervous system for patients with demyelinating and degenerative diseases of
+the nervous system and vascular diseases of the extremities. Appl. Neurophysiol. 1977, 40, 208–217. [CrossRef]
+
+Brain Sci. 2021, 11, 472
+
+26.
+27.
+28.
+29.
+30.
+31.
+32.
+33.
+34.
+35.
+36.
+37.
+38.
+
+39.
+
+40.
+41.
+42.
+43.
+
+44.
+45.
+46.
+47.
+48.
+49.
+50.
+51.
+52.
+53.
+
+17 of 20
+
+Illis, L.S.; Sedgwick, E.M.; Tallis, R.C. Spinal cord stimulation in multiple sclerosis: Clinical results. J. Neurol. Neurosurg. Psychiatry
+1980, 43, 1–14. [CrossRef] [PubMed]
+Waltz, J.M. Chronic stimulation for motor disorders. In Textbook for Stereotactic and Functional Neurosurgery; Gindelberg, P., Tasker,
+R., Eds.; McGraw-Hill: New York, NY, USA, 1998; pp. 1087–1099.
+Barnes, M.P.; Kent, R.M.; Semlyen, J.K.; McMullen, K.M. Spasticity in Multiple Sclerosis. Neurorehabil. Neural Repair 2003, 17,
+66–70. [CrossRef]
+Rizzo, M.A.; Hadjimichael, O.C.; Preiningerova, J.; Vollmer, T.L. Prevalence and treatment of spasticity reported by multiple
+sclerosis patients. Mult. Scler. J. 2004, 10, 589–595. [CrossRef] [PubMed]
+Van Asch, P. Impact of Mobility Impairment in Multiple Sclerosis 2—Patients’ Perspectives. Eur. Neurol. Rev. 2011, 6, 115.
+[CrossRef]
+Minassian, K.; Hofstoetter, U.; Tansey, K.; Mayr, W. Neuromodulation of lower limb motor control in restorative neurology. Clin.
+Neurol. Neurosurg. 2012, 114, 489–497. [CrossRef]
+Kurtzke, J.F. Rating neurologic impairment in multiple sclerosis: An expanded disability status scale (EDSS). Neurology 1983,
+33, 1444. [CrossRef] [PubMed]
+Bohannon, R.W.; Smith, M.B. Interrater reliability of a modified Ashworth scale of muscle spasticity. Phys. Ther. 1987, 67, 206–207.
+[CrossRef] [PubMed]
+Sherwood, A.M.; McKay, W.B.; Dimitrijević, M.R. Motor control after spinal cord injury: Assessment using surface EMG. Muscle
+Nerve 1996, 19, 966–979. [CrossRef]
+Sherwood, A.M.; Graves, D.E.; Priebe, M.M. Altered motor control and spasticity after spinal cord injury: Subjective and objective
+assessment. J. Rehabil. Res. Dev. 2000, 37, 41–52.
+Kirshblum, S.; Waring, W. Updates for the International Standards for Neurological Classification of Spinal Cord Injury. Phys.
+Med. Rehabil. Clin. N. Am. 2014, 25, 505–517. [CrossRef]
+Morganti, B.; Scivoletto, G.; Ditunno, P.; Ditunno, J.F.; Molinari, M. Walking index for spinal cord injury (WISCI): Criterion
+validation. Spinal Cord 2005, 43, 27–33. [CrossRef] [PubMed]
+Ditunno, J.F.; Ditunno, P.L.; Scivoletto, G.; Patrick, M.; Dijkers, M.; Barbeau, H.; Burns, A.S.; Marino, R.J.; Schmidt-Read, M. The
+Walking Index for Spinal Cord Injury (WISCI/WISCI II): Nature, metric properties, use and misuse. Spinal Cord 2013, 51, 346–355.
+[CrossRef]
+Hofstoetter, U.S.; Freundl, B.; Binder, H.; Minassian, K. Recovery cycles of posterior root-muscle reflexes evoked by transcutaneous
+spinal cord stimulation and of the H reflex in individuals with intact and injured spinal cord. PLoS ONE 2019, 14, e0227057.
+[CrossRef] [PubMed]
+Mathias, S.; Nayak, U.S.; Isaacs, B. Balance in elderly patients: The “get-up and go” test. Arch. Phys. Med. Rehabil. 1986, 67,
+387–389.
+Sebastião, E.; Sandroff, B.M.; Learmonth, Y.C.; Motl, R.W. Validity of the Timed Up and Go Test as a Measure of Functional
+Mobility in Persons With Multiple Sclerosis. Arch. Phys. Med. Rehabil. 2016, 97, 1072–1077. [CrossRef]
+Kempen, J.; de Groot, V.; Knol, D.; Polman, C.; Lankhorst, G.; Beckerman, H. Community walking can be assessed using a
+10-metre timed walk test. Mult. Scler. J. 2011, 17, 980–990. [CrossRef] [PubMed]
+Scalzitti, D.A.; Harwood, K.J.; Maring, J.R.; Leach, S.J.; Ruckert, E.A.; Costello, E. Validation of the 2-Minute Walk Test with
+the 6-Minute Walk Test and Other Functional Measures in Persons with Multiple Sclerosis. Int. J. MS Care 2018, 20, 158–163.
+[CrossRef]
+Gijbels, D.; Eijnde, B.; Feys, P. Comparison of the 2- and 6-minute walk test in multiple sclerosis. Mult. Scler. J. 2011, 17, 1269–1272.
+[CrossRef] [PubMed]
+Khasnis, A.; Gokula, R.M. Romberg’s test. J. Postgrad. Med. 2003, 49, 169–172. [PubMed]
+Feys, P.; Lamers, I.; Francis, G.; Benedict, R.; Phillips, G.; LaRocca, N.; Hudson, L.D.; Rudick, R. The Nine-Hole Peg Test as a
+manual dexterity performance measure for multiple sclerosis. Mult. Scler. J. 2017, 23, 711–720. [CrossRef]
+Franchignoni, F.P.; Tesio, L.; Ricupero, C.; Martino, M.T. Trunk Control Test as an Early Predictor of Stroke Rehabilitation Outcome.
+Stroke 1997, 28, 1382–1385. [CrossRef]
+Lin, C.S.-Y.; Chan, J.H.L.; Pierrot-Deseilligny, E.; Burke, D. Excitability of human muscle afferents studied using threshold tracking
+of the H reflex. J. Physiol. 2002, 545, 661–669. [CrossRef] [PubMed]
+Burke, D. Clinical uses of H reflexes of upper and lower limb muscles. Clin. Neurophysiol. Pract. 2016, 1, 9–17. [CrossRef]
+Hofstoetter, U.S.; Freundl, B.; Binder, H.; Minassian, K. Common neural structures activated by epidural and transcutaneous
+lumbar spinal cord stimulation: Elicitation of posterior root-muscle reflexes. PLoS ONE 2018, 13, e0192013. [CrossRef]
+Kagamihara, Y.; Hayashi, A.; Okuma, Y.; Nagaoka, M.; Nakajima, Y.; Tanaka, R. Reassessment of H-reflex recovery curve using
+the double stimulation procedure. Muscle Nerve 1998, 21, 352–360. [CrossRef]
+Pinter, M.M.; Gerstenbrand, F.; Dimitrijevic, M.R. Epidural electrical stimulation of posterior structures of the human lumbosacral
+cord: 3. Control Of spasticity. Spinal Cord 2000, 38, 524–531. [CrossRef] [PubMed]
+Shaw, L.; Rodgers, H.; Price, C.; van Wijck, F.; Shackley, P.; Steen, N.; Barnes, M.; Ford, G.; Graham, L. BoTULS: A multicentre
+randomised controlled trial to evaluate the clinical effectiveness and cost-effectiveness of treating upper limb spasticity due to
+stroke with botulinum toxin type A. Health Technol. Assess. 2010, 14, 1–13. [CrossRef]
+
+Brain Sci. 2021, 11, 472
+
+54.
+
+55.
+56.
+57.
+58.
+
+59.
+
+60.
+
+61.
+62.
+63.
+64.
+65.
+66.
+67.
+68.
+69.
+
+70.
+
+71.
+72.
+
+73.
+74.
+
+75.
+
+76.
+
+77.
+78.
+
+18 of 20
+
+Brashear, A.; Gordon, M.F.; Elovic, E.; Kassicieh, V.D.; Marciniak, C.; Do, M.; Lee, C.-H.; Jenkins, S.; Turkel, C. Intramuscular
+Injection of Botulinum Toxin for the Treatment of Wrist and Finger Spasticity after a Stroke. N. Engl. J. Med. 2002, 347, 395–400.
+[CrossRef]
+Sheikh, K.; Smith, D.S.; Meade, T.W.; Brennan, P.J.; Ide, L. Assessment of motor function in studies of chronic disability.
+Rheumatology 1980, 19, 83–90. [CrossRef]
+Cetisli Korkmaz, N.; Can Akman, T.; Kilavuz Oren, G.; Bir, L.S. Trunk control: The essence for upper limb functionality in patients
+with multiple sclerosis. Mult. Scler. Relat. Disord. 2018, 24, 101–106. [CrossRef] [PubMed]
+Musselman, K.E. Clinical significance testing in rehabilitation research: What, why, and how? Phys. Ther. Rev. 2007, 12, 287–296.
+[CrossRef]
+Hupperts, R.; Lycke, J.; Short, C.; Gasperini, C.; McNeill, M.; Medori, R.; Tofil-Kaluza, A.; Hovenden, M.; Mehta, L.R.; Elkins, J.
+Prolonged-release fampridine and walking and balance in MS: Randomised controlled MOBILE trial. Mult. Scler. J. 2016, 22,
+212–221. [CrossRef] [PubMed]
+Hobart, J.; Ziemssen, T.; Feys, P.; Linnebank, M.; Goodman, A.D.; Farrell, R.; Hupperts, R.; Blight, A.R.; Englishby, V.; McNeill,
+M.; et al. Assessment of Clinically Meaningful Improvements in Self-Reported Walking Ability in Participants with Multiple
+Sclerosis: Results from the Randomized, Double-Blind, Phase III ENHANCE Trial of Prolonged-Release Fampridine. CNS Drugs
+2019, 33, 61–79. [CrossRef]
+Baert, I.; Freeman, J.; Smedal, T.; Dalgas, U.; Romberg, A.; Kalron, A.; Conyers, H.; Elorriaga, I.; Gebara, B.; Gumse, J.; et al.
+Responsiveness and Clinically Meaningful Improvement, According to Disability Level, of Five Walking Measures After
+Rehabilitation in Multiple Sclerosis. Neurorehabil. Neural Repair 2014, 28, 621–631. [CrossRef]
+Danner, S.M.; Hofstoetter, U.S.; Minassian, K. Finite Element Models of Transcutaneous Spinal Cord Stimulation. In Encyclopedia
+of Computational Neuroscience; Jaeger, D., Jung, R., Eds.; Springer: New York, NY, USA, 2014; pp. 1–6.
+Minassian, K.; Persy, I.; Rattay, F.; Pinter, M.M.; Kern, H.; Dimitrijevic, M.R. Human lumbar cord circuitries can be activated by
+extrinsic tonic input to generate locomotor-like activity. Hum. Mov. Sci. 2007, 26, 275–295. [CrossRef]
+Hunter, J.P.; Ashby, P. Segmental effects of epidural spinal cord stimulation in humans. J. Physiol. 1994, 474, 407–419. [CrossRef]
+Holsheimer, J. Which Neuronal Elements are Activated Directly by Spinal Cord Stimulation. Neuromodulation 2002, 5, 25–31.
+[CrossRef] [PubMed]
+Ranck, J.B.J. Which elements are excited in electrical stimulation of mammalian central nervous system: A review. Brain Res. 1975,
+98, 417–440. [CrossRef]
+Rattay, F. The basic mechanism for the electrical stimulation of the nervous system. Neuroscience 1999, 89, 335–346. [CrossRef]
+Struijk, J.J.; Holsheimer, J.; Boom, H.B.K. Excitation of dorsal root fibers in spinal cord stimulation: A theoretical study. IEEE
+Trans. Biomed. Eng. 1993, 40, 632–639. [CrossRef]
+Lloyd, D. Reflex action in relation to pattern and peripheral source of afferent stimulation. J. Neurophysiol. 1943, 6, 111–119.
+[CrossRef]
+Formento, E.; Minassian, K.; Wagner, F.; Mignardot, J.B.; Le Goff-Mignardot, C.G.; Rowald, A.; Bloch, J.; Micera, S.; Capogrosso,
+M.; Courtine, G. Electrical spinal cord stimulation must preserve proprioception to enable locomotion in humans with spinal
+cord injury. Nat. Neurosci. 2018, 21, 1728–1741. [CrossRef]
+Sedgwick, E.M.; Illis, L.S.; Tallis, R.C.; Thornton, A.R.; Abraham, P.; El-Negamy, E.; Docherty, T.B.; Soar, J.S.; Spencer, S.C.; Taylor,
+F.M. Evoked potentials and contingent negative variation during treatment of multiple sclerosis with spinal cord stimulation. J.
+Neurol. Neurosurg. Psychiatry 1980, 43, 15–24. [CrossRef] [PubMed]
+Hofstoetter, U.S.; Danner, S.M.; Freundl, B.; Binder, H.; Mayr, W.; Rattay, F.; Minassian, K. Periodic modulation of repetitively
+elicited monosynaptic reflexes of the human lumbosacral spinal cord. J. Neurophysiol. 2015, 114, 400–410. [CrossRef]
+Lin, S.; Li, Y.; Lucas-Osma, A.M.; Hari, K.; Stephens, M.J.; Singla, R.; Heckman, C.J.; Zhang, Y.; Fouad, K.; Fenrich, K.K.; et al.
+Locomotor-related V3 interneurons initiate and coordinate muscles spasms after spinal cord injury. J. Neurophysiol. 2019, 121,
+1352–1367. [CrossRef]
+Dimitrijevic, M.R.; Gerasimenko, Y.; Pinter, M.M. Evidence for a spinal central pattern generator in humans. Ann. N. Y. Acad. Sci.
+1998, 860, 360–376. [CrossRef]
+Minassian, K.; Jilge, B.; Rattay, F.; Pinter, M.M.; Binder, H.; Gerstenbrand, F.; Dimitrijevic, M.R. Stepping-like movements in
+humans with complete spinal cord injury induced by epidural stimulation of the lumbar cord: Electromyographic study of
+compound muscle action potentials. Spinal Cord 2004, 42, 401–416. [CrossRef]
+Minassian, K.; Hofstoetter, U.S.; Danner, S.M.; Mayr, W.; Bruce, J.A.; McKay, W.B.; Tansey, K.E. Spinal Rhythm Generation by StepInduced Feedback and Transcutaneous Posterior Root Stimulation in Complete Spinal Cord-Injured Individuals. Neurorehabil.
+Neural Repair 2016, 30, 233–243. [CrossRef]
+Sivaramakrishnan, A.; Solomon, J.M.; Manikandan, N. Comparison of transcutaneous electrical nerve stimulation (TENS) and
+functional electrical stimulation (FES) for spasticity in spinal cord injury—A pilot randomized cross-over trial. J. Spinal Cord Med.
+2018, 41, 397–406. [CrossRef]
+Ping Ho Chung, B.; Kam Kwan Cheng, B. Immediate effect of transcutaneous electrical nerve stimulation on spasticity in patients
+with spinal cord injury. Clin. Rehabil. 2010, 24, 202–210. [CrossRef]
+Liberson, W.T.; Holmquest, H.J.; Scot, D.; Dow, M. Functional electrotherapy: Stimulation of the peroneal nerve synchronized
+with the swing phase of the gait of hemiplegic patients. Arch. Phys. Med. Rehabil. 1961, 42, 101–105.
+
+Brain Sci. 2021, 11, 472
+
+19 of 20
+
+Trapp, B.D.; Nave, K.-A. Multiple Sclerosis: An Immune or Neurodegenerative Disorder? Annu. Rev. Neurosci. 2008, 31, 247–269.
+[CrossRef]
+80. Pearson, O.R.; Busse, M.E.; van Deursen, R.W.M.; Wiles, C.M. Quantification of walking mobility in neurological disorders. QJM
+2004, 97, 463–475. [CrossRef]
+81. Confavreux, C.; Vukusic, S.; Moreau, T.; Adeleine, P. Relapses and Progression of Disability in Multiple Sclerosis. N. Engl. J. Med.
+2000, 343, 1430–1438. [CrossRef]
+82. Confavreux, C. Early clinical predictors and progression of irreversible disability in multiple sclerosis: An amnesic process. Brain
+2003, 126, 770–782. [CrossRef]
+83. Confavreux, C.; Vukusic, S. Natural history of multiple sclerosis: A unifying concept. Brain 2006, 129, 606–616. [CrossRef]
+84. Motl, R.W.; Learmonth, Y.C. Neurological disability and its association with walking impairment in multiple sclerosis: Brief
+review. Neurodegener. Dis. Manag. 2014, 4, 491–500. [CrossRef]
+85. Goldman, M.D.; Motl, R.W.; Scagnelli, J.; Pula, J.H.; Sosnoff, J.J.; Cadavid, D. Clinically meaningful performance benchmarks in
+MS: Timed 25-Foot Walk and the real world. Neurology 2013, 81, 1856–1863. [CrossRef]
+86. Learmonth, Y.C.; Motl, R.W.; Sandroff, B.M.; Pula, J.H.; Cadavid, D. Validation of patient determined disease steps (PDDS) scale
+scores in persons with multiple sclerosis. BMC Neurol. 2013, 13, 37. [CrossRef] [PubMed]
+87. Andersen, L.K.; Knak, K.L.; Witting, N.; Vissing, J. Two- and 6-minute walk tests assess walking capability equally in neuromuscular diseases. Neurology 2016, 86, 442–445. [CrossRef]
+88. Nielsen, J.; Willerslev-Olsen, M.; Lorentzen, J. Pathophysiology of Spasticity. In Neurological Rehabilitation. Spasticity and
+Contractures in Clinical Practice and Research; Pandyan, A., Hermens, H., Conway, B., Eds.; Imprint; CRC Press: Boca Raton, FL,
+USA, 2018; pp. 25–57.
+89. Faist, M.; Mazevet, D.; Dietz, V.; Pierrot-Deseilligny, E. A quantitative assessment of presynaptic inhibition of Ia afferents in
+spastics. Differences in hemiplegics and paraplegics. Brain 1994, 117, 1449–1455. [CrossRef] [PubMed]
+90. Grey, M.J.; Klinge, K.; Crone, C.; Lorentzen, J.; Biering-Sørensen, F.; Ravnborg, M.; Nielsen, J.B. Post-activation depression of
+soleus stretch reflexes in healthy and spastic humans. Exp. Brain Res. 2008, 185, 189–197. [CrossRef]
+91. Schindler-Ivens, S.; Shields, R.K. Low frequency depression of H-reflexes in humans with acute and chronic spinal-cord injury.
+Exp. Brain Res. 2000, 133, 233–241. [CrossRef] [PubMed]
+92. Crone, C.; Johnsen, L.L.; Biering-Sørensen, F.; Nielsen, J.B. Appearance of reciprocal facilitation of ankle extensors from ankle
+flexors in patients with stroke or spinal cord injury. Brain 2003, 126, 495–507. [CrossRef] [PubMed]
+93. Boulenguez, P.; Liabeuf, S.; Bos, R.; Bras, H.; Jean-Xavier, C.; Brocard, C.; Stil, A.; Darbon, P.; Cattaert, D.; Delpire, E.; et al.
+Down-regulation of the potassium-chloride cotransporter KCC2 contributes to spasticity after spinal cord injury. Nat. Med. 2010,
+16, 302–307. [CrossRef]
+94. Hidler, J.M.; Rymer, W.Z. A simulation study of reflex instability in spasticity: Origins of clonus. IEEE Trans. Rehabil. Eng. 1999, 7,
+327–340. [CrossRef]
+95. Dimitrijevic, M.R.; Nathan, P.W.; Sherwood, A.M. Clonus: The role of central mechanisms. J. Neurol. Neurosurg. Psychiatry 1980,
+43, 321–332. [CrossRef]
+96. Beres-Jones, J.A.; Johnson, T.D.; Harkema, S.J. Clonus after human spinal cord injury cannot be attributed solely to recurrent
+muscle-tendon stretch. Exp. Brain Res. 2003, 149, 222–236. [CrossRef] [PubMed]
+97. Rossi, A.; Mazzocchio, R.; Scarpini, C. Clonus in man: A rhythmic oscillation maintained by a reflex mechanism. Electroencephalogr.
+Clin. Neurophysiol. 1990, 75, 56–63. [CrossRef]
+98. Murray, K.C.; Stephens, M.J.; Ballou, E.W.; Heckman, C.J.; Bennett, D.J. Motoneuron Excitability and Muscle Spasms Are
+Regulated by 5-HT 2B and 5-HT 2C Receptor Activity. J. Neurophysiol. 2011, 105, 731–748. [CrossRef] [PubMed]
+99. D’Amico, J.M.; Murray, K.C.; Li, Y.; Chan, K.M.; Finlay, M.G.; Bennett, D.J.; Gorassini, M.A. Constitutively active 5-HT 2 /α 1
+receptors facilitate muscle spasms after human spinal cord injury. J. Neurophysiol. 2013, 109, 1473–1484. [CrossRef] [PubMed]
+100. Bennett, D.J.; Li, Y.; Harvey, P.J.; Gorassini, M. Evidence for plateau potentials in tail motoneurons of awake chronic spinal rats
+with spasticity. J. Neurophysiol. 2001, 86, 1972–1982. [CrossRef]
+101. Bellardita, C.; Caggiano, V.; Leiras, R.; Caldeira, V.; Fuchs, A.; Bouvier, J.; Löw, P.; Kiehn, O. Spatiotemporal correlation of spinal
+network dynamics underlying spasms in chronic spinalized mice. eLife 2017, 6, e23011. [CrossRef] [PubMed]
+102. Jankowska, E. Interneuronal relay in spinal pathways from proprioceptors. Prog. Neurobiol. 1992, 38, 335–378. [CrossRef]
+103. Pierrot-Deseilligny, E.; Burke, D. The Circuitry of the Human Spinal Cord: Spinal and Corticospinal Mechanisms of Movement;
+Cambridge University Press: Cambridge, UK, 2012.
+104. Hofstoetter, U.S.; Danner, S.M.; Freundl, B.; Binder, H.; Lackner, P.; Minassian, K. Ipsi- and Contralateral Oligo- and Polysynaptic
+Reflexes in Humans Revealed by Low-Frequency Epidural Electrical Stimulation of the Lumbar Spinal Cord. Brain Sci. 2021,
+11, 112. [CrossRef] [PubMed]
+105. Calancie, B. Interlimb reflexes following cervical spinal cord injury in man. Exp. Brain Res. 1991, 85, 458–469. [CrossRef]
+106. Butler, J.E.; Godfrey, S.; Thomas, C.K. Interlimb Reflexes Induced by Electrical Stimulation of Cutaneous Nerves after Spinal Cord
+Injury. PLoS ONE 2016, 11, e0153063. [CrossRef]
+107. McNulty, P.A.; Burke, D. Self-sustained motor activity triggered by interlimb reflexes in chronic spinal cord injury, evidence of
+functional ascending propriospinal pathways. PLoS ONE 2013, 8, e72725. [CrossRef] [PubMed]
+79.
+
+Brain Sci. 2021, 11, 472
+
+20 of 20
+
+108. Cheung, J.; Rancourt, A.; Di Poce, S.; Levine, A.; Hoang, J.; Ismail, F.; Boulias, C.; Phadke, C.P. Patient-Identified Factors That
+Influence Spasticity in People with Stroke and Multiple Sclerosis Receiving Botulinum Toxin Injection Treatments. Physiother. Can.
+2015, 67, 157–166. [CrossRef]
+109. Oreja-Guevara, C.; González-Segura, D.; Vila, C. Spasticity in multiple sclerosis: Results of a patient survey. Int. J. Neurosci. 2013,
+123, 400–408. [CrossRef] [PubMed]
+110. Lucchinetti, C.; Brück, W.; Parisi, J.; Scheithauer, B.; Rodriguez, M.; Lassmann, H. Heterogeneity of multiple sclerosis lesions:
+Implications for the pathogenesis of demyelination. Ann. Neurol. 2000, 47, 707–717. [CrossRef]
+111. Hofstoetter, U.S.; Freundl, B.; Binder, H.; Minassian, K. Spinal Cord Stimulation as a Neuromodulatory Intervention for Altered
+Motor Control Following Spinal Cord Injury. In Advanced Technologies in Rehabilitation of Gait and Balance Disorders; Sandrini, G.,
+Homberg, V., Saltuari, L., Smania, N., Pedrocchi, A., Eds.; Springer: Berlin, Germany, 2018; pp. 501–521.
+
+

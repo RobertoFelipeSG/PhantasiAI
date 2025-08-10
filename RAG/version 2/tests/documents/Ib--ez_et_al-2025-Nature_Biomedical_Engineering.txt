@@ -1,0 +1,1387 @@
+nature biomedical engineering
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+Peripheral neural interfaces for reading
+high-frequency brain signals
+Received: 22 September 2023
+Accepted: 29 May 2025
+Published online: xx xx xxxx
+Check for updates
+
+Jaime Ibáñez 1,2,3 , Blanka Zicher4, Etienne Burdet
+Carsten Mehring 6,7 & Dario Farina 4
+
+, Stuart N. Baker5,
+
+4
+
+Accurate and robust recording and decoding from the central nervous
+system (CNS) is essential for advances in human–machine interfacing.
+Technologies for direct measurements of CNS activity are limited by their
+resolution, sensitivity to interference and invasiveness. Motor neurons
+(MNs) represent the motor output layer of the CNS, receiving and sampling
+signals from different regions in the nervous system and generating the
+neural commands that control muscles. Muscle recordings and deep
+learning decode the spiking activity of spinal MNs in real time and with
+high accuracy. The input signals to MNs can be estimated from MN outputs.
+Here we argue that peripheral neural interfaces using muscle sensors
+represent a promising, non-invasive approach to estimate some of the
+neural activity from the CNS that reaches the MNs but does not directly
+modulate force production. We discuss the evidence supporting this
+concept and the advances needed to consolidate and test MN-based CNS
+interfaces in controlled and real-world settings.
+
+Neural signals from the central nervous system (CNS) reach the muscles and control when and how they generate forces to produce movement. The motor unit is the key structure in the translation of neural
+information into muscle contraction. A motor unit consists of a spinal
+motor neuron (MN) and the group of muscle fibres that it innervates
+and controls1. Motor units represent the frontier between neural processing and behaviour, and MNs are the last common neural pathway
+controlling behaviour2. The activation of each MN in the spinal cord
+is mirrored by the activation of the innervated muscle unit, thus the
+muscle unit can serve as an accessible proxy of neural activity. From an
+engineering perspective, reading the activity of MNs provides access
+to the output of the somatic motor nervous system (Fig. 1a) and a way
+to infer its working principles.
+Currently, methods for directly—that is, invasively—recording
+representative ongoing activity from the CNS are scarce. However,
+there is growing evidence of increasingly safe approaches, such as
+intracranial recordings used in various medical devices, which have
+
+led to meaningful advancements in fields such as speech prostheses
+and other types of brain–machine interface for patients with severe
+paralysis3,4. Nonetheless, exploring alternative methods for recording
+CNS activity remains crucial to address existing limitations in current
+technologies and to further enhance safety and efficacy in neurotechnologies5. As a potential alternative to direct brain recordings, we can
+use an inverse modelling approach to investigate signals in the CNS
+by decoding the final electrical activity produced at its outputs, in the
+periphery of the nervous system.
+Advances in sensors and signal processing methods, including
+deep learning methods, have enabled access to the neural activity
+of sets of MNs by recording the activity they evoke in muscles using
+electromyography (EMG)6. EMG recordings represent a mixture of
+the electrical activity from the muscle units that compose a muscle,
+which serve as proxies for the MNs in the spinal cord. EMG signals are
+therefore recordings that embed the final output of the CNS. Identifying motor unit activity in the EMG signals then yields a neural interface.
+
+BSICoS Group, Departamento de Ingeniería Electrónica y Comunicaciones, Instituto de Investigación en Ingeniería de Aragón (I3A), Universidad de
+Zaragoza, Zaragoza, Spain. 2BSICoS Group, Instituto de Investigación Sanitaria (IIS) Aragón, Zaragoza, Spain. 3Centro de Investigación Biomédica en Red
+de Bioingeniería, Biomateriales y Nanomedicina (CIBER-BBN), Zaragoza, Spain. 4Department of Bioengineering, Imperial College, London, UK. 5Institute
+of Neuroscience, Newcastle University, Newcastle upon Tyne, UK. 6Bernstein Center Freiburg, University of Freiburg, Freiburg im Breisgau, Germany.
+7
+BrainLinks-BrainTools, University of Freiburg, Freiburg im Breisgau, Germany.
+e-mail: jibanez@unizar.es; d.farina@imperial.ac.uk
+
+1
+
+Nature Biomedical Engineering
+
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+a
+
+b
+
+Reading
+point
+Brain and spinal cord
+
+Muscle units
+MNs
+
+Spinal and supraspinal
+inputs (corticospinal,
+reticulospinal, propriospinal
+and other drives)
+
+Afferent inputs
+from muscles and
+recurrent connections
+(Renshaw cells)
+
+Afferent feedback
+
+Fig. 1 | Convergent inputs to MNs. a, MNs in the muscles represent the output
+layer of the CNS. By measuring the electrical activity that muscles produce
+during contraction, we can characterize the firing patterns of MNs and therefore
+read the neural activity of this last layer of the nervous system complex network.
+
+b, MNs receive inputs from multiple sites in the CNS (including direct brain
+projections) and from sensory organs in the periphery. All this information drives
+MN activity7.
+
+This concept is schematically described in Fig. 1a. In this scheme, the
+CNS and peripheral nervous system constitute a large neural network
+with high complexity. This network projects its activity to MNs, which
+form the last layer of the network and connect with different parts of
+the CNS7 (Fig. 1b).
+By characterizing the MN activity that reaches muscles, we can
+access some of the neural signals most tightly associated with behaviour. This has been a key reason for the use of myocontrol for interfaces
+in clinical applications, such as using EMG to estimate motion intent
+and to control active prosthetics8. However, it is unclear whether the
+motor command to the muscles (that is, the neural inputs to muscles
+that determine or modulate the level of contraction) is the only information that MNs encode, or whether the MNs also encode activity in
+the CNS that does not directly modulate muscle force. This question
+relates to how much information about neural processing within the
+CNS can be extracted from MN recordings.
+As MNs control muscles, one would think that their output is
+tightly matched to muscle characteristics so that the full information
+transfer from MNs to muscles is associated with force production.
+However, numerous studies have shown that MN discharge patterns,
+and therefore EMG signals, contain information that is related to brain
+oscillations but not directly to force production. For example, it is well
+known that cortical and EMG signals are correlated in the beta band
+(13–30 Hz)9–11, which lies outside the muscle contraction dynamics12,13
+and thus information in this band cannot directly influence force, at
+least within a linear approximation of force production.
+These classical observations raise questions about which cortical oscillations are transmitted to the output of the CNS (the MNs)
+and why. They also suggest that part of the neural activity generated
+in the brain, containing relevant information regarding brain states
+and dynamics, may be observed in the electric fields produced by
+muscles, even if it is not associated with underlying muscle contractile activity. This is because there is a mismatch between the
+bandwidth of the electrical and mechanical activity of muscles:
+muscle electrical signals have a broader spectral bandwidth than
+mechanical muscle contraction; thus, they potentially contain more
+information. EMG may offer a window through which we can look
+at brain activity.
+
+This Perspective discusses existing evidence supporting the possibility of using the activity of MN populations to estimate neural activity
+originating in the CNS that is not directly involved in force production.
+This introduces the concept of brain interfacing via muscle sensors,
+which differs from classic EMG-based interfaces aimed at decoding the
+motor command sent to the muscles to generate an intended action
+or gesture. Along these lines, we envision a technology that senses
+the electric fields in muscles and processes them to infer informative
+brain signals, such as circuit-specific cortical oscillations at different
+frequencies in patients with a brain lesion, or changes in identified
+brain signals that can be used to develop models and strategies for
+human–machine interaction.
+The following sections introduce the key concepts that allow the
+decomposition of large populations of MNs using non-invasive or
+minimally invasive sensors, and the physiological basis supporting
+the notion that this neural information can be used to infer ongoing
+neural activity in relevant regions of the CNS, such as the motor cortex.
+Finally, we propose frameworks in which MN-derived information can
+be used to advance the fields of neuroimaging and neural interfacing
+and improve our understanding of the neural control of movement.
+
+Nature Biomedical Engineering
+
+Muscle interfaces to decode the output of the CNS
+The contribution of a motor unit to the electric potential recorded at a
+certain point on a muscle can be modelled as a train of delta functions
+convolved with the motor-unit-specific action potential waveform, as
+measured from that recording point14. The EMG recording thus corresponds to the sum of the electric potentials produced by all the active
+motor units and noise components.
+In this model, the trains of delta functions associated with each
+motor unit are the neural activity (that is, the output of the CNS) that
+can be estimated through the deconvolution of the EMG signal (Fig. 2).
+The possibility of identifying this neural activity from EMG signals
+depends on two key properties of the biological and biophysical systems underlying muscle activity. The first property is the stability
+of the synaptic connection between each MN and its muscle unit.
+This connection means that each action potential travelling along
+the axon of an MN determines a corresponding action potential in the
+innervated muscle fibres, that is, in the corresponding muscle unit15.
+
+Perspective
+Spinal cord
+
+https://doi.org/10.1038/s41551-025-01445-1
+Motor neurons
+
+Motor unit APs
+
+High-density EMG
+
+Unmixing sources
+
+Estimated MN spikes
+
+σ1
+Σ
+σ2
+
+* W1
+Σ
+
+σ3
+
+* W2
+Σ
+* W3
+
+σ4
+Σ
+
+EMG generation
+
+MN decomposition
+
+Fig. 2 | Simplified model of EMG signal generation and the decomposition of
+MN activity from multichannel EMG with classic deconvolution methods.
+The cell body of MNs is in the ventral horn of the spinal cord. On the basis of the
+synaptic inputs MNs receive, they generate trains of action potentials (APs) that
+travel along their axons to the muscles. Each MN AP causes a corresponding
+muscle fibre AP that travels along the muscle fibres of the motor unit formed with
+the innervating MN. Placing EMG electrodes at different points on the muscle
+
+results in recordings of the muscle fibre APs generated by different units, each
+with distinct waveforms (based on the relative position of the electrode and the
+recorded fibres), along with additional independent noise of standard deviation
+σ. By multiplying the EMG recordings by unmixing matrices (the ‘Wi’ terms), we
+can enhance the time points at which specific motor units generate APs travelling
+along the muscle fibres. This provides a reliable read-out of the spiking activity of
+MNs corresponding to the identified motor units.
+
+This one-to-one relation between MNs and muscle unit action potentials implies that the spiking activity of single neurons can be measured
+by identifying the action potentials produced by muscle fibres of
+a motor unit. The second property is the spatial and temporal differentiation of the electrical activity that muscle fibres produce in
+the surrounding volume conductor, that is, the motor unit electrical
+signatures. Each motor unit is unique within the muscle in terms of
+the spatial distribution of muscle fibres, neuromuscular junctions
+and fibre membrane characteristics. This implies that the convolutive
+filters are unique for each motor unit, at least under ideal conditions
+of sampling in space and time.
+Within a linear and stationary model, the two properties mentioned previously and the sparsity of spiking in individual MNs allow
+us to solve the deconvolution problem and to isolate the activity of
+individual MNs6,16.
+The deconvolution of neural activity from invasive or non-invasive
+EMG recordings can be solved by blind source separation methods customized to the convolutive nature of the mixtures and the sparsity of
+the sources (Fig. 2). Alternatively, deep neural networks17 or generative
+models of EMG signals and their inverse formulation18,19 can be used.
+The current main aim in the development of more refined methods for
+EMG deconvolution is to increase the number of decoded MNs, which
+can be attained both by refinement in electrode technology and by
+advances in decoding algorithms20.
+The performance of current conventional methods to decode EMG
+signals strongly depends on the number of neural sources relative to
+the number of observations and on the stability of the action potential
+waveforms of individual motor units. Because of the large number of
+motor units in a muscle, only some of them can be accurately identified
+by current source separation methods. Decoding is typically limited
+to the sources with the greatest energy and with distinctive motor
+unit action potential shapes (if two motor units produce action potentials with comparable temporal–spatial shapes, as measured from the
+recording points, they will not be distinguishable)21. In addition, the
+ability to decompose sources is limited in all contractions that involve
+changes in joint angles, which applies to most natural tasks. In fact,
+changes in muscle length and relative position with respect to the skin
+during motion modify the characteristics of the volume conductor
+separating the sources from the recording electrodes22,23.
+Artificial-intelligence-based approaches may be used to mitigate
+the above limitations. An improvement over conventional statistical
+
+source separation methods can be obtained by training deep networks
+to perform the decomposition process, using deconvolution methods
+for labelling and then increasing the robustness of the network-based
+decomposition by extensive data augmentation. Current models of
+EMG signal generation are sufficiently realistic to provide simulated
+data useful for augmenting neural-network-based decomposition
+of experimental data. For example, recent studies have shown that a
+realistic model of EMG signal generation can augment the training of
+a network based on gate recurrent units that learn how to decompose
+EMG signals, making the resultant decomposition more robust than
+the original deconvolution algorithm used for labelling24. Moreover,
+a hybrid architecture that combines elements of deep latent variable
+models and conditional adversarial training can provide a generative
+model of EMG signals that can mimic the outputs of complex numerical
+models of human muscle biophysics. Such a framework can be used to
+continuously sample from a dynamically changing system in real time18.
+This allows us to model all factors of variability in the generation of
+EMG signals and use them for data augmentation, and to derive inverse
+models that estimate internal parameters (such as MN discharge patterns) based on observations.
+The decomposition process can be performed in a fully unsupervised way by identifying the embedded neural code in a reduced
+dimensional space, imposing constraints on the properties of this
+space. For example, a proposed autoencoder learns the discharge times
+of individual motor units by processing multichannel EMG recordings25.
+Following preprocessing of the EMG recording via convolutive sphering, the encoder is constrained to apply an orthogonal transformation
+to the spatial data and the optimization criterion enforces a temporal
+sparsity constraint. Because of its encoding–decoding structure, this
+method does not need to be trained on known decomposition results.
+
+Nature Biomedical Engineering
+
+MNs linearly transmit high-frequency
+neural signals
+Spinal MNs receive a barrage of synaptic inputs from afferent nerves
+coding proprioceptive and other sensory information, and from spinal
+and supraspinal circuits, including direct inputs from the cerebral
+cortex through monosynaptic corticospinal projections26. All these
+inputs are integrated and translated into spiking activity that is transmitted to muscles (Fig. 1b). Therefore, the twitches that muscle fibres
+produce can be seen as the result of a complex transformation of the
+net excitatory inputs that MNs receive from different sources in the
+
+Perspective
+CNS. The CNS ensures that the appropriate neural inputs are received
+by MNs to generate an intended movement.
+The net excitatory input received by MNs is typically modelled
+as a set of independent and common synaptic inputs27. Independent
+inputs represent the synaptic inputs to MNs that are not correlated
+with the inputs received by other MNs in a pool. Conversely, common
+synaptic inputs are those that are the same as or correlated to inputs
+that (many) other MNs in the pool receive28–30. Owing to the differences
+in the biophysical properties of MNs within a pool, their responses to
+inputs tend to linearize and amplify the common inputs relative to
+the independent inputs when the neural activity of MNs is analysed
+at the population level31–35. For this reason, a group of MNs receiving
+and sampling common and independent inputs can be viewed as a
+neural linear amplifier of the common inputs, with very high rejection
+of independent noise36. This is evident when considering the layer of
+MNs as a single-layer perceptron that acts as a linear regressor if the
+activation functions are linear. In the biological case, this corresponds
+to considering the MNs as active approximately in the middle of their
+input–output response curve37. We can therefore conclude that the
+last layer of the CNS is an approximately linear one that amplifies the
+common inputs it receives when considering the activity of populations of MNs that are fully recruited and not reaching saturation38. The
+amount of amplification of the linear components by a group of MNs
+will increase as a function of the group size36. Indeed, the observation
+that common inputs to MNs act as a linearization process aligns with
+population coding principles that are also observed elsewhere in the
+nervous system39,40. In the retina for instance, decoding the activity of
+small populations of retinal ganglion cells rapidly saturates information extraction, indicating that a few neurons can effectively represent
+the encoded information when it is commonly distributed41. Similar
+results have been observed in the auditory system using multiple spike
+trains in auditory receptor neurons42.
+The linearization performed by MNs applies to any common inputs
+they receive; groups of MNs can effectively transmit multiple sources
+of information at different frequencies simultaneously35. Figure 3
+exemplifies this property of MNs in a simulation in which a group of
+MNs receives common inputs at different frequencies along with independent inputs (different for each MN). Simple band-pass filtering of
+the sum of the spike trains of all MNs allows a reliable estimation and
+separation of the common inputs at multiple frequencies.
+The conversion from motor unit action potentials into muscle
+force can be modelled as a second-order critically damped filter,
+which strongly attenuates high-frequency neural inputs to muscles (here we consider high-frequency inputs to muscles as those
+above ~10 Hz)12,13,43,44. Indeed, the frequency of movements and forces
+produced by limbs are constrained to rather low frequencies, with
+(pathological) tremors representing the highest frequencies that
+can be measured in the arms and hands45,46. However, and somewhat surprisingly, the neural inputs that MNs receive, and therefore
+their outputs, go far beyond the maximum working frequencies of
+muscles. This can be experimentally observed when decoding a
+large number of MNs that can show common activity at frequencies
+>70–80 Hz (ref. 20). This neural information may consist of different
+components, spanning various frequency ranges, originating from
+diverse regions of the nervous system that project into the MN pools.
+Given the characteristics of how muscle transforms neural inputs
+into forces, this broad spectrum of common inputs suggests that a
+substantial portion of the common synaptic inputs to MNs will be
+transmitted along their axons without having a direct influence on
+muscle forces (Fig. 4). These high-frequency inputs may be associated with ongoing activity in the CNS, reaching and modulating the
+firing patterns of MNs. Because of the linear transmission by MN
+populations, extraction of this high-frequency activity, which does
+not directly affect forces, can be achieved using standard linear
+separation methods (Fig. 3).
+Nature Biomedical Engineering
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+Accessing brain activity through MNs
+Identifying the sources contributing to the high-frequency activity
+in MNs and understanding why this activity reaches MNs are relevant
+challenges to advance in the framework of MN-based CNS interfaces.
+Given the limitations of non-invasive neuroimaging technologies
+to record signals originating in the CNS, the interpretation of the
+high-frequency activity in the MNs is complex, particularly due to the
+lack of reference signals guiding the analysis. By simultaneously recording brain and muscle activity, many studies have consistently shown
+that the oscillatory activities at 20–30 Hz (beta rhythms) and 40–50 Hz
+(low gamma rhythms) carried by MNs have a cortical origin9,10,47–54.
+This implies that muscles are to some extent driven by the cortical
+rhythms that are encoded by MNs. For MNs to provide valuable information about the ongoing cortical activity that they receive, the characteristics of the corticospinal transmission of such signals must be
+stable over time. Also, to implement neural interfaces with the brain
+with MNs, transmission needs to be established with relatively small
+delays, and modulations of cortical oscillatory inputs to MNs need to
+be strong enough to be clearly sensed from MNs.
+Neurons in the corticospinal tract, the main descending pathway
+connecting the brain and MNs, are entrained by ongoing activity in
+neighbouring areas of the motor cortex, such as beta and gamma
+rhythms55,56. Although highly heterogeneous and complex pathways
+connect cortical neurons and MNs, cortical neural activity is effectively
+and reliably transmitted to the muscles through the fastest and most
+straightforward pathways because of the distribution of transmission
+delays across the thousands of channels connecting the motor cortex
+to MNs57. This implies that MNs can provide a timely and stable read-out
+of ongoing cortical neural activity. Figure 5a shows an example of the
+linear association, measured using spectral coherence58, between
+cortical and MN frequency components, specifically beta rhythms
+that are prominent during sustained contractions. On average, there
+is a time delay of approximately 28 ms between cortical signals and
+MN activity (Fig. 5b), which corresponds to the expected transmission
+delays in the fastest pathways connecting the motor cortex and the
+measured muscle, in this example, the tibialis anterior muscle. These
+results show the fast transmission of cortical rhythmic activity to the
+muscles, supporting the idea that decoding MN from muscle sensors
+enables interfacing with the motor cortex.
+The use of muscle recordings to characterize the functional connection between the brain and MNs, as well as to estimate brain signals
+indirectly, can be further examined using neurofeedback paradigms.
+For example, neurofeedback paradigms led participants to modify the
+coherence amplitudes in the beta band during sustained contractions,
+without changing the elicited forces59. Other studies used real-time
+decoding of EMG signals into MN activities to train participants to
+volitionally modulate rhythmic beta activity (13–30 Hz) in the neural drive to muscles60,61. After a relatively short training process, this
+muscle-based neurofeedback paradigm led to changes in the beta activity detected in muscles and in cortical electroencephalography (EEG).
+Results further indicated that beta events (or bursts) identified in the
+muscles during sustained contractions had a similar duration and rate
+of detection of bursts to beta events identified from the motor cortex,
+suggesting that the beta activity transmitted by MNs has a primarily
+supraspinal origin. Investigating optimal ways to deliver feedback
+to participants may allow us to gain a deeper insight into the characteristics of the high-frequency neural signals sampled by MNs, study
+how well participants can learn to modulate high-frequency inputs to
+muscles during different types of motor tasks, and generate models
+explaining the functional roles of these types of input to muscles.
+When recordings of muscle activity occur during long periods
+of steady muscle contractions, the observed fluctuations in cortical
+rhythmic activity projected to MNs are moderate but strong enough to
+be detected in relatively small groups of MNs; for example, around 12
+motor units were identified and tracked in real time per participant in
+
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+a
+
+c
+
+Common inputs
+
+PSD of individual spike trains
+
+PSD of the CST
+
+MN
+pool
+
+MN
+1
+
+Independent
+input 1
+
+MN
+2
+
+Independent
+input 2
+
+MN
+177
+10 Hz
+
+Independent
+input 3
+
+b
+
+d
+
+Common input
+
+Common input (2–4 Hz)
+
+Common input (20–22 Hz)
+
+Common input (44–46 Hz)
+
+CST
+
+CST (2–4 Hz)
+
+CST (20–22 Hz)
+
+CST (44–46 Hz)
+1s
+
+5s
+
+Fig. 3 | Linearization of common input transmission by MNs. a, Simulation of a
+group of 177 MNs receiving a common input (sum of 3 inputs at 2–4 Hz, 21 Hz and
+45 Hz) plus an independent input that is different for each MN. b, Raster plot with
+the spike trains of the simulated MNs. Each row represents the spiking activity of
+a simulated MN. c, Power spectral densities (PSDs) of the spike trains produced by
+the individual MNs (top) and of the composite spike train (sum of all spike trains;
+bottom). The mean of the signals was subtracted to obtain the PSD. The arrows
+represent the peaks in the PSD at the frequencies of the common inputs. d, The
+common input to the MNs and the band-pass-filtered versions of the common
+input at different frequencies (top four plots) and the resulting cumulative
+spike train (CST; bottom four plots) and its filtered version at the frequencies
+of the components contributing to the common inputs. To simulate the results
+
+in this figure, a previously validated model was used27,91. The model simulated
+the spiking activity of 177 MNs driven by common and independent inputs. The
+common input was a signal obtained by summing white Gaussian noise filtered
+in 3 bands (2–4 Hz, 20–22 Hz and 44–46 Hz). The three filtered signals were
+normalized in power before summing them. The common input also included a
+direct current component so that the simulated number of inputs arriving from
+the common projection per 0.2-ms time step was 1.7 (which is equivalent to each
+MN receiving 8,500 impulses per second). In addition to the common input, MNs
+also received independent inputs that were modelled as white Gaussian noise
+with mean equal to the variance. The level of the independent input was adjusted
+to make MNs fire at physiologically realistic levels during low-force contractions.
+
+the neurofeedback experiments31. To further investigate how strongly
+the power of high-frequency (>10 Hz) cortical projections to MNs can
+fluctuate and how these changes can alter corticospinal transmission,
+it becomes relevant to use experimental approaches that induce strong
+changes in high-frequency motor cortical oscillations during steady
+contractions62–64. A study65 assessed the magnitude and consistency
+of changes in the spectral contents of motor unit population activity
+during a movement preparation and cancellation paradigm. Two types
+of trial were designed for this, ‘go’ and ‘no-go’ trials, guided by auditory cues. During the trials, participants holding a tonic contraction
+
+of ankle dorsiflexion were first given a warning stimulus to prepare a
+motor response (ballistic contraction), and 1 s later they received an
+imperative stimulus that required them to either release the prepared
+action (go trials) or to cancel the preparation but keep holding the
+stable contraction (no-go trials). Cancellation of a prepared action
+is known to be associated with strong increases in cortical beta activity, which may have a role in preventing changes in motor cortical
+outputs64,66. The study showed that while participants successfully
+held the sustained contractions in the no-go trials, salient changes in
+power across different spectral bands in the MNs could be observed
+
+Nature Biomedical Engineering
+
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+Motor command
+
+High-frequency
+inputs to MN
+High-frequency inputs
+
+Motor
+command
+
+Muscle
+electrical
+signals
+MN
+pool
+
+Spinal
+cord
+
+Neural drive
+to muscles
+
+Fig. 4 | Separation of common synaptic inputs to MNs. MN pools can sample multiple common synaptic inputs. The low-frequency inputs control the level of muscle
+contraction to determine movement12,43,44. The high-frequency inputs do not interfere with movement directly but they are still encoded by the trains of action
+potentials travelling along MNs and muscle fibres and can be decoded.
+
+(see data from a representative participant in Fig. 6a). Some of these
+changes (between 13–30 Hz and 30–45 Hz) were related to changes
+in cortical activity occurring in parallel with the cancellation of the
+prepared action in the no-go trials65. These results provide evidence
+of successful corticospinal transmission of salient cortical oscillations
+without changes in motor outputs. This further supports the concept
+that MNs can simultaneously control force production and receive,
+and be driven by, high-frequency inputs from distal areas in the CNS.
+Further support for this idea can be found in a study67 that provides
+consistent evidence of corticomuscular transmission of beta bursts
+occurring without any detectable changes in the force produced by
+tonically contracted muscles (Fig. 6b).
+The previous studies suggest that MN activity may allow us to distinguish brain states related to different types of mental processing. In
+another study68, MN activity was decoded during steady contractions
+while participants performed different types of mental task (right foot
+motor imagery, imagining movements of both hands, mathematical mental operation or not focusing on any specific tasks). Using a
+filter bank and a linear classifier, the mental tasks could be classified in some participants with moderate to low accuracies, using only
+high-frequency components in the MN activity as input features for
+classification. Furthermore, the modulations in high-frequency components were incompatible with changes in force level. This study
+replicated classic brain-interfacing approaches based on imagery with
+peripheral recordings, showing that some mental task-induced oscillations from supraspinal areas may leak down to MNs, allowing the discrimination of mental tasks above chance level via EMG. This study also
+involved imagining non-motor tasks, further supporting the notion
+that MN activity may be used to retrieve information about ongoing
+brain activity, even if it is not associated with motor processing.
+Overall, there is consistent evidence that MNs receive and encode
+rhythmic activity that does not modulate forces and that have origins
+in the brain, for example, in the motor cortex. To further advance in
+the interpretation and use of high-frequency neural inputs to MNs,
+Nature Biomedical Engineering
+
+it becomes critical that multiple common inputs to MNs can be separated. This should be possible using standard spectral separation
+techniques if the different neural inputs to MNs are independent and
+have non-overlapping spectral bandwidths. However, this may not
+be expected if neural inputs have large bandwidths or if they are only
+transmitted to MNs through relatively small neural populations. In
+such a case, the inputs will present harmonic components that can be
+summed with neural sources in other frequency bands, with nonlinear
+mechanisms. An alternative possibility in this context is to use other
+source separation methods that rely on the statistical properties of
+the inputs to be decoded. These methods may take advantage of the
+fact that inputs to MNs arising from different parts of the CNS may
+have distinct patterns of projections to MNs within a muscle or to
+the groups of muscles they innervate69,70. Alternatively, spike prediction models may be implemented to estimate upstream neural
+activity from downstream spiking behaviour71–73. A recently proposed
+reinforcement-learning-based point process framework has been used
+to generatively predict spike trains through behaviour-level rewards74,
+that is, by using behavioural information to reduce the complexity of
+estimating neural activity in higher centres from downstream activity. The framework could be used to estimate the neural information
+associated with movement from the spiking activity of MNs encoding
+cortical information and, as a consequence, the activity that does not
+influence movement.
+
+Prospects of the peripheral neural interfaces
+with the CNS
+The ability to decode CNS signals from MN activity presents an exciting opportunity to access neural information that would otherwise
+be difficult to obtain non-invasively in unconstrained contexts. This
+is especially important for understanding neural activity in deep brain
+structures and spinal circuits, which are not currently measurable
+with existing technologies but may project their activity onto MNs in
+specific motor contexts.
+
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+a Brain and muscle recordings during isometric contractions
+
+b Directed coherence
+0.2
+
+Coherence
+
+EEG
+0.1
+
+Force
+tracking
+task
+10
+
+Cumulant density
+
+20
+30
+Frequency (Hz)
+
+40
+
+50
+
+~28 ms
+
+Normalized units
+
+HD-EMG
+
+Force
+sensor
+
+1s
+
+–100
+
+0
+Lag (ms)
+
+100
+
+Fig. 5 | Stable transmission of cortical activity to muscles. Simultaneous
+recordings of brain and muscle activity to assess their neural connectivity.
+a, The EEG signal from the primary motor cortex (blue trace) and high-density
+EMG (HD-EMG) recording from the tibialis anterior muscle were acquired while
+the ankle produced an isometric flexion force (at approximately 10% of the
+maximum force that the study participant could generate). The MN activity
+decoded from the HD-EMG recording was analysed together with the EEG
+recordings from the scalp area above the cortical representation of the studied
+muscle. b, Corticomuscular coherence in the descending direction (brain to
+
+muscle; top) provides evidence for the linear transmission of cortical activity
+at ~20 Hz to MNs. The analysis of the temporal association between the cortical
+and MN activity (bottom) indicates a lag between the correlated activity in
+the 2 recordings of ~28 ms, which corresponds to the average brain–muscle
+transmission delays through the fastest neural routes connecting the brain and
+the tibialis anterior92. The red traces indicate the data from one representative
+participant; the grey traces are the average group data (n = 19 participants). Panel
+b adapted from ref. 57 under a Creative Commons license CC BY 4.0.
+
+The possibility of using MNs as an indirect measure of the human
+brain is promising in the development of neural interfaces. Having
+access to large populations of MNs during a variety of motor conditions is expected to lead to improved estimates of high-frequency
+signals encoded by MNs and to a more refined understanding of how
+these signals co-vary with behaviour. Neural interfaces based on MN
+recordings may provide access to both spinal and brain signals, as long
+as the connectivity between circuits in the CNS and the muscles is not
+disrupted by a lesion. With modern EMG recording and processing
+techniques, we can now track the activity of large volumes of MNs with
+increasing precision and generalizability, both across participants and
+out of the laboratory, making this a viable approach for man–machine
+interfaces20,22,75,76. This type of interfacing can be accomplished with
+minimally invasive or even non-invasive devices, allowing for potentially large information transfer by simultaneously and accurately
+measuring multiple neurons. It also requires minimal calibration and
+may achieve long-term stability in tracking individual motor units
+across multiple sessions if the position of the EMG electrodes is maintained relative to the measured muscles77,78.
+Using MNs to develop an interface with the human brain may
+be particularly interesting for expanding human motor abilities by
+allowing people to control artificial limbs concurrently with their
+natural limbs79. The difficulty in realizing such motor augmentation is
+to identify neural signals that can be controlled independently from
+and in coordination with natural motor control signals80, and to transform the extracted information that is outside the motor space into a
+
+command that can allow a meaningful control of an electronic device81.
+MNs can be measured using wearable sensors and may transmit simultaneously low- and high-frequency neural contents to muscles. If some
+of the high-frequency signals transmitted to muscles are not directly
+linked to motor function, they may represent a resource for expanding
+the number of degrees of freedom that humans can control without
+interfering with the movements of natural limbs, which could allow
+movement of different parts in the body (see concept in Fig. 7).
+As a step towards this goal, real-time decomposition of MN activity allowed participants to control two components of the spectral
+content encoded by MNs60. After brief periods of training, participants
+could partially dissociate the activity in the two frequency bands that
+they had to control independently. This provides proof of concept
+that it is possible to extend the degrees of freedom that a single muscle can control (from one to two in this case). To advance this line
+of research, work is now needed to identify methods to extract and
+classify high-frequency signals in MNs and develop optimal training
+protocols that enable humans to control neural processes originating in the brain and transmitting through the muscles. One promising
+direction would involve the data-driven extraction of latent variables
+from MN behaviour that are orthogonal to movement kinematics. This
+could be done using artificial-intelligence-based approaches applied
+to dynamic modelling and latent factor analysis of MN populations82–84.
+Approaches that enable the identification of behaviourally relevant
+subspaces from cortical activity could be adapted to dynamic systems
+at the spinal level using MN data decomposed from muscle recordings.
+
+Nature Biomedical Engineering
+
+Perspective
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+a Forces in go and no-go trials
+
+b
+IS
+
+Spectral changes in MNs (no-go trials)
+
+Frequency (Hz)
+
+IS
+
+30
+
+30
+
+0
+40
+
+15
+
+0
+60
+
+15
+5
+
+–1
+
+Time (s)
+
+0
+
+0
+
+2
+
+35
+25
+15
+5
+
+–2
+
+Time (ms)
+
+35
+
+0.07
+
+25
+15
+5
+
+–0.07
+
+Time (ms)
+
+0.3
+0
+
+–0.3
+5
+–2
+
+–6
+
+Time (ms)
+
+∆ coherence (%)
+
+60
+
+WS
+
+Change
+in power
+(%)
+
+Frequency
+(Hz)
+
+No-go
+trials
+
+25
+
+∆ power (%)
+
+10% MVC
+
+Frequency
+(Hz)
+
+Go
+trials
+
+6
+
+35
+
+∆ power (%)
+
+Frequency
+(Hz)
+
+ON versus OFF
+
+∆ grip
+(a.u.)
+
+WS
+
+–300
+
+–150
+
+0
+Time (ms)
+
+150
+
+300
+
+Fig. 6 | Evidence for changes in high-frequency signals sampled by MNs
+that do not translate into force changes during isometric contractions.
+a, Changes in different frequency bands in the MN activity during the preparation
+and cancellation of a motor task in a go/no-go paradigm. Top: force traces from
+a representative participant in a study using a go/no-go paradigm to measure
+changes in high-frequency MN activity. In each trial, participants had to mildly
+activate the tibialis anterior muscle (producing a dorsiflexion force of 10% of
+the maximum voluntary contraction (MVC) achievable by each participant).
+After some time keeping the force stable, participants were presented with
+two cues: a warning stimulus (WS) informed about the upcoming imperative
+stimulus (IS), which was given 1 s after the WS. The IS could either mean that
+participants had to perform a fast dorsiflexion with the minimum reaction
+time possible (go trials) or that they had to remain in the same position without
+changing the produced force with the ankle (no-go trials). Bottom: results
+from the same representative participant as that in the top panel. From this
+participant, 38 motor units could be decomposed and tracked across 46 valid
+no-go trials. The composite spike train (summing the activity of all identified
+motor units) was obtained and then a continuous wavelet transform analysis
+was used to analyse the time–frequency changes in the composite spike train
+
+signal. The results reflect important changes in power at 3 frequencies (around
+8 Hz, 20 Hz and 46 Hz). In the average results across participants, significant
+changes could only be found at frequencies above 15 Hz (ref. 65). Colour scales
+were adapted to 3 frequency ranges (5–15 Hz, 15–30 Hz and 30–60 Hz). These
+results motivate the investigation of high-frequency signals in MNs as a potential
+resource for indirectly studying changes in the CNS (data from ref. 65). b, Results
+from a study67 combining magnetoencephalography with EMG to analyse the
+corticomuscular transmission of beta activity during sustained contractions.
+The figure shows the averaged segments of brain recordings in which beta
+bursts are detected (top) and the corresponding activity in the muscles
+(second panel), which aligns with the beta modulations in the brain. The
+coherence measurements between brain and muscle signals (third panel)
+provide consistent evidence of the common origin of the beta activity measured
+in the brain and muscle. Finally, the bottom panel shows how forces are kept
+unaltered during periods of strong beta modulation at the level of the brain and
+muscle (the plot shows the average and s.d. of the measured forces across all
+trials considered to generate these plots). In all four plots in panel b, ∆ refers to
+changes in the measured magnitude. a.u., arbitrary units. Panel b adapted from
+ref. 67 under a Creative Commons license CC BY 4.0.
+
+This would allow for the separation of the behaviourally relevant and
+irrelevant latent factors that drive motor unit activity. Alternatively,
+neurofeedback on MNs may be used to train the CNS to increase the
+number of motor commands to muscles to reach augmented control85.
+Decoding cortical activity from wearable sensors in the limbs to
+monitor brain states, without direct brain recordings, may also be used
+to refine existing interventions that guide neural changes in the CNS
+through non-invasive stimulation86,87. MN-based information can be
+used in neuromodulation interventions, such as in closed-loop brain
+stimulation approaches in which the information on the brain state that
+triggers the stimulation is obtained from a peripheral recording. This
+strategy may encounter problems when the delay introduced by conduction to the periphery poses major constraints on the closed-loop
+algorithm88. However, in applications where this delay is not a problem,
+such recordings would have several advantages with respect to current closed-loop brain stimulation approaches that estimate brain
+states directly from brain recordings86. First, electrical or magnetic
+stimulation of the CNS produces large artefacts that strongly affect
+brain recordings, but they have little impact on muscle recordings
+that should not affect the accuracy in decoding the spiking activity
+
+of MNs89. Second, oscillations at high frequencies can presumably be
+better identified from direct neural cell spike trains, as in the case of
+MN decoding, than from the interference EEG signals recorded from
+the scalp. Finally, if oscillations in a frequency band decoded from MNs
+are caused only by cortical projections, or if the contributions from
+different sources to a given frequency band of the spectral contents
+in MN activity can be separated (for example, by using separation
+methods), then it would not be necessary to separate multiple cortical sources that oscillate simultaneously at overlapping frequencies.
+In fact, in this context MNs are expected to provide reliable estimates
+of modulations in cortical rhythmic activity based on simulations of
+corticospinal projections to MNs.
+
+Nature Biomedical Engineering
+
+Considerations and limitations
+This Perspective underscores recent strides made in the analysis and
+interpretation of muscle recordings, aiming to motivate further exploration into harnessing the information encoded by MNs about CNS
+activity. The promise of muscle-based neural interfaces is evident in
+their practicality and potential for real-world applications76. However,
+it is important to consider the current state of techniques and systems
+
+Perspective
+a
+
+https://doi.org/10.1038/s41551-025-01445-1
+
+b
+High-frequency
+inputs
+Motor
+inputs
+
+Fig. 7 | Human motor augmentation extending the number of control signals
+extracted from human muscles. In the field of human motor augmentation, a
+key question relates to the extraction of neural information from the brain that
+allows humans to control artificial effectors. a, Schematic of limb augmentation,
+inspired by Stelarc’s third-hand art project (stelarc.org). b, The spinal cord
+projects multiple signals to the MN pools innervating muscles. Inputs common
+to all MNs in a muscle and outside the motor band are linearly transmitted to
+
+muscles and are partly associated with ongoing brain activity. These highfrequency inputs to MNs and muscles may be used to augment the degrees of
+freedom that humans can use to control natural limbs and artificial effectors.
+In this view, the electric fields that can be measured over the human body reflect
+the activity of muscles that can be tracked back to cortical brain signals, thereby
+yielding a brain interface from peripheral sensors placed on limbs.
+
+used to extract MN information from muscles, such as the reliance of
+MN-based interfaces on muscle activation. Information at the entry
+points of MNs becomes accessible only upon their recruitment and
+firing. A critical challenge facing EMG-based MN recording methods
+is decoding MNs during dynamic contractions. As muscles and limbs
+initiate movement, the stability of the shape of the motor unit action
+potential diminishes, rendering linear decomposition methods unreliable for identifying and tracking single MNs. While recent literature suggests various approaches to address this limitation18,22,24, non-invasive
+systems capable of tracking MNs during unrestricted movements are
+yet to be realized, constraining the applicability of MN-based neural interfaces beyond laboratory settings. Moreover, to accurately
+estimate neural inputs to MNs from their outputs during dynamic
+conditions, it is imperative to reliably model neuromodulatory processes at the MN membrane. Such processes may transiently disrupt
+the linear input–output curves of MNs. Although these fluctuations
+may not substantially impede the extraction of common inputs from
+an MN pool across different frequencies, they could introduce noise,
+compromising the fidelity with which modulations in various common inputs are tracked37,90. At present, we still do not understand the
+functional roles of high-frequency inputs to MNs with cortical origin,
+such as beta and gamma activity, nor their link with motor control.
+Therefore, it is difficult to predict the range of applications that may
+be developed by having access to this type of information from MNs.
+Further research is needed to explore how MNs can give a handle on
+the high-frequency inputs.
+
+References
+
+Conclusion
+In this Perspective, we argue that the electric fields generated by muscles in our bodies may provide an indirect observation of neural activity
+that originates in the CNS and is transmitted through MNs and muscles
+without directly modulating forces. These fields reflect the behaviour of
+neurons that constitute the output layer of the neural network formed
+by the nervous system. As at least part of the information that arrives
+at the output of the nervous system is known to originate in regions of
+the CNS such as the cortex, recording from muscle tissue may allow us
+to establish a type of human interfacing not only with the peripheral
+nervous system but also with the CNS. The presence of cortical oscillations in the activity of MNs opens opportunities of interfacing with
+applications that range from neurofeedback to human movement
+augmentation.
+Nature Biomedical Engineering
+
+1.
+
+2.
+3.
+4.
+
+5.
+6.
+
+7.
+8.
+
+9.
+
+10.
+11.
+12.
+
+13.
+
+14.
+
+15.
+
+Liddell, E. G. T. & Sherrington, C. S. Recruitment and some other
+features of reflex inhibition. Proc. R. Soc. Lond. B 97, 488–518
+(1997).
+Sherrington, C. S. The Integrative Action of the Nervous System
+(Yale Univ. Press, 1906).
+Duraivel, S. et al. High-resolution neural recordings improve the
+accuracy of speech decoding. Nat. Commun. 14, 6938 (2023).
+Willett, F. R., Avansino, D. T., Hochberg, L. R., Henderson, J. M. &
+Shenoy, K. High-performance brain-to-text communication via
+handwriting. Nature 593, 249–254 (2021).
+Nurmikko, A. Challenges for large-scale cortical interfaces.
+Neuron 108, 259–269 (2020).
+Merletti, R., Holobar, A. & Farina, D. Analysis of motor units with
+high-density surface electromyography. J. Electromyogr. Kinesiol.
+18, 879–890 (2008).
+Gandevia, S. Spinal and supraspinal factors in human muscle
+fatigue. Physiol. Rev. 81, 1725–1789 (2001).
+Farina, D. et al. Man/machine interface based on the discharge
+timings of spinal motor neurons after targeted muscle
+reinnervation. Nat. Biomed. Eng. 1, 0025 (2017).
+Conway, B. A. et al. Synchronization between motor cortex
+and spinal motoneuronal pool during the performance of a
+maintained motor task in man. J. Physiol. 489, 917–924 (1995).
+Mima, T., Ohara, S. & Nagamine, T. Cortical–muscular coherence.
+Int. Congr. Ser. 1226, 109–119 (2002).
+Baker, S. N. Oscillatory interactions between sensorimotor cortex
+and the periphery. Curr. Opin. Neurobiol. 17, 649–655 (2007).
+Baldissera, F., Cavallari, P. & Cerri, G. Motoneuronal
+pre-compensation for the low-pass filter characteristics of
+muscle. A quantitative appraisal in cat muscle units. J. Physiol.
+511, 611–627 (1998).
+Cisi, R. R. L. & Kohn, A. F. Simulation system of spinal cord motor
+nuclei and associated nerves and muscles, in a web-based
+architecture. J. Comput. Neurosci. 25, 520–542 (2008).
+Merletti, R. & Muceli, S. Tutorial. Surface EMG detection in space
+and time: best practices. J. Electromyogr. Kinesiol. 49, 102363
+(2019).
+Adrian, E. D. & Bronk, D. W. The discharge of impulses in motor
+nerve fibres: part II. The frequency of discharge in reflex and
+voluntary contractions. J. Physiol. 67, i3–151 (1929).
+
+Perspective
+16. Kline, J. C. & Luca, C. J. D. Error reduction in EMG signal
+decomposition. J. Neurophysiol. 112, 2718–2728 (2018).
+17. Wen, Y. et al. A deep CNN framework for neural drive estimation
+from HD-EMG across contraction intensities and joint angles.
+IEEE Trans. Neural Syst. Rehabil. Eng. 30, 2950–2959 (2022).
+18. Ma, S. et al. Conditional generative models for simulation of EMG
+during naturalistic movements. IEEE Trans. Neural Netw. Learn.
+Syst. 36, 9224–9237 (2025).
+19. Clarke, A. K. et al. Deep learning for robust decomposition of
+high-density surface EMG signals. IEEE Trans. Biomed. Eng. 68,
+526–534 (2021).
+20. Muceli, S. et al. Blind identification of the spinal cord output in
+humans with high-density electrode arrays implanted in muscles.
+Sci. Adv. 8, 2003–2005 (2022).
+21. Holobar, A. & Zazula, D. Multichannel blind source separation
+using convolution kernel compensation. IEEE Trans. Signal
+Process. 55, 4487–4496 (2007).
+22. Glaser, V. & Holobar, A. Motor unit identification from highdensity surface electromyograms in repeated dynamic muscle
+contractions. IEEE Trans. Neural Syst. Rehabil. Eng. 27, 66–75
+(2019).
+23. Glaser, V., Holobar, A. & Zazula, D. Real-time motor unit
+identification from high-density surface EMG. IEEE Trans. Neural
+Syst. Rehabil. Eng. 21, 949–958 (2013).
+24. Maksymenko, K., Clarke, A. K., Mendez Guerra, I.,
+Deslauriers-Gauthier, S. & Farina, D. A myoelectric digital twin for
+fast and realistic modelling in deep learning. Nat. Commun. 14,
+1600 (2023).
+25. Mayer, K. M. S., Del Vecchio, A., Eskofier, B. M. & Farina, D.
+Unsupervised neural decoding of signals recorded by thin-film
+electrode arrays implanted in muscles using autoencoding with
+a physiologically derived optimisation criterion. Biomed. Signal
+Process. Control 86, 105178 (2023).
+26. Lemon, R. N. Descending pathways in motor control. Annu. Rev.
+Neurosci. 31, 195–218 (2008).
+27. Williams, E. R. & Baker, S. N. Circuits generating corticomuscular
+coherence investigated using a biophysically based
+computational model. I. Descending systems. J. Neurophysiol.
+101, 31–41 (2009).
+28. Farmer, S. F., Bremner, F. D., Halliday, D. M., Rosenberg, J. R. &
+Stephens, J. A. The frequency content of common synaptic inputs
+to motoneurones studied during voluntary isometric contraction
+in man. J. Physiol. 470, 127–155 (1993).
+29. Nordstrom, M. A., Fuglevand, A. J. & Enoka, R. M. Estimating the
+strength of common input to human motoneurons from the
+cross-correlogram. J. Physiol. 453, 547–574 (1992).
+30. De Luca, C. J. & Erim, Z. Common drive of motor units in
+regulation of muscle force. Trends Neurosci. 17, 299–305 (1994).
+31. Farina, D. & Negro, F. Common synaptic input to motor neurons,
+motor unit synchronization, and force control. Exerc. Sport Sci.
+Rev. 43, 23–33 (2015).
+32. Feeney, D. F., Meyer, F. G., Noone, N. & Enoka, R. A latent
+low-dimensional common input drives a pool of motor neurons:
+a probabilistic latent state-space model. J. Neurophysiol. 118,
+2238–2250 (2017).
+33. Feeney, D. F., Mani, D. & Enoka, R. M. Variability in common
+synaptic input to motor neurons modulates both force steadiness
+and pegboard time in young and older adults. J. Physiol. 596,
+3793–3806 (2018).
+34. Umeda, T., Isa, T. & Nishimura, Y. Temporal dynamics of the
+sensorimotor convergence underlying voluntary limb movement.
+Proc. Natl Acad. Sci. USA 119, e2208353119 (2022).
+35. Nakao, M., Norimatsu, M., Mizutani, Y. & Yamamoto, M. Spectral
+distortion properties of the integral pulse frequency modulation
+model. IEEE Trans. Biomed. Eng. 44, 419–426 (1997).
+Nature Biomedical Engineering
+
+https://doi.org/10.1038/s41551-025-01445-1
+36. Farina, D., Negro, F. & Dideriksen, J. L. The effective neural drive
+to muscles is the common synaptic input to motor neurons.
+J. Physiol. 592, 3427–3441 (2014).
+37. Revill, A. L. & Fuglevand, A. J. Inhibition linearizes firing rate
+responses in human motor units: implications for the role of
+persistent inward currents. J. Physiol. 595, 179–191 (2017).
+38. Enoka, R. Physiological validation of the decomposition of surface
+EMG signals. J. Electromyogr. Kinesiol. 46, 70–83 (2019).
+39. Averbeck, B. B., Latham, P. E. & Pouget, A. Neural correlations,
+population coding and computation. Nat. Rev. Neurosci. 7,
+358–366 (2006).
+40. de la Rocha, J., Doiron, B., Shea-Brown, E., Josić, K. & Reyes, A.
+Correlation between neural spike trains increases with firing rate.
+Nature 448, 802–806 (2007).
+41. Warland, D. K., Reinagel, P. & Meister, M. Decoding visual
+information from a population of retinal ganglion cells.
+J. Neurophysiol. 78, 2336–2350 (1997).
+42. Sabourin, P. & Pollack, G. S. Temporal coding by populations
+of auditory receptor neurons. J. Neurophysiol. 103, 1614–1621
+(2010).
+43. Partridge, L. D. Modifications of neural output signals by muscles:
+a frequency response study. J. Appl. Physiol. 20, 150–156 (1965).
+44. Partridge, L. D. & Benton, L. A. in Handbook of Physiology: section
+1. The nervous system II. Motor control, part 1 (ed. Brooks, V. B.)
+43–106 (American Physiological Society, 1981).
+45. Raethjen, J., Govindan, R. B., Kopper, F., Muthuraman, M. &
+Deuschl, G. Cortical involvement in the generation of essential
+tremor. J. Neurophysiol. 97, 3219–3228 (2007).
+46. Elble, R. J. Report from a U.S. conference on essential tremor.
+Mov. Disord. 21, 2052–2061 (2006).
+47. Novembre, G. et al. The effect of salient stimuli on neural
+oscillations, isometric force, and their coupling. NeuroImage 198,
+221–230 (2019).
+48. Schoffelen, J., Poort, J., Oostenveld, R. & Fries, P. Selective
+movement preparation is subserved by selective increases
+in corticomuscular gamma-band coherence. J. Neurosci. 31,
+6750–6758 (2011).
+49. Schoffelen, J., Oostenveld, R. & Fries, P. Neuronal coherence as a
+mechanism of effective corticospinal interaction. Science 308,
+111–113 (2005).
+50. Mima, T., Steger, J., Schulman, A. E., Gerloff, C. & Hallett, M.
+Electroencephalographic measurement of motor cortex control
+of muscle activity in humans. Clin. Neurophysiol. 111, 326–337
+(2000).
+51. Omlor, W., Patino, L., Hepp-Reymond, M.-C. & Kristeva, R.
+Gamma-range corticomuscular coherence during dynamic force
+output. NeuroImage 34, 1191–1198 (2007).
+52. Mehrkanoon, S., Breakspear, M. & Boonstra, T. W. The
+reorganization of corticomuscular coherence during a transition
+between sensorimotor states. NeuroImage 100, 692–702 (2014).
+53. Petersen, T. H., Willerslev-Olsen, M., Conway, B. A. & Nielsen, J. B.
+The motor cortex drives the muscles during walking in human
+subjects. J. Physiol. 590, 2443–2452 (2012).
+54. Halliday, D. M., Conway, B. A., Farmer, S. F. & Rosenberg, J. R.
+Using electroencephalography to study functional coupling
+between cortical activity and electromyograms during voluntary
+contractions in humans. Neurosci. Lett. 241, 5–8 (1998).
+55. Jackson, A., Spinks, R. L., Freeman, T. C. B., Wolpert, D. M.
+& Lemon, R. N. Rhythm generation in monkey motor cortex
+explored using pyramidal tract stimulation. J. Physiol. 541,
+685–699 (2002).
+56. Baker, S. N., Pinches, E. M. & Lemon, R. N. Synchronization in
+monkey motor cortex during a precision grip task. II. Effect of
+oscillatory activity on corticospinal output. J. Neurophysiol. 89,
+1941–1953 (2003).
+
+Perspective
+57. Ibáñez, J., Del Vecchio, A., Rothwell, J. C., Baker, S. N. &
+Farina, D. Only the fastest corticospinal fibers contribute to β
+corticomuscular coherence. J. Neurosci. 41, 4867–4879 (2021).
+58. Halliday, D. M. Nonparametric directionality measures for time
+series and point process data. J. Integr. Neurosci. 14, 253–277
+(2015).
+59. von Carlowitz-Ghori, K., Bayraktaroglu, Z., Waterstraat, G., Curio, G.
+& Nikulin, V. V. Voluntary control of corticomuscular coherence
+strength through neurofeedback: a proof-of-principle study in
+healthy subjects. Neuroscience 290, 243–254 (2015).
+60. Bräcklein, M., Ibáñez, J., Barsakcioglu, D. & Farina, D. Towards
+human motor augmentation by voluntary decoupling beta
+activity in the neural drive to muscle and force production.
+J. Neural Eng. 18, 016001 (2021).
+61. Bräcklein, M., Barsakcioglu, D., Del Vecchio, A., Ibáñez, J. &
+Farina, D. Reading and modulating cortical beta bursts from
+motor unit spiking activity. J. Neurosci. 42, 3611–3621 (2022).
+62. Kaufman, M. T., Churchland, M. M., Ryu, S. I. & Shenoy, K.
+Cortical activity in the null space: permitting preparation without
+movement. Nat. Neurosci. 17, 440–448 (2014).
+63. Ibáñez, J., Hannah, R., Rocchi, L. & Rothwell, J. C. Premovement
+suppression of corticospinal excitability may be a necessary part
+of movement preparation. Cereb. Cortex 30, 2910–2923 (2020).
+64. Wessel, J. R. β-Bursts reveal the trial-to-trial dynamics of move­
+ment initiation and cancellation. J. Neurosci. 40, 411–423 (2020).
+65. Zicher, B., Avrillon, S., Ibáñez, J. & Farina, D. Changes in
+high-frequency neural inputs to muscles during movement
+cancellation. J. Neural Eng. 21, 056039 (2024).
+66. Nakata, H., Sakamoto, K., Otsuka, A., Yumoto, M. & Kakigi, R.
+Cortical rhythm of no-go processing in humans: an MEG study.
+Clin. Neurophysiol. 124, 273–282 (2013).
+67. Echeverria-Altuna, I. et al. Transient beta activity and
+cortico-muscular connectivity during sustained motor behaviour.
+Prog. Neurobiol. 214, 102281 (2022).
+68. Ofner, P., Lee, M., Farina, D. & Mehring, C. Mental tasks modulate
+motor-units above 10 Hz and are a potential control signal for
+movement augmentation: a preliminary study. In Proc. 45th
+Annual International Conference of the IEEE Engineering in
+Medicine and Biology Society (EMBC) (IEEE, 2023).
+69. Stephens, J. A., Garnett, R. & Buller, N. P. Reversal of recruitment
+order of single motor units produced by cutaneous stimulation
+during voluntary muscle contraction in man. Nature 272, 362–364
+(1978).
+70. Baker, S. N. The primate reticulospinal tract, hand function and
+functional recovery. J. Physiol. 589, 5603–5612 (2011).
+71. Truccolo, W., Eden, U. T., Fellows, M. R., Donoghue, J. P. &
+Brown, E. N. A point process framework for relating neural
+spiking activity to spiking history, neural ensemble, and extrinsic
+covariate effects. J. Neurophysiol. 93, 1074–1089 (2005).
+72. Qian, C. et al. Nonlinear modeling of neural interaction for spike
+prediction using the staged point-process model. Neural Comput.
+30, 3189–3226 (2018).
+73. Qian, C. et al. Binless kernel machine: modeling spike train
+transformation for cognitive neural prostheses. Neural Comput.
+32, 1863–1900 (2020).
+74. Wu, S. et al. Generative neural spike prediction from upstream
+neural activity via behavioral reinforcement. Preprint at bioRxiv
+https://doi.org/10.1101/2023.07.25.550495 (2023).
+75. Wang, Y. et al. Electrically compensated, tattoo-like electrodes
+for epidermal electrophysiology at scale. Sci. Adv. 6, eabd0996
+(2020).
+76. CTRL-labs at Reality Labs, Sussillo, D., Kaifosh, P. & Reardon, T.
+A generic noninvasive neuromotor interface for human-computer
+interaction. Preprint at bioRxiv https://doi.org/10.1101/2024.
+02.23.581779 (2024).
+Nature Biomedical Engineering
+
+https://doi.org/10.1038/s41551-025-01445-1
+77. Del Vecchio, A. et al. Interfacing motor units in nonhuman
+primates identifies a principal neural component for force control
+constrained by the size principle. J. Neurosci. 42, 7386–7399
+(2022).
+78. Del Vecchio, A. & Farina, D. Interfacing the neural output of the
+spinal cord: robust and reliable longitudinal identification of
+motor neurons in humans. J. Neural Eng. 17, 016003 (2019).
+79. Eden, J. et al. Principles of human movement augmentation
+and the challenges in making it a reality. Nat. Commun. 13,
+1345 (2022).
+80. Kieliba, P., Clode, D., Maimon-Mor, R. O. & Makin, T. R.
+Robotic hand augmentation drives changes in neural body
+representation. Sci. Robot. 6, eabd7935 (2021).
+81. Sawyer, A., Cooke, L., Ramsey, N. F. & Putrino, D. The digital
+motor output: a conceptual framework for a meaningful clinical
+performance metric for a motor neuroprosthesis. J. Neurointerv.
+Surg. 16, 443–446 (2024).
+82. Pandarinath, C. et al. Inferring single-trial neural population
+dynamics using sequential auto-encoders. Nat. Methods 15,
+805–815 (2018).
+83. Sani, O. G., Abbaspourazad, H., Wong, Y. T., Pesaran, B. &
+Shanechi, M. M. Modeling behaviorally relevant neural dynamics
+enabled by preferential subspace identification. Nat. Neurosci. 24,
+140–149 (2021).
+84. Vyas, S., Golub, M. D., Sussillo, D. & Shenoy, K. Computation
+through neural population dynamics. Annu. Rev. Neurosci. 43,
+249–275 (2020).
+85. Formento, E., Botros, P. & Carmena, J. M. Skilled independent
+control of individual motor units via a non-invasive
+neuromuscular–machine interface. J. Neural Eng. 18, 066019
+(2021).
+86. Zrenner, C., Desideri, D., Belardinelli, P. & Ziemann, U.
+Real-time EEG-defined excitability states determine efficacy of
+TMS-induced plasticity in human motor cortex. Brain Stimul. 11,
+374–389 (2018).
+87. Bergmann, T. O., Karabanov, A., Hartwigsen, G., Thielscher, A. &
+Siebner, H. Combining non-invasive transcranial brain stimulation
+with neuroimaging and electrophysiology: current approaches
+and future perspectives. NeuroImage 140, 4–19 (2016).
+88. Brown, K. I., Williams, E. R., de Carvalho, F. & Baker, S. N. Plastic
+changes in human motor cortical output induced by random but
+not closed-loop peripheral stimulation: the curse of causality.
+Front. Hum. Neurosci. 10, 590 (2016).
+89. Ibáñez, J. et al. Standard intensities of transcranial alternating
+current stimulation over the motor cortex do not entrain
+corticospinal inputs to motor neurons. J. Physiol. 601, 3187–3199
+(2023).
+90. Binder, M. D., Powers, R. K. & Heckman, C. J. Nonlinear
+input-output functions of motoneurons. Physiology 35, 31–39
+(2020).
+91. Williams, E. R. & Baker, S. N. Renshaw cell recurrent inhibition
+improves physiological tremor by reducing corticomuscular
+coupling at 10 Hz. J. Neurosci. 29, 6616–6624 (2009).
+92. Jaiser, S. R., Barnes, J. D., Baker, S. N. & Baker, M. R. A multiple
+regression model of normal central and peripheral motor
+conduction times. Muscle Nerve 51, 706–712 (2015).
+
+Acknowledgements
+
+This work was partly funded by the EC H2020 grants NIMA
+(FETOPEN 899626) and Natural BionicS (ERC Synergy 810346),
+UKRI’s EPSRC grant EP/T020970/1 and the BBSRC grant BB/
+V00896X/1. J.I. is supported by the European Research Council (ERC)
+through the Horizon Europe 2022 Starting Grant programme under
+REA grant agreement number 101077693, and by MICIU/AEI and
+FEDER, EU (grant PID2022-138585OA-C32).
+
+Perspective
+
+Author contributions
+
+J.I. and D.F. drafted the paper. J.I., B.Z., E.B., S.N.B., C.M. and D.F.
+contributed to literature review, conceptualization and editing
+of the article.
+
+Competing interests
+
+The authors declare no competing interests.
+
+Additional information
+
+Correspondence should be addressed to Jaime Ibáñez or Dario Farina.
+Peer review information Nature Biomedical Engineering thanks
+Tamar Makin and the other, anonymous, reviewer(s) for their
+contribution to the peer review of this work.
+
+Nature Biomedical Engineering
+
+https://doi.org/10.1038/s41551-025-01445-1
+Reprints and permissions information is available at
+www.nature.com/reprints.
+Publisher’s note Springer Nature remains neutral with regard to
+jurisdictional claims in published maps and institutional affiliations.
+Springer Nature or its licensor (e.g. a society or other partner)
+holds exclusive rights to this article under a publishing
+agreement with the author(s) or other rightsholder(s); author
+self-archiving of the accepted manuscript version of this article is
+solely governed by the terms of such publishing agreement and
+applicable law.
+© Springer Nature Limited 2025
+
+

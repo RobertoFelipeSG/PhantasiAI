@@ -1,0 +1,28 @@
+Meyer, C., Hofstoetter, U. S., Hubli, M., Hassani, R. H., Rinaldo, C., Curt, A., & Bolliger, M. (2020). Immediate Effects of Transcutaneous Spinal Cord Stimulation on Motor Function in Chronic, Sensorimotor Incomplete Spinal Cord Injury. Journal of clinical medicine, 9(11), 3541. https://doi.org/10.3390/jcm9113541 
+
+The study investigates the immediate effects of a single application of tSCS at three different frequencies (15 Hz, 30 Hz, and 50 Hz) on voluntary ankle control in ten individuals with chronic, sensorimotor incomplete spinal cord injury (iSCI) in the supine position. 
+The study also investigates whether the effects observed in the ankle control task would transfer to over-ground walking with a body weight support (BWS) system and if other stimulation-induced effects were present during locomotion. The study also investigates the effect of tSCS on dedicated spinal networks by the electromyographic (EMG) representation of a polysynaptic spinal reflex elicited by electrical stimulation of the distal tibial nerve.
+
+Participants had chronic, sensorimotor iSCI, classified as grade D on the American Spinal Injury Association Impairment Scale none of the participants had previous experience with tSCS. None of the participants had previous experience with tSCS. Among the exclusion criteria were neurological lesion levels caudal to T12, and active or passive implants at vertebral level T9 or caudally. 
+[FROM TABLE 1]: 10 participants (9 male, 1 female), age ranged from ranged 28-65, time post-SCI ranged from 4-38 years, associated levels of SCI include C3, C4, C5, C6, C7, T3, T4, and T10.
+
+Two independent study sessions were conducted on separate days (time between sessions: 1–21 days). For both sessions, lumbar tSCS was applied through a self-adhesive surface electrode (5 x 9 cm; positioned longitudinally over the spine, covering the T11 and T12 spinous processes, and a coupled pair of electrodes (7.5 x 13 cm each) placed over the lower abdomen, in symmetry to the umbilicus. 
+Session 1: The participants’ ability to perform controlled ankle movements was investigated. The mean PRM-reflex threshold +/- SD across participants was 31.0 +/- 18.8 mA (per phase of the biphasic stimulation pulse), ranging from 15 mA to 70 mA. Tonic tSCS was applied with a target amplitude of 0.8–1.0 times the individual PRM-reflex threshold, yet always below a level causing discomfort, and which amounted to 26.4 +/- 17.3 mA across participants (same for all stimulation frequencies, 13–65 mA; 0.84 +/- 0.10  PRM-reflex threshold)
+Session 2: Spinal reflex activity and walking performance were assessed. The mean PRM-reflex threshold was 32.0 +/- 14.4 mA (14–65 mA) in the supine position (spinal reflex protocol), and 40.6 +/- 13.5 mA (20–60 mA) in the BWS-supported standing position with walking aids, as used for stepping. The mean stimulation amplitude of tonic tSCS was 28.8 +/- 14.7 mA (13–65 mA, 0.89 +/- 0.08 PRM reflex threshold) for the spinal reflex protocol, and 34.8 +/- 13.1 mA (same for all stimulation frequencies, 16–60 mA, 0.85 +/- 0.10  PRM reflex threshold) for the walk tests.
+The maximum durations of tSCS application with the target amplitude were approximately 5 min for the ankle control and walk tests, and 15 min for the spinal reflex assessment. 
+
+Data were analyzed offline using Matlab 2017b, IBM SPSS Statistics 26.0 for Windows, and R 3.6.1 with R Studio 1.2. Alpha-errors of p < 0.05 were considered significant. 
+For ankle movement, separate linear mixed models, with movement rate and tSCS condition as fixed effects and between-subject differences as random effect, were fit to the data of the more and the less affected lower limbs. Effect sizes are reported by the partial eta-squared.
+For spinal reflexes, EMG-RMS values of the early and the late response components, as well as spinal reflex thresholds, were compared by running separate linear mixed models with stimulation condition and lower limb as fixed effects and between-subject differences as random effect. Effect sizes are reported by the partial eta-squared.
+Maximum walking speed was compared between tSCS-off and tSCS-on at 30 Hz using a Wilcoxon signed-rank test (correlation coefficient as effect size).
+
+This study demonstrated that tonic tSCS can acutely facilitate residual voluntary ankle control after chronic iSCI, and modulates spinal locomotor networks, i.e., polysynaptic spinal reflex behavior. Effects on locomotion were variable across participants, yet, the ones with lower ambulatory function showed increased maximum walking speed or more continuous stepping in the presence of tSCS. 
+During rhythmic voluntary ankle movements, maximum dorsiflexion was significantly enhanced in the more affected lower limb during 30-Hz stimulation compared to tSCS-off. No effects on rhythmic ankle movements were observed for 15-Hz and 50-Hz tSCS. Absolute plantar flexion angles were unchanged, or even decreased, for both legs across stimulation conditions in this study. Coordination of the ankle joint was unchanged during tSCS across all frequencies.  
+In this study, the late reflex component was decreased under tonic 30-Hz stimulation for the more and less affected leg. No significant group effect on the early reflex component existed, yet, in some of the participants, it was increased or reoccurred (the latter in participant 5 only) when the stimulation was applied.
+There was no group effect of tSCS on walking ability, and high variability between participants was observed.
+
+Individually tailored stimulation parameter settings, as well as multiple applications of the intervention together with task-specific training paradigms, may lead to enhanced clinical outcomes.
+
+
+
+

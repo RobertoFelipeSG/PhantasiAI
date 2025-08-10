@@ -1,0 +1,932 @@
+J Appl Physiol 118: 1364–1374, 2015.
+First published March 26, 2015; doi:10.1152/japplphysiol.01128.2014.
+
+Spinal segment-specific transcutaneous stimulation differentially shapes
+activation pattern among motor pools in humans
+Dimitry G. Sayenko,1,2 Darryn A. Atkinson,3 Christine J. Dy,4 Katelyn M. Gurley,3 Valerie L. Smith,3
+Claudia Angeli,1,3 Susan J. Harkema,1,3 V. Reggie Edgerton,2 and Yury P. Gerasimenko2,5,6
+1
+
+Department of Neurological Surgery, University of Louisville, Louisville, Kentucky; 2Department of Integrative Biology
+and Physiology, University of California, Los Angeles, Los Angeles, California; 3Neuroscience Collaborative Center, Frazier
+Rehab Institute, Louisville, Kentucky; 4School of Kinesiology and Nutritional Science, California State University, Los
+Angeles, California; 5Pavlov Institute of Physiology, St. Petersburg, Russia; and 6Institute of Fundamental Medicine and
+Biology, Kazan Federal University, Kazan, Russia
+Submitted 18 December 2014; accepted in final form 25 March 2015
+
+Sayenko DG, Atkinson DA, Dy CJ, Gurley KM, Smith VL, Angeli C,
+Harkema SJ, Edgerton VR, Gerasimenko YP. Spinal segment-specific
+transcutaneous stimulation differentially shapes activation pattern among
+motor pools in humans. J Appl Physiol 118: 1364–1374, 2015. First published March 26, 2015; doi:10.1152/japplphysiol.01128.2014.—Transcutaneous and epidural electrical spinal cord stimulation techniques are
+becoming more valuable as electrophysiological and clinical tools.
+Recently, we observed selective activation of proximal and distal
+motor pools during epidural spinal stimulation. In the present study,
+we hypothesized that the characteristics of recruitment curves obtained from leg muscles will reflect a relative preferential activation of
+proximal and distal motor pools based on their arrangement along the
+lumbosacral enlargement. The purpose was to describe the electrophysiological responses to transcutaneous stimulation in leg muscles
+innervated by motoneurons from different segmental levels. Stimulation delivered along the rostrocaudal axis of the lumbosacral enlargement in the supine position resulted in a selective topographical
+recruitment of proximal and distal leg muscles, as described by
+threshold intensity, slope of the recruitment curves, and plateau point
+intensity and magnitude. Relatively selective recruitment of proximal
+and distal motor pools can be titrated by optimizing the site and
+intensity level of stimulation to excite a given combination of motor
+pools. The slope of the recruitment of particular muscles allows
+characterization of the properties of afferents projecting to specific
+motoneuron pools, as well as to the type and size of the motoneurons.
+The location and intensity of transcutaneous spinal electrical stimulation are critical to target particular neural structures across different
+motor pools in investigation of specific neuromodulatory effects.
+Finally, the asymmetry in bilateral evoked potentials is inevitable and
+can be attributed to both anatomical and functional peculiarities of
+individual muscles or muscle groups.
+human; transcutaneous spinal cord stimulation; evoked potentials;
+electrophysiological assessment; neurorehabilitation
+TRANSCUTANEOUS AND EPIDURAL electrical stimulation techniques
+
+applied to the intact or injured spinal cord are emerging as
+valuable tools for electrophysiological and clinical assessment
+(10, 12, 13, 21, 39). Given the increasingly recognized clinical
+importance of spinal stimulation as a means to facilitate recovery of motor function after paralysis (21, 39), a better understanding of excitability of the sensory-motor pathways related
+Address for reprint requests and other correspondence: D. G. Sayenko, Dept.
+of Integrative Biology and Physiology, Univ. of California, Los Angeles,
+Terasaki Life Science Bldg., 610 Charles E. Young Dr. East, Los Angeles, CA
+90095 (e-mail: dsayenko@ucla.edu).
+1364
+
+to the spinal circuitry using transcutaneous and epidural stimulation is critical.
+Spinally evoked potentials using transcutaneous spinal stimulation are most frequently studied with the cathode positioned
+over the T11–T12 intervertebral space (10, 12, 23, 28), which in
+the most cases provides simultaneous activation of knee and
+ankle flexors and extensor muscles. There are also several
+reports describing the responses to transcutaneous stimulation
+at different spinal levels along the rostrocaudal axis of the
+lumbosacral area (3, 36, 40, 58). Furthermore, Roy et al. (47)
+demonstrated the degree to which transcutaneous stimulation
+can preferentially activate sensory and motor roots, depending
+on the stimulation site; whereas, Krenn et al. (32) investigated
+selective activation of quadriceps and triceps surae muscles.
+These studies reported that the threshold of activation of the
+proximal muscles was lower than for the distal muscles when
+stimulating at the more rostral spinal levels, whereas the
+threshold for the distal muscles’ recruitment occurs at lower
+intensities than for proximal muscles with stimulation at more
+caudal levels (32, 40, 47). However, no studies have investigated in details and characterized the topographical recruitment
+of multiple proximal and distal motor pools, depending on the
+location of the stimulation site.
+Recently, we observed selective activation of proximal and
+distal motor pools in individuals with complete motor paralysis
+who were implanted with epidural electrodes during stimulation over the lumbosacral enlargement (48). It was demonstrated that the pathways mediating evoked responses include
+both monosynaptic and oligosynaptic components. Limiting
+stimulation within an electrode array to electrodes localized
+over the spinal segments L1–L2, L3–L4, and L5–S1 allowed for
+more selective recruitment of the motor pools, whereas a
+wide-field stimulation over L1–L2 and L5–S1 resulted in a more
+generalized pattern of activation among proximal and distal
+motor pools (Ref. 48: cf., Fig. 1).
+We suggested that the complex behavior and characteristics
+of the spinally evoked potentials using transcutaneous spinal
+stimulation can be similar to the potentials evoked using
+epidural stimulation. At the same time, the amount of selectivity at different motor pools’ recruitment, as well as the
+contribution of specific neural structures during transcutaneous
+stimulation, remain unclear and can be different than during
+epidural stimulation. Appropriate utilization of these differences may be critical for the therapeutic and functional efficacy
+of these approaches.
+
+8750-7587/15 Copyright © 2015 the American Physiological Society
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+http://www.jappl.org
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+1365
+
+Fig. 1. Reconstruction showing the approximate location of transcutaneous electrical
+spinal stimulation over the lumbosacral enlargement, and the location of the motor
+pools based on the segmental charts provided by Kendall et al. (27) and Sharrard
+(52). Figure created using data from Refs. 27
+and 52. Triangle endings in Kendall’s chart
+denote agreement of three to four sources
+out of six from the anatomical and clinical
+data, whereas square ending bars denote motor pools’ localization agreed on five or six
+sources. The numbers shown left at each
+spinal segment are the average length in
+millimeters of the segment (52). VL, vastus
+lateralis; RF, rectus femoris; MH, medial
+hamstring; ST, semitendinosus; TA, tibialis
+anterior; SOL, soleus; MG, medial gastrocnemius; QUAD, quadriceps.
+
+In this study, we characterize the relative selectivity of
+recruitment of different motor pools innervating leg muscles in
+uninjured individuals using transcutaneous stimulation along
+the rostrocaudal axis of the lumbosacral enlargement, at sites
+similar to the previous study with epidurally implanted electrodes (48) (Fig. 1). We hypothesized that variation in multiple
+characteristics of the evoked potentials would reflect a relative
+preferential activation of proximal and distal leg muscles based
+on the proximal-distal position of the sensory motor pathways
+and motoneuron pools. The resulting spatiotemporal activation
+patterns should yield an electrophysiological map that reflects
+the responsiveness of multiple motor pools, which may, in
+turn, provide a neurophysiological marker for selecting the
+more effective stimulation sites for facilitating performance of
+a given motor task. Here, we describe the electrophysiological
+features of responses in leg muscles to transcutaneous electrical spinal stimulation at different segmental levels.
+METHODS
+
+Participants. Experiments were conducted in 15 volunteers (7 men
+and 8 women; mean ⫾ SD: age 29.9 ⫾ 5.2 yr, height 168.3 ⫾ 7.8 cm,
+body mass 68.8 ⫾ 13.7 kg; 14 right-handed and 1 left-handed). None
+of the participants had any history of neurological or orthopedic
+disorders. Participants provided written, informed consent to the
+experimental procedures, which were approved by the University of
+Louisville (KY) institutional review board.
+Transcutaneous electrical spinal stimulation. A custom-built constant-current stimulator with a range of 0 –100 mA was used to deliver
+transcutaneous spinal cord stimulation. The stimulation was administered using a conductive rubber electrode with a diameter of 18 mm
+placed on the skin between the spinous processes at the midline over
+the vertebral column as a cathode, and two 5 ⫻ 9 cm self-adhesive
+electrodes (Pro-Patch) located symmetrically on the skin over the iliac
+crests as anodes (10, 12, 20). The spaces between the spinous
+processes of the T10 and T11, T11 and T12, and T12 and L1 vertebrae
+were marked following palpation in a prone position. Once the
+cathode was affixed over the particular interspinous space, the participant was moved to a supine position and stayed relaxed during the
+experiment. In addition, we prompted the participants to keep their
+head position as stable as possible and avoid turning it on either side
+and ensured the symmetrical position of the limbs. The stimulation
+
+was delivered as single, 1-ms monophasic square-wave pulses every
+6 s. Using 2-mA increments, the stimulation intensity was increased
+from 2 to 100 mA, or the maximum tolerable intensity. A minimum
+of three stimuli were delivered at each intensity. Recruitment curves
+were collected at three stimulation locations (Fig. 1).
+EMG recording and data collection. Surface electromyogram
+(EMG) signals were recorded bilaterally using bipolar surface electrodes (Motion Lab Systems, Baton Rouge, LA) placed longitudinally
+on the soleus (SOL), medial gastrocnemius (MG), tibialis anterior
+(TA), vastus lateralis (VL), rectus femoris (RF), and medial hamstrings (MH) muscles with fixed interelectrode distance of 17 mm.
+Indifferent or ground reference electrode was placed over the distal
+part of the left tibia bone and connected to the 16-channel portable
+unit, which carried the EMG signals to the desktop interface unit. The
+EMG signals were differentially amplified using MA300 EMG System (Motion Lab Systems, Baton Rouge, LA) with a band-pass filter
+of 10 Hz to 2 kHz (⫺3 dB). Finally, the EMG data were digitized at
+a sampling rate of 5,000 Hz.
+Data analysis. The digitized SOL, MG, TA, VL, RF, and MH
+EMG time series were full-wave rectified after subtraction of the
+mean background EMG. Magnitudes of the spinally evoked potentials
+were calculated by measuring the area under the curve, within a time
+window manually selected for each muscle. The onset of the time
+window was defined from the overlaid responses based on the earliest
+inclination from the baseline across all stimulation intensities. The
+duration of the time window for different muscles varied between 20
+and 40 ms and was kept the same for a given muscle across different
+stimulation levels. Magnitudes were plotted as a function of stimulation intensity to determine the recruitment curve for each muscle at
+each location of spinal stimulation. As reported in the studies utilizing
+epidural spinal cord stimulation (18, 34, 48), two components of the
+evoked potentials can in some cases be distinguished in plantar flexors
+and dorsiflexors based on their latencies. Early (ER) and medium
+responses (MR), which may be attributed to the prevalent involvement
+of different pathways, were analyzed in such a case. To identify their
+latencies and magnitudes, the responses were examined at each
+stimulation intensity from the overlaid waveforms, displayed on a
+computer monitor upon higher magnification and resolution. The
+onset of the ER was determined based on the earliest inclination from
+the baseline in a given muscle at the magnitudes greater than the
+average plus 3 SDs of the baseline. A separation between two biphasic
+waveforms characterized by a change in the shape and magnitude of
+the components was determined as the onset of the MR. In occur-
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+1366
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+rences when it was difficult to distinguish visually the ER and MR, the
+onset of MR was defined based on the duration of ER at different
+stimulation intensities within a given muscle and location of the same
+participant (48) (cf., Fig. 4A). For each component, the area under the
+full-wave-rectified curve was measured to represent their magnitudes
+within selected time windows, which were kept the same across
+different stimulation levels. The appearance of ER and MR was
+irregular across muscles in different individuals. That is the reason
+why the main findings are reported as the sum of area of ER and MR.
+In the pooled data, the evoked potential magnitude for each muscle
+was reported as a percentage of the maximum value for a given
+muscle across three stimulation locations; the stimulation intensity
+then was normalized to that corresponding to the MH threshold
+response that occurred during stimulation at the interspinous space of
+T11–T12. Normalization of the values to that of the MH response was
+chosen because of the interjacent location of the MH motor pools in
+the lumbosacral enlargement (Fig. 1). As such, we suggested that MH
+motor pools in all individuals would be always sufficiently activated,
+irrespective of both rostral or caudal placement of the stimulating
+electrode.
+Four parameters were derived from the recruitment curves: 1)
+threshold intensity, 2) maximal tangential slope, 3) plateau point
+intensity, and 4) plateau point magnitude (Fig. 2). Threshold intensity
+was defined as the minimum stimulation intensity that produced the
+responses with the magnitudes greater than the average plus 3 SDs of
+the baseline in at least two of three trials. Threshold intensity was
+chosen as a measurement to provide the initial insight on the sensitivity of individual motor pools, as well as to reveal the sequence of
+
+recruitment of different pools in relation to each other. The maximal
+tangential slope was determined by fitting a sixth-order polynomial
+function to the ascending limb of the recruitment curve (29) and finding
+the greatest value of the first derivative. To improve fitting, the polynomial was initiated 6 mA below the threshold intensity. The maximal
+tangential slope of the recruitment curve can provide the estimate of the
+rate of Ia afferent recruitment (16, 30, 49) in different muscles in various
+locations of the stimulation. The plateau point intensity and magnitude
+were determined based on the minimum decrement of the second
+derivative of the polynomial, that is, where the slope of the recruitment curve is most rapidly decreasing. These parameters were chosen
+as the measurements attributed to the maximum or submaximum
+responses, because in some cases it was difficult to reach a “true
+plateau” in the magnitude of the responses due to either stimulator
+limitations or tolerance of participants (see, for instance, Fig. 2, VL).
+In addition, bilateral asymmetry was calculated for individual variables as a difference between left and right sides. The calculation was
+performed such that the dividend was always a larger value and the
+quotient was smaller; the negative values in results indicate that
+bilateral asymmetry was shifted to the left leg, whereas the positive
+values indicate the shift to the right leg. The pooled results are
+summarized in boxplots with the box as the 25–75th percentile, and
+the whiskers as the highest and lowest values.
+Threshold intensity, maximal tangential slope, and plateau point
+intensity and magnitude were submitted to a 6 (muscles: VL, RF, MH,
+TA, SOL, and MG) by 3 (stimulation locations: T10–T11, T11–T12,
+and T12–L1) ANOVA. In this design, both the muscles and stimulation locations were within-participant factors. A post hoc t-tests with
+Bonferroni correction were made to decompose any significant effects
+(␣ ⫽ 0.05). The results for the pooled data are presented as mean
+values and SD.
+RESULTS
+
+Fig. 2. Examples of recruitment curves (solid squares, left Y-axis) of VL and
+MG recorded in one participant. A sixth-order polynomial function (red line)
+was fitted to each curve; tangential slope was then computed as the first
+derivative (gray line, right Y-axis). Specific parameters were taken from the
+recruitment curve for experimental comparison: threshold intensity, maximal
+tangential slope, and plateau point.
+
+Stimulation over the lumbosacral enlargement resulted in
+single twitches in multiple leg muscles. Figure 3 demonstrates
+the evoked potentials (Fig. 3A) and corresponding recruitment
+curves (Fig. 3B) obtained at different stimulation intensities at
+three spinal locations in one participant. The order of activation
+in different muscles in relation to each other was dependent on
+the rostrocaudal location of stimulation. For instance, during
+stimulation at T10–T11 at lower stimulation intensities, the
+magnitude of response of VL and RF was higher than for MG,
+SOL, and MH, whereas, during stimulation at T12–L1 at the
+same intensities, this relationship was reversed. The threshold
+of activation of MG, SOL, TA, as well as MH, was also
+dependent on the location of stimulation, with thresholds
+increasing progressively with more rostral site of the stimulation. In proximal and distal muscles, recruitment curve characteristics varied based on stimulation location. Figure 3C
+shows the initial ascending portions of the recruitment curves
+of VL and SOL. Increasing intensities of stimulation at T10–
+T11 was characterized by a rapid increase in the magnitude of
+the evoked responses in the VL, whereas, at T11–T12 and
+T12–L1, the evoked potentials were very low, even at stimulation intensities ranging from 16 to 30 mA. The recruitment of
+SOL, on the contrary, was rapid during the stimulation at
+T11–T12 and T12–L1 and included a similar low-magnitude
+suprathreshold phase at T10–T11 as described for VL at T11–T12
+and T12–L1.
+Figure 4 shows the onset and composition of evoked potentials in TA and MG in one participant during stimulation
+delivered at three locations. During stimulation at T10–T11 and
+T11–T12, the onset of the response did not change noticeably at
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+1367
+
+Fig. 3. Evoked potentials in one participant during transcutaneous electrical spinal stimulation delivered between the spinous processes of the T10 and T11, T11
+and T12, and T12 and L1 vertebrae. A: the average of three nonrectified responses in right muscles at each stimulation intensity from 2 to 100 mA. Shown is the
+time window between 10 and 55 ms following the stimulus. B: recruitment curves of right muscles at each location of spinal stimulation. Orange dotted lines
+on VL and SOL indicate the initial rise of the recruitment curves. C: enlarged ascending fragments of the recruitment curves of VL and SOL designated in B.
+Dotted lines of different colors show the muscle activation threshold corresponding to each spinal level of stimulation. Arrows indicate the inflection points in
+the ascending fragments recruitment curves.
+
+different intensities, whereas, during stimulation at T12–L1, the
+onset changed considerably as a function of stimulation intensity (Fig. 4A). It is also noteworthy that the separation between
+ER and MR was more distinguishable at lower stimulation
+intensities and hardly detectable at higher intensities. In such
+cases, calculations were performed based on the time windows
+obtained at lower stimulation intensities within a given muscle
+and location. Figure 4B depicts recruitment curves of ER and
+MR during stimulation delivered at three locations. In TA, the
+increase of stimulation intensity was accompanied by a gradual
+increase of both ER and MR magnitude. In MG, increasing
+stimulation intensity from the medium to higher values was
+accompanied by an increase of the ER and considerable decrease of the MR during stimulation at T12–L1. The intensities
+required to reach threshold decreased considerably with a more
+caudal stimulation site (Fig. 4B).
+
+Figure 5 demonstrates the pooled data of threshold intensity, as well as plateau point intensity and magnitude derived from the recruitment curves. The analysis of the
+threshold intensity revealed main effects for the muscle
+(F2,14 ⫽ 3.7, P ⫽ 0.036), stimulation location (F2,14 ⫽ 25.1,
+P ⬍ 0.001), as well as the interaction between muscle and
+stimulation location (F4,14 ⫽ 8.4, P ⫽ 0.015). To account
+the number of comparisons, the ␣-value was corrected to
+0.0006 (␣ ⫽ 0.05/81). The main effect for the stimulation
+location showed that the intensities required to evoke
+threshold responses were greater at T10–T11 compared with
+T11–T12 and T12–L1 (P ⬍ 0.05). For the interaction between
+muscle and stimulation location, the differences in the
+stimulation intensities required to produce threshold responses were revealed within MG, SOL, TA, MH (shown by
+bicolored horizontal lines), as well as in VL vs. TA, SOL,
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+1368
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+Fig. 4. Evoked potentials in one participant during
+transcutaneous electrical spinal stimulation delivered at
+different intensity at three spinal levels. A: the average
+of three nonrectified responses is shown for each stimulation intensity. Dashed lines of different colors show
+the onset of the early responses (ER) determined from
+the ensemble-averaged waveforms and corresponding
+to each spinal level of stimulation. Note the changes
+of the onset with increment of the stimulation intensity.
+Dotted lines indicate the epochs of medium responses
+(MR). Note well-distinguished separation between ER
+and MR at lower stimulation intensities, and a masked,
+“smoothened” division between them at higher intensities. Red shadowed areas near the baseline on the top
+and bottom traces on the left indicate the average magnitude plus 3 SDs before the stimulus during stimulation
+at T12–L1. B: area of the ERs and MRs during stimulation delivered at each stimulation location.
+
+and MG within T10–T11 stimulation location (shown by blue
+vertical lines) (P ⬍ 0.05) (Fig. 5).
+The analysis of the plateau point intensity yielded main
+effects for the stimulation location (F2,14 ⫽ 19.9, P ⬍ 0.001)
+and the interaction between muscle and stimulation location
+(F4,14 ⫽ 39.8, P ⬍ 0.001). To account for the number of
+comparisons, the ␣-value was corrected to 0.0008 (␣ ⫽ 0.05/
+63). The stimulation intensities required to reach the plateau
+point were greater at T10–T11 compared with T11–T21 and
+T12–L1 (P ⬍ 0.05). The interaction between muscle and stimulation location differed within MG, SOL, TA, MH (shown by
+bicolored horizontal lines), as well as within T11–T12 and
+T12–L1 stimulation locations (shown by green and red vertical
+lines, respectively) (P ⬍ 0.05) (Fig. 5). Plateau point magnitude yielded main effect for the stimulation location (F2,14 ⫽
+4.9, P ⫽ 0.026). The ␣-value was corrected to 0.02 (␣ ⫽
+0.05/3). The average of the evoked potential magnitude was
+smaller during the stimulation at T10–T11, compared with
+T11–T12 and T12–L1 (P ⬍ 0.05).
+Figure 6 presents the pooled data of the maximal tangential
+slope of the ascending portions of recruitment curves of right
+leg muscles at different locations of stimulation. The maximal
+tangential slope yielded main effects for the muscle (F2,14 ⫽
+8.6, P ⫽ 0.007), stimulation location (F2,14 ⫽ 9.6, P ⫽ 0.005),
+as well as the interaction between muscle and stimulation
+location (F4,14 ⫽ 18.2, P ⫽ 0.04). The ␣-value was corrected
+to 0.0006 (␣ ⫽ 0.05/81). The effect for the muscle showed
+
+lower slope of the recruitment curve of RF and TA, compared
+with MG, SOL, and MH (P ⬍ 0.05), and is depicted by black
+horizontal bars (Fig. 6). The slope of the recruitment curve was
+greater during the stimulation at locations T11–T12 and T12–L1
+(0.35 ⫾ 0.2 and 0.45 ⫾ 0.2 ␮V/mA, respectively), compared
+with T10–T11 (0.58 ⫾ 0.3 ␮V/mA) (P ⬍ 0.05). For the
+interaction between muscle and stimulation location, the differences within SOL and MG (shown by bicolored horizontal
+bars), as well as within the stimulation locations (shown by
+colored horizontal bars) were significant (P ⬍ 0.05) (Fig. 6).
+Figure 7, A and B, demonstrates the example of asymmetry
+between bilateral muscles in one individual during stimulation
+at different locations. It can be seen that the characteristics of
+the recruitment curves varied greatly in different muscles (Fig.
+7A). Bilateral asymmetry was calculated for the plateau point
+magnitude, threshold intensity, and maximal tangential slope
+as a difference between left and right sides: the negative values
+indicate that bilateral asymmetry was shifted to the left,
+whereas the positive values indicate the shift to the right leg.
+Interestingly, with the graphical presentation according to the
+motor pools’ topographical alignment in the lumbosacral enlargement, a pattern of reciprocity between proximal and distal
+muscles can be for the plateau point magnitude, as well as the
+maximal tangential slope (Fig. 7B). However, a consistent
+pattern of bilateral asymmetry was not revealed across the
+experimental group: the amount, direction, and proximal-distal
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+Fig. 5. Pooled data of the thresholds and plateau points in right leg muscles at
+three stimulation locations. The magnitude of responses was normalized to the
+maximum area of each muscle across three stimulation locations. The stimulation intensity was normalized to the motor threshold of MH at T11–T12.
+Colored vertical bars on the right indicate statistically significant differences in
+the stimulation intensities required to produce threshold (&) or plateau point (/)
+responses between different muscles at each location (i.e., blue bars indicate
+the difference in VL vs. TA, SOL, and MG at T10–T11; green bar indicates the
+difference in VL vs. MH at T11–T12; and red bars indicate the difference in VL
+vs. MH, TA, and MG, as well as RF vs. TA and MG at T12–L1). Bicolored
+horizontal bars indicate significant differences in the stimulation intensities
+required to produce threshold (§) or plateau responses (#) in a single muscle
+between different stimulation locations (i.e., red-blue bars indicate the difference between T12–L1 and T10–T11; green-blue bars indicate the difference
+between T11–T12 and T10–T11; and red-green bars indicate the difference
+between T12–L1 and T11–T12) (P ⬍ 0.05).
+
+muscles’ relationship varied to a large extent among different
+individuals (Fig. 7C).
+DISCUSSION
+
+The stimulation intensities required to evoke threshold responses, as well as to reach the magnitude plateau, were greater
+
+1369
+
+at more rostral locations of stimulation. Transcutaneous electrical stimulation of rostral and caudal areas of lumbosacral
+enlargement resulted in a selective topographical recruitment
+of proximal and distal leg muscles, based on their threshold
+intensity, maximal slope of the recruitment curves, and plateau
+point intensity and magnitude. The maximal slope of the
+recruitment curves varied among muscles. Finally, considerable levels of bilateral asymmetry in spinally evoked potentials
+were observed, varying among participants.
+Spatiotemporal patterns of motor pool activation along the
+rostrocaudal axis of the spinal cord. Using epidural stimulation of rostral and caudal areas of lumbar spinal cord, our
+laboratory has previously demonstrated a predominant activation of proximal and distal muscles’ motoneuron pools (48). In
+the present study, we hypothesized that the optimal site for
+activation of a particular motor pool within the lumbosacral
+enlargement can be derived from changes in the relationship of
+multiple motor pools’ recruitment characteristics across three
+stimulation locations. We found that transcutaneous spinal
+stimulation delivered even within a relatively narrow range
+between T10 and L1 vertebrae results in a different order of
+activation of the proximal and distal motor pools. Our data are
+generally consistent with previous reports (32, 47, 58), as well
+as with the anatomy and myotomal maps of the spinal cord and
+lumbosacral roots (2, 25, 27, 44, 51, 52, 55) (Fig. 1). We
+observed that stimulation over the areas that approximately
+correspond to L2–L4 or L4–S2 spinal segments differentially
+modulates the order of activation of the proximal and distal
+motor pools (Fig. 5).
+We have also found more specific modulation of the relative
+threshold intensities and rate of recruitment of the MG, SOL,
+TA, and MH, compared with little changes in VL and RF at
+different spinal levels (Figs. 5 and 6). This difference may not
+be surprising in light of the anatomical arrangement of the VL
+and RF motor pools along the lumbosacral enlargement, and
+the average length of the corresponding L2 and L4 spinal
+segments (Fig. 1). At all three locations used, the stimulation
+always activated a considerable portion of the VL and RF
+nerve roots, as suggested by a minimal variation in the threshold and slope of the recruitment curve. Compared with VL and
+RF, more distal motor pools located in smaller and fewer spinal
+segments had greater threshold of activation during stimulation
+over the T10–T11 intervertebral level and reached their plateau
+point at relatively lower intensities during stimulation over the
+T12–L1 intervertebral level.
+It is also noteworthy that, for all motor pools, the absolute
+intensities required to evoke threshold responses, as well as to
+reach the magnitude plateau, increased with more rostral stimulation delivery (Figs. 4B and 5). It is plausible that these
+results may be attributed to differences in the geometry of the
+thoraco-lumbar spine, as well as alignment of the corresponding dorsal roots, leading to changes in the relative position of
+the stimulating electrode, thereby influencing the flow of current during stimulation.
+The analysis of the maximal slope of the recruitment curves
+of individual muscles, which, based on the H-reflex, has been
+suggested to indicate the rate of Ia afferent recruitment (16, 30,
+49), revealed significant levels of both the interlocation and
+intermuscle variations. The interlocation variation of the rate of
+recruitment may also be explained by the difference in the
+anatomical arrangement of the motor pools, as described in the
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+1370
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+Fig. 6. Pooled data of the maximal tangential slope of the
+ascending portions of recruitment curves of right leg muscles at different locations of stimulation. *Black horizontal
+bars indicate statistically significant differences of the slope
+between the muscles: RF vs. MH, SOL, MG; MH vs. TA;
+and TA vs. SOL, MG. ⫽|Blue, green, and red horizontal
+bars indicate statistically significant differences of the slope
+between different muscles at T10–T11 (i.e., TA vs. SOL,
+MH), T11–T12 (i.e., RF vs. SOL, MG, as well as TA vs.
+SOL, MG), and T12–L1 (i.e., RF vs. MG), respectively.
+Y
+|Blue-red bars indicate the differences of the slope between T10– T11 and T12–L1 in SOL and MG (P ⬍ 0.05).
+
+previous paragraph and, therefore, is dependent on the length
+of the corresponding spinal segments, as well as the distance
+between the stimulation location and projecting dorsal roots.
+The intermuscle variation of the maximal slope of the
+recruitment curves can be attributed to the difference in diameter and number of low-threshold Ia afferents projecting to
+specific motoneuron pools, as well as to the type and size of the
+motoneurons (45). Our findings support these assertions. For
+instance, MG, SOL, and MH have larger diameter Ia afferents,
+compared with the VL and RF (37, 45). It is also known that
+motoneurons innervating slow-twitch units receive preferential
+distribution of Ia excitatory inputs (14). Furthermore, the
+number of connections between the motoneuron and the Ia
+afferent (synaptic density per unit area) varies inversely with
+the size of the motoneuron (54). The difference in the maximal
+slope of the recruitment curve between different muscles may
+also depend on the tonic level of presynaptic inhibition of Ia
+terminals (45), and in this context our data seem to concur with
+the occurrence and variations in the size of the maximal
+H-reflex demonstrated among different muscles at rest in
+previous studies (45, 50, 61). Whether this represents a functional separation in connections from Ia afferents to flexor and
+extensor muscles is presently unclear (61). It has been suggested that the motoneurons of individual muscles could have
+different central connections and recruitment patterns, depending on the intrinsic properties optimized for the performance of
+a specific functional task (22, 35). It is worth noting that the
+slowest slope gain occurred in the RF and TA, which are
+located anteriorly, and counteract posterior shifts of the center
+of mass, whereas the fastest slope gain occurred in posteriorly
+located muscles, such as SOL, MG, and MH, whose primary
+role during quiet standing is to resist the gravity-induced torque
+pulling the body forward due to the anterior location of the
+center of mass relative to the ankle joint axis. These antigravity muscles are requisite for continuous and accurate
+postural adjustments; their synergy and connection were demonstrated at both functional (23) and neurophysiological (45)
+levels. Finally, it is intriguing that the analysis has revealed
+
+considerable differences in the VL and RF recruitment characteristics compared with MH and distal muscles (Figs. 5 and
+6). One explanation of this difference can be the activation of
+nerve fibers in the lumbar plexus through the anodes placed
+over the iliac crests. While activation of the lumbar plexus
+cannot be ruled out, modeling studies suggest that this is
+doubtful (33). It seems more likely that heteronomous inhibitory connections from the antagonistic MH might have a
+different influence on the recruitment characteristics of VL
+and RF.
+Possible neural structures activated during transcutaneous
+spinal stimulation. In the modeling study, it has been shown
+that transcutaneous stimulation can depolarize at least a subset
+of the same neural structures as recruited by implanted epidural
+electrodes (33). Data obtained from experiments with epidural
+stimulation (48) demonstrate that, with increasing intensity, the
+stimulus response relationship of the early and medium components in many muscles shares some characteristics with the
+H-reflex and M-wave interaction; that is, it is characterized by
+the initial increase of the MR, followed by a decrease in its
+magnitude at low-to-moderate stimulation intensities (similar
+to the H-reflex), and continuous increase of the ER magnitude,
+followed by a plateau at moderate-to-high stimulation intensities (similar to the M-wave) (Ref. 48; cf., Fig. 5). These
+findings let us suggest that epidural stimulation results in the
+recruitment of both sensory and motor fibers. Similar to those
+findings, our data indicate that transcutaneous spinal electrical
+stimulation can involve diverse elements along the spinal cord,
+based on the location and intensity (Figs. 3C and 4). An
+analysis of ER and MR recruitment curves in MG at different
+stimulation locations in one individual has revealed that, during stimulation at T12–L1, their relationship was reciprocal: the
+increment of ER was accompanied by a substantial decrement
+of MR (Fig. 4B). Although these findings have to be interpreted
+with caution, they suggest that lower stimulation intensities
+result in initial preferential recruitment of lower threshold
+afferent fibers accompanied to some extent with involvement
+of motor axons, whereas, with increasing intensity, more motor
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+1371
+
+Fig. 7. A: recruitment curves of left and right muscles at each location of spinal stimulation in one participant. Individual (B) and pooled data (C) illustrating
+the asymmetry level between left and right muscles in the plateau point magnitude (top), threshold intensity (middle), and maximal tangential slope (bottom).
+
+axons may become activated, leading to the decreased latency
+of the response and causing an occlusion effect of the afferent
+pathways. This notion concurs with prior reports obtained in
+experiments with transcutaneous (40) and epidural (48) spinal
+cord stimulation, as well as in modeling studies (33). Another
+plausible explanation of the reciprocal interplay between the
+ER and MR is the finding obtained in animal models (15) and
+human subjects (42) on the existence of inhibitory circuits from
+cutaneous receptors of the lumbosacral back contained within
+the spinal cord. In this light, it is possible that incremental
+increases in the stimulation intensity would result in a decrease
+in the magnitude of longer latency component of the evoked
+potentials. In experiments with H-reflex, Burke et al. (7)
+suggested that the composite excitatory postsynaptic potential
+of the H-reflex in the motoneurons of SOL had a sufficiently
+long rising phase to permit oligosynaptic inputs to reach the
+motoneuron. There is also considerable evidence from animal
+models (26) and in humans (41, 45) for the existence of
+oligosynaptic pathways from group Ia afferents onto homonymous and synergistic muscles. Based on the evidence from
+previous experiments with transcutaneous (12) and epidural
+spinal stimulation (48), there are also mounting reasons to
+suggest the contribution of oligosynaptic pathways to spinally
+
+evoked potentials. We suggest that, with increasing of the
+stimulation intensity, in addition to the Ia afferents, the involvement of smaller diameter afferents, including group Ib,
+larger diameter cutaneous afferents, group II muscle spindle
+afferents, and even intraspinal connections and spinal interneurons (34), as well as direct motor activation (47), may all
+contribute to the spinally evoked potentials with progressively
+higher stimulation intensities. Not all of these structures are
+susceptible to neuromodulatory effects, such as facilitation or
+inhibition during conditioning experiments (11), and might be
+influenced by inhibitory pathways (46) or heteronymous facilitation (8). Our data demonstrate the feasibility of the approach
+when responses can and should be evoked at a particular stage
+of recruitment across different muscles. Such approach may be
+of importance during neurophysiological or functional assessment, when activation of particular structures among different
+motor pools is advantageous.
+Symmetry of evoked potentials in individual muscles. We
+also investigated the symmetry of the bilateral evoked potentials in individual muscles. Bilateral anatomical asymmetries
+have been previously observed in numerous animal models (4,
+5, 60). In systematic experiments with cats, it has been proposed that only the differences in the magnitude of reflex
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+1372
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+responses exceeding 15–20% can signify “true biological
+asymmetry” (24). We revealed that, even with careful bilateral
+symmetrical placement of both EMG and reference electrodes,
+as well as the stimulating electrode over the midline, the
+asymmetry between left and right that exceeds 100% is often
+inevitable. In the tested population, 14 participants were righthanded, one was left-handed, and there was no distinct pattern
+in occurrence of the asymmetry: its extent between the left and
+right responses varied considerably in proximal and distal
+muscles among different individuals. Contradictory results are
+found in the literature on the correlation between the asymmetries in the right and left SOL H-reflex recruitment curves and
+the dominant side of participants (9, 19, 43, 56). Recently, it
+has been suggested that lateral dominance does not seem to
+affect difference in the H-reflex characteristics, such as mean
+amplitude and level of variability, and it is likely that lateral
+dominance is less important in the leg than in the arm (38). We
+did not record the leg dominance in our experiments and
+suggest this as an additional measure in future experiments.
+The existence of asymmetry in experiments with transcutaneous spinal cord stimulation has been noted previously (10,
+40). These variations could arise from interindividual variability in the segmental innervation (44, 55), the anatomical
+asymmetries, including differences in the composition of the
+peripheral nerve fibers and the proportion of the type Ia, Ib, and
+II afferents (1, 6, 38), as well as from the asymmetry of
+motoneuron excitability (56). In addition, as it has been supported by recent studies examining SOL H-reflex operant
+conditioning (57, 59), the differences between the contralateral
+responses can be attributed to the functional peculiarities of
+individual muscles or muscle groups. By exploring the bilateral
+asymmetry using transcutaneous spinal cord stimulation, our
+data further contribute to the investigation of the phenomenon
+and indicate that spinally evoked potentials can serve in physiological, anatomic, and clinical studies, evaluating the degree
+of symmetry of the respective spinal reflex circuits. This is a
+highly relevant issue from the clinical perspective, given that
+almost all spinal injuries are functionally asymmetric. Further
+separate study of this phenomenon with test-retest reliability
+measurements, as well as in relation to the peripheral nerves’
+stimulation, is warranted.
+Methodological considerations. Our findings on the stimulus-response relationships at different configurations were similar in all participants. Although the previously published
+anatomical localization of segments of the human lumbosacral
+spinal cord has been confirmed by functional magnetic resonance imaging (31), the present findings have to be implemented, acknowledging potential interindividual variability of
+the anatomical relationship between spinal cord and vertebral
+column (53, 58), as well as in the segmental myotomal charts
+of muscle innervation (44, 55). As such, we suggest that the
+vertebral levels presented in our study will be used as approximate guidance, and the exact spatiotemporal maps of the
+proximal and distal leg muscles should be determined individually during probing over the lumbosacral area, based on the
+recruitment characteristics described. In addition, variations in
+threshold and magnitude of the evoked potentials among different individuals can result from variations in the underlying
+skin resistance, different amounts of subcutaneous fat, muscles, vertebral bone, and intervertebral ligaments.
+
+Finally, different characteristics of spinal reflexes highly
+depend on the descending and segmental conditions, the level
+of muscle activity, and on the task performed (10, 12, 17, 45).
+Although the neuromodulatory effects of transcutaneous electrical spinal cord stimulation on the locomotor networks has
+been demonstrated (17, 20), there is a need to investigate to
+what extent the present data on the spinal segment-specific
+effects obtained in a supine resting position are relevant during
+different motor tasks, including gait rehabilitation or recovery
+of postural function.
+Conclusion. The present data show that transcutaneous electrical spinal cord stimulation can be used to differentially
+activate motor pools and projecting dorsal roots based on their
+anatomical arrangements along the rostrocaudal axis of the
+lumbosacral enlargement. We demonstrated that, during transcutaneous stimulation, preferential activation of spinal structures at specific segments is possible, even with the considerably wider configuration of the stimulating and reference
+electrodes and thus a less focused current flow compared with
+epidural stimulation. Selective recruitment of proximal and
+distal motor pools can be titrated at lower intensities. As during
+epidural spinal stimulation, with variation of the stimulation
+intensity and location, different neural structures may be activated. The maximal slope of the recruitment of particular
+muscles allows characterization of the properties of afferents
+projecting to specific motoneuron pools, as well as to the type
+and size of the motoneurons. The spatiotemporal patterns of
+spinal motor activation may have important clinical as well as
+electrophysiological implications, especially when there is a
+need to target particular motor pools. Finally, the asymmetry in
+bilateral evoked potentials is inevitable and can be attributed to
+both anatomical and functional peculiarities of individual muscles or muscle groups.
+ACKNOWLEDGMENTS
+We thank the research volunteers for valuable contributions to this study.
+GRANTS
+This work was supported by the Frazier Rehab Institute and Kentucky One
+Health, Kentucky Spinal Cord & Head Injury Research Trust Grant no. 11-7,
+National Institute of General Medical Sciences Grant 8 P30 GM-103507,
+Russian Foundation for Basic Research Grant 13-04-12030 ofi-m, and Russian
+Scientific Fund Project Nos. 14-15-00788 (development of the method for
+transcutaneous spinal cord stimulation) and 14-45-00024 (analysis of evoked
+potentials).
+DISCLAIMER
+The content is solely the responsibility of the authors and does not
+necessarily represent the official views of the granting agencies.
+DISCLOSURES
+No conflicts of interest, financial or otherwise, are declared by the author(s).
+AUTHOR CONTRIBUTIONS
+Author contributions: D.G.S. and Y.P.G. conception and design of research;
+D.G.S., D.A.A., C.J.D., K.M.G., V.L.S., and Y.P.G. performed experiments;
+D.G.S. and K.M.G. analyzed data; D.G.S., D.A.A., V.R.E., and Y.P.G.
+interpreted results of experiments; D.G.S. prepared figures; D.G.S. drafted
+manuscript; D.G.S., D.A.A., C.J.D., K.M.G., V.L.S., C.A.A., V.R.E., and
+Y.P.G. edited and revised manuscript; D.G.S., D.A.A., C.J.D., K.M.G., V.L.S.,
+S.J.H., V.R.E., and Y.P.G. approved final version of manuscript.
+REFERENCES
+1. Aggelopoulos NC, Edgley SA. Segmental localisation of the relays
+mediating crossed inhibition of hindlimb motoneurones from group II
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+afferents in the anaesthetized cat spinal cord. Neurosci Lett 185: 60 –64,
+1995.
+2. Altman J, Bayer SA. Development of the Human Spinal Cord: An
+Interpretation Based on Experimental Studies in Animals. Oxford, UK:
+Oxford University Press, 2001, p. xi, 0542.
+3. Andriianova E. [Peculiarities of multisegmental monosynaptic responses
+of leg muscles in subjects with lumbar nerve compression]. Fiziol Cheloveka 36: 80 –88, 2010.
+4. Avendano C, Lagares A. A stereological analysis of the numerical
+distribution of neurons in dorsal root ganglia C4-T2 in adult macaque
+monkeys. Somatosens Mot Res 13: 59 –66, 1996.
+5. Barker D, Chin NK. The number and distribution of muscle-spindles in
+certain muscles of the cat. J Anat 94: 473–486, 1960.
+6. Baxendale RH, Rosenberg JR. Crossed reflexes evoked by selective
+activation of muscle spindle primary endings in the decerebrate cat. Brain
+Res 115: 324 –327, 1976.
+7. Burke D, Gandevia SC, McKeon B. The afferent volleys responsible for
+spinal proprioceptive reflexes in man. J Physiol 339: 535–552, 1983.
+8. Burke D, Gandevia SC, McKeon B. Monosynaptic and oligosynaptic
+contributions to human ankle jerk and H-reflex. J Neurophysiol 52:
+435–448, 1984.
+9. Chandran AP, Maini BK, Marya RK. Long latency inhibition of
+H-reflex recovery by cutaneous tactile stimulation in man: a cutaneous
+transcortical reflex. Neuroscience 27: 1037–1048, 1988.
+10. Courtine G, Harkema SJ, Dy CJ, Gerasimenko YP, Dyhre-Poulsen P.
+Modulation of multisegmental monosynaptic responses in a variety of leg
+muscles during walking and running in humans. J Physiol 582: 1125–
+1139, 2007.
+11. Crone C, Hultborn H, Mazieres L, Morin C, Nielsen J, PierrotDeseilligny E. Sensitivity of monosynaptic test reflexes to facilitation and
+inhibition as a function of the test reflex size: a study in man and the cat.
+Exp Brain Res 81: 35–45, 1990.
+12. Dy CJ, Gerasimenko YP, Edgerton VR, Dyhre-Poulsen P, Courtine G,
+Harkema SJ. Phase-dependent modulation of percutaneously elicited
+multisegmental muscle responses after spinal cord injury. J Neurophysiol
+103: 2808 –2820, 2010.
+13. Edgerton VR, Harkema S. Epidural stimulation of the spinal cord in
+spinal cord injury: current status and future challenges. Expert Rev
+Neurother 11: 1351–1353, 2011.
+14. Edgerton VR, Smith JL, Simpson DR. Muscle fibre type populations of
+human leg muscles. Histochem J 7: 259 –266, 1975.
+15. Frigon A, Thibaudier Y, Johnson MD, Heckman CJ, Hurteau MF.
+Cutaneous inputs from the back abolish locomotor-like activity and reduce
+spastic-like activity in the adult cat following complete spinal cord injury.
+Exp Neurol 235: 588 –598, 2012.
+16. Funase K, Imanaka K, Nishihira Y. Excitability of the soleus motoneuron pool revealed by the developmental slope of the H-reflex as reflex
+gain. Electromyogr Clin Neurophysiol 34: 477–489, 1994.
+17. Gerasimenko Y, Gorodnichev R, Puhov A, Moshonkina T, Savochin
+A, Selionov V, Roy RR, Lu DC, Edgerton VR. Initiation and modulation
+of locomotor circuitry output with multisite transcutaneous electrical
+stimulation of the spinal cord in noninjured humans. J Neurophysiol 113:
+834 –842, 2015.
+18. Gerasimenko YP, Lavrov IA, Courtine G, Ichiyama RM, Dy CJ,
+Zhong H, Roy RR, Edgerton VR. Spinal cord reflexes induced by
+epidural spinal cord stimulation in normal awake rats. J Neurosci Methods
+157: 253–263, 2006.
+19. Goode DJ, Glenn S, Manning AA, Middleton JF. Lateral asymmetry of
+the Hoffmann reflex: relation to cortical laterality. J Neurol Neurosurg
+Psychiatry 43: 831–835, 1980.
+20. Gorodnichev RM, Pivovarova EA, Pukhov A, Moiseev SA, Savokhin
+AA, Moshonkina TR, Shcherbakova NA, Kilimnik VA, Selionov VA,
+Kozlovskaia IB, Edgerton VR, Gerasimenko IP. [Transcutaneous electrical stimulation of the spinal cord: non-invasive tool for activation of
+locomotor circuitry in human]. Fiziol Cheloveka 38: 46 –56, 2012.
+21. Harkema S, Gerasimenko Y, Hodes J, Burdick J, Angeli C, Chen Y,
+Ferreira C, Willhite A, Rejc E, Grossman RG, Edgerton VR. Effect of
+epidural stimulation of the lumbosacral spinal cord on voluntary movement, standing, and assisted stepping after motor complete paraplegia: a
+case study. Lancet 377: 1938 –1947, 2011.
+22. Hoffer JA, Loeb GE, Sugano N, Marks WB, O’Donovan MJ, Pratt
+CA. Cat hindlimb motoneurons during locomotion. III. Functional segregation in Sartorius. J Neurophysiol 57: 554 –562, 1987.
+
+1373
+
+23. Hofstoetter US, Minassian K, Hofer C, Mayr W, Rattay F, Dimitrijevic MR. Modification of reflex responses to lumbar posterior root
+stimulation by motor tasks in healthy subjects. Artif Organs 32: 644 –648,
+2008.
+24. Hultborn H, Malmsten J. Changes in segmental reflexes following
+chronic spinal cord hemisection in the cat. I. Increased monosynaptic and
+polysynaptic ventral root discharges. Acta Physiol Scand 119: 405–422,
+1983.
+25. Ivanenko YP, Poppele RE, Lacquaniti F. Spinal cord maps of spatiotemporal alpha-motoneuron activation in humans walking at different
+speeds. J Neurophysiol 95: 602–618, 2006.
+26. Jankowska E, McCrea D, Mackel R. Oligosynaptic excitation of motoneurones by impulses in group Ia muscle spindle afferents in the cat. J
+Physiol 316: 411–425, 1981.
+27. Kendall FP, McCreary EK, Provance PG. Muscles, Testing and Function: With Posture and Pain. Baltimore, MD: Williams & Wilkins, 1993,
+p. xv, 451.
+28. Kitano K, Koceja DM. Spinal reflex in human lower leg muscles evoked
+by transcutaneous spinal cord stimulation. J Neurosci Methods 180:
+111–115, 2009.
+29. Klimstra M, Zehr EP. A sigmoid function is the best fit for the ascending
+limb of the Hoffmann reflex recruitment curve. Exp Brain Res 186:
+93–105, 2008.
+30. Komiyama T, Kawai K, Fumoto M. The excitability of a motoneuron
+pool assessed by the H-reflex method is correlated with the susceptibility
+of Ia terminals to repetitive discharges in humans. Brain Res 826: 317–
+320, 1999.
+31. Kornelsen J, Stroman PW. fMRI of the lumbar spinal cord during a
+lower limb motor task. Magn Reson Med 52: 411–414, 2004.
+32. Krenn M, Toth A, Danner SM, Hofstoetter US, Minassian K, Mayr
+W. Selectivity of transcutaneous stimulation of lumbar posterior roots at
+different spinal levels in humans. Biomed Tech (Berl) 58, Suppl 1, 2013.
+33. Ladenbauer J, Minassian K, Hofstoetter US, Dimitrijevic MR, Rattay
+F. Stimulation of the human lumbar spinal cord with implanted and
+surface electrodes: a computer simulation study. IEEE Trans Neural Syst
+Rehabil Eng 18: 637–645, 2010.
+34. Lavrov I, Gerasimenko YP, Ichiyama RM, Courtine G, Zhong H, Roy
+RR, Edgerton VR. Plasticity of spinal cord reflexes after a complete
+transection in adult rats: relationship to stepping ability. J Neurophysiol
+96: 1699 –1710, 2006.
+35. Loeb GE. Motoneurone task groups: coping with kinematic heterogeneity. J Exp Biol 115: 137–146, 1985.
+36. Maertens de Noordhout A, Rothwell JC, Thompson PD, Day BL,
+Marsden CD. Percutaneous electrical stimulation of lumbosacral roots in
+man. J Neurol Neurosurg Psychiatry 51: 174 –181, 1988.
+37. Meunier S, Pierrot-Deseilligny E, Simonetta M. Pattern of monosynaptic heteronymous Ia connections in the human lower limb. Exp Brain
+Res 96: 534 –544, 1993.
+38. Mezzarane RA, Kohn AF. Bilateral soleus H-reflexes in humans elicited
+by simultaneous trains of stimuli: symmetry, variability, and covariance. J
+Neurophysiol 87: 2074 –2083, 2002.
+39. Minassian K, Hofstoetter U, Tansey K, Mayr W. Neuromodulation of
+lower limb motor control in restorative neurology. Clin Neurol Neurosurg
+114: 489 –497, 2012.
+40. Minassian K, Persy I, Rattay F, Dimitrijevic MR, Hofer C, Kern H.
+Posterior root-muscle reflexes elicited by transcutaneous stimulation of the
+human lumbosacral cord. Muscle Nerve 35: 327–336, 2007.
+41. Misiaszek JE. The H-reflex as a tool in neurophysiology: its limitations
+and uses in understanding nervous system function. Muscle Nerve 28:
+144 –160, 2003.
+42. Nadeau S, Jacquemin G, Fournier C, Lamarre Y, Rossignol S. Spontaneous motor rhythms of the back and legs in a patient with a complete
+spinal cord transection. Neurorehabil Neural Repair 24: 377–383, 2010.
+43. Nativ A, Frank J, Allard F. The effect of handedness on spinal and
+supra-spinal reflex excitability. Electroencephalogr Clin Neurophysiol 72:
+157–164, 1989.
+44. Phillips LH 2nd, Park TS. Electrophysiologic mapping of the segmental
+anatomy of the muscles of the lower extremity. Muscle Nerve 14: 1213–
+1218, 1991.
+45. Pierrot-Deseilligny E, Burke D. The Circuitry of the Human Spinal
+Cord: Its Role in Motor Control and Movement Disorders. Cambridge,
+UK: Cambridge University Press, 2005, p. xxii, 642.
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+1374
+
+Spinal Segment-Specific Transcutaneous Stimulation in Humans • Sayenko DG et al.
+
+46. Pierrot-Deseilligny E, Morin C, Bergego C, Tankov N. Pattern of group
+I fibre projections from ankle flexor and extensor muscles in man. Exp
+Brain Res 42: 337–350, 1981.
+47. Roy FD, Gibson G, Stein RB. Effect of percutaneous stimulation at
+different spinal levels on the activation of sensory and motor roots. Exp
+Brain Res 223: 281–289, 2012.
+48. Sayenko DG, Angeli C, Harkema SJ, Edgerton VR, Gerasimenko YP.
+Neuromodulation of evoked muscle potentials induced by epidural spinalcord stimulation in paralyzed individuals. J Neurophysiol 111: 1088 –
+1099, 2014.
+49. Sekiguchi H, Nakazawa K, Akai M. Recruitment gain of antagonistic
+motoneurons is higher during lengthening contraction than during shortening contraction in man. Neurosci Lett 342: 69 –72, 2003.
+50. Semmler JG, Turker KS. Compound group I excitatory input is differentially distributed to motoneurons of the human tibialis anterior. Neurosci
+Lett 178: 206 –210, 1994.
+51. Sharrard WJ. The distribution of the permanent paralysis in the lower
+limb in poliomyelitis; a clinical and pathological study. J Bone Joint Surg
+Br 37-B: 540 –558, 1955.
+52. Sharrard WJ. The segmental innervation of the lower limb muscles in
+man. Ann R Coll Surg Engl 35: 106 –122, 1964.
+53. Soleiman J, Demaerel P, Rocher S, Maes F, Marchal G. Magnetic
+resonance imaging study of the level of termination of the conus medullaris and the thecal sac: influence of age and gender. Spine (Phila Pa 1976)
+30: 1875–1880, 2005.
+
+54. Stein R, Bertoldi R. The size principle: a synthesis of neurophysiological
+data. In: Motor Unit Types, Recruitment and Plasticity in Health and
+Disease. Progress in Clinical Neurophysiology, edited by Desmedt JE.
+Basel: Karger, 1981, vol. 9, p. 85–96.
+55. Stewart JD. Electrophysiological mapping of the segmental anatomy
+of the muscles of the lower extremity. Muscle Nerve 15: 965–966,
+1992.
+56. Tan U. Lateral asymmetry of H-reflex recovery curves in cat: evidence for
+a spinal motor asymmetry. Int J Neurosci 24: 45–52, 1984.
+57. Thompson AK, Chen XY, Wolpaw JR. Acquisition of a simple motor
+skill: task-dependent adaptation plus long-term change in the human
+soleus H-reflex. J Neurosci 29: 5784 –5792, 2009.
+58. Troni W, Di Sapio A, Berra E, Duca S, Merola A, Sperli F, Bertolotto
+A. A methodological reappraisal of non invasive high voltage electrical
+stimulation of lumbosacral nerve roots. Clin Neurophysiol 122: 2071–
+2080, 2011.
+59. Wolpaw JR, Lee CL, Calaitges JG. Operant conditioning of primate
+triceps surae H-reflex produces reflex asymmetry. Exp Brain Res 75:
+35–39, 1989.
+60. Ygge J, Aldskogius H, Grant G. Asymmetries and symmetries in the
+number of thoracic dorsal root ganglion cells. J Comp Neurol 202:
+365–372, 1981.
+61. Zehr PE. Considerations for use of the Hoffmann reflex in exercise
+studies. Eur J Appl Physiol 86: 455–468, 2002.
+
+J Appl Physiol • doi:10.1152/japplphysiol.01128.2014 • www.jappl.org
+Downloaded from journals.physiology.org/journal/jappl (107.159.024.177) on July 10, 2025.
+
+

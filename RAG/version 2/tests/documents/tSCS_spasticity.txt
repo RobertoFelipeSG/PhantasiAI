@@ -1,0 +1,917 @@
+Research article
+
+Modification of spasticity by transcutaneous
+spinal cord stimulation in individuals with
+incomplete spinal cord injury
+Ursula S. Hofstoetter 1 , William B. McKay2, Keith E. Tansey2,3,4, Winfried Mayr 1,
+Helmut Kern5,6, Karen Minassian 1
+1
+
+Center for Medical Physics and Biomedical Engineering, Medical University of Vienna, Vienna, Austria, 2Hulse
+Spinal Cord Injury Lab, Crawford Research Institute, Shepherd Center, Atlanta, GA, USA, 3Departments of
+Neurology and Physiology, Emory University School of Medicine, Atlanta, GA, USA, 4Spinal Cord Injury Clinic,
+Atlanta Veterans Administration Medical Center, Atlanta, GA, USA, 5Ludwig Boltzmann Institute of Electrical
+Stimulation and Physical Rehabilitation, Vienna, Austria, 6Department of Physical Medicine and Rehabilitation,
+Wilhelminenspital Wien, Vienna, Austria
+Context/objective: To examine the effects of transcutaneous spinal cord stimulation (tSCS) on lower-limb
+spasticity.
+Design: Interventional pilot study to produce preliminary data.
+Setting: Department of Physical Medicine and Rehabilitation, Wilhelminenspital, Vienna, Austria.
+Participants: Three subjects with chronic motor-incomplete spinal cord injury (SCI) who could walk ≥10 m.
+Interventions: Two interconnected stimulating skin electrodes (Ø 5 cm) were placed paraspinally at the T11/T12
+vertebral levels, and two rectangular electrodes (8 × 13 cm) on the abdomen for the reference. Biphasic 2 mswidth pulses were delivered at 50 Hz for 30 minutes at intensities producing paraesthesias but no motor
+responses in the lower limbs.
+Outcome measures: The Wartenberg pendulum test and neurological recordings of surface-electromyography
+(EMG) were used to assess effects on exaggerated reflex excitability. Non-functional co-activation during
+volitional movement was evaluated. The timed 10-m walk test provided measures of clinical function.
+Results: The index of spasticity derived from the pendulum test changed from 0.8 ± 0.4 pre- to 0.9 ± 0.3 poststimulation, with an improvement in the subject with the lowest pre-stimulation index. Exaggerated reflex
+responsiveness was decreased after tSCS across all subjects, with the most profound effect on passive
+lower-limb movement (pre- to post-tSCS EMG ratio: 0.2 ± 0.1), as was non-functional co-activation during
+voluntary movement. Gait speed values increased in two subjects by 39%.
+Conclusion: These preliminary results suggest that tSCS, similar to epidurally delivered stimulation, may be used
+for spasticity control, without negatively impacting residual motor control in incomplete SCI. Further study in a
+larger population is warranted.
+Keywords: Humans, Movement, Muscle spasticity, Spinal cord injuries, Spinal cord stimulation, Paraplegia, Tetraplegia, Rehabilitation
+
+Introduction
+Partial injury of descending spinal cord tracts alters the
+supraspinal motor control over the lumbosacral neural
+circuitry that is normally preserved caudal to the
+lesion. The consequences of such injuries are usually
+paresis or paralysis and spasticity of the lower
+
+Correspondence to: Ursula S. Hofstoetter, Center for Medical Physics and
+Biomedical Engineering, Medical University of Vienna, Waehringer Guertel
+18-20/4L, A-1090 Vienna, Austria. Email: ursula.hofstoetter@meduniwien.ac.at
+
+202
+
+© The Academy of Spinal Cord Injury Professionals, Inc. 2014
+DOI 10.1179/2045772313Y.0000000149
+
+extremities.1,2 Also, when present, spasticity can negatively impact otherwise sufficient residual motor
+control.3,4
+Treatment modalities used for spasticity target
+the segmental pathophysiological changes within the
+spinal cord after the injury as well as changes in the
+muscle–tendon complex.5 They range from oral medication and physical interventions to motor nerve block
+injections and intrathecal drug delivery.5,6 Yet, therapeutic control of severe forms of spasticity, while
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+Hofstoetter et al.
+
+maintaining or even enhancing residual motor
+capacities, has remained difficult.7 Surgical treatment
+of spasticity is based on the concept that spinal reflex
+circuitry becomes hyperactive after being deprived of
+supraspinal inhibitory control. By cutting the posterior
+roots, Otfrid Foerster, in 1909, interrupted afferent
+inputs to the spinal cord to reduce the excitability of segmental neural circuits.8 More selective posterior root
+entry zone procedures were developed to decrease
+lower limb hypertonia and improve ambulation.9
+However, such surgical approaches create permanent
+lesions within the neural tissue and have the potential
+to damage surviving neural function and a high incidence of recurrence of spasticity has been reported.10
+The emergence of epidurally delivered electrical
+spinal cord stimulation (SCS) provided an alternative
+way to reversibly modify motor control in patients
+with upper motor neuron disorders.11–15 Richardson
+and McLone16 and Richardson et al. 17 described the
+alleviation of severe lower limb spasticity in clinically
+complete thoracic spinal cord injury (SCI) by epidural
+stimulation applied over the lumbosacral spinal cord
+and cauda equina. In patients with motor-complete
+and incomplete SCI, epidural SCS was applied below
+and above the lesion at vertebral levels ranging from
+C2 to T10 and at stimulation frequencies of
+30–1500 Hz, with variable results.18–22 Dimitrijevic
+et al. 23,24 suggested that the diversity of physiological
+conditions after SCI and the placement of the epidural
+electrodes determined the efficacy of SCS in spasticity
+control. While interest in this technique declined in the
+1990s, Pinter et al. 25 revisited its use in individuals
+with chronic SCI. They showed a significant suppression
+of severe lower limb spasticity when the epidural electrodes were placed over the lumbar posterior roots and the
+stimulation frequency was in a range of 50–100 Hz. The
+suggested mechanism was the modification of the excitability of neural circuits within the lumbar spinal cord
+through continuous posterior-root activation.25–27
+We previously described a transcutaneous stimulation
+method to depolarize large-diameter afferent fibers of
+
+Table 1
+
+Modification of tSCS on lower-limb spasticity
+
+the L2–S2 posterior roots in humans.28–30 These input
+structures to the segmental neural circuits are hence (at
+least a sub-population of ) the same neural targets as
+electrically stimulated by epidural implants over the
+lumbar spinal cord.22,30 In this exploratory work, we
+hypothesized that transcutaneous SCS (tSCS), when
+applied in a continuous mode at 50 Hz, can be used to
+modify the central state of excitability of lumbar
+neural circuits, and reduce spasticity.
+
+Methods
+Subjects and clinical data
+After informed consent was obtained, three subjects
+(mean age 32.7 ± 4.1 years; one female) with chronic
+(10.7 ± 1.2 years post-onset) sensory- and motor-incomplete SCI were studied (Table 1). The participants were
+otherwise healthy adults. All subjects had spastic muscle
+hypertonia in the lower limbs and exhibited clonus but
+were able to complete the 10-m walk test without
+braces and were not taking anti-spasticity medications.
+The study was approved by the Ethics Committee of
+the City of Vienna, Austria, and conforms to the
+Helsinki Declaration of 1975, as revised in 2000.
+
+Transcutaneous spinal cord stimulation
+tSCS was applied using self-adhesive electrodes (Schwamedico GmbH, Ehringshausen, Germany). A pair of
+stimulating disk electrodes (Ø = 5 cm) was placed over
+the T11 and T12 spinous processes, manually identified
+by palpation, with one electrode on either side of the
+spine (Fig. 1A). A pair of rectangular reference electrodes (8 cm × 13 cm each) was placed over the lower
+anterior abdomen, in symmetry to the umbilicus. The
+two electrodes of each pair were connected together so
+as to function as single, larger electrodes. A constantvoltage stimulator delivered charge-balanced, symmetric, biphasic rectangular pulses of 2 ms width (1 ms
+per phase). Electrode placement was confirmed by eliciting posterior root-muscle reflexes (PRM reflexes) in
+lower limb muscles with the subjects relaxed in the
+supine position (Fig. 1B).29–31 The requirement was
+
+Subject characteristics
+Lower limb
+motor scores
+
+Subject no.
+
+Sex
+
+Age
+
+Years post-injury
+
+Level of SCI
+
+AIS
+
+Left
+
+Right
+
+WISCI
+
+Device
+
+1
+2
+3
+
+M
+M
+F
+
+38
+32
+28
+
+9
+12
+11
+
+C5
+C5
+T9
+
+D
+D
+D
+
+13
+12
+11
+
+12
+17
+13
+
+13
+16
+16
+
+Walker
+Crutches
+Crutches
+
+ASIA Impairment Scale (AIS) category, Walking Index for Spinal Cord Injury (WISCI), assistive devices needed for gait (Device).
+M, male; F, female.
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+203
+
+Hofstoetter et al.
+
+Modification of tSCS on lower-limb spasticity
+
+Figure 1 Transcutaneous spinal cord stimulation. (A) Sketch of the placement of the stimulating and reference skin electrodes over
+the back and the lower abdomen, respectively, relative to the spine and the lumbosacral spinal cord. (B) The elicitation of posterior
+root-muscle reflexes in left (L) and right (R) quadriceps (Q), hamstrings (Ham), tibialis anterior (TA), and triceps surae (TS) was used
+as electrophysiological criterion to confirm the position of the stimulating paravertebral electrodes over the lumbar spinal cord.
+(C) The stimulation of posterior root afferents was verified by testing the recovery cycle of the evoked responses using doublestimuli at interstimulus intervals of 30, 50, and 100 ms. Electromyographic data derived from subject 2 in the supine position.
+
+that single stimuli evoke PRM reflexes in the L2–L4
+innervated quadriceps (Q) at lower thresholds than
+in the L5–S2 innervated triceps surae (TS).25,26,32
+Paraspinal electrodes were relocated, up to 3 cm in
+either the rostral or caudal direction when needed to
+achieve this required PRM response distribution.
+Double-stimuli at interstimulus intervals of 30, 50, and
+100 ms were applied to test the presence of post-stimulation attenuation of the detected responses to verify
+the stimulation of afferent fibers (Fig. 1C).29,33
+To induce the hypothesized neuromodulative effect
+on lumbar spinal neural circuits, tSCS was applied at
+a frequency of 50 Hz.25 With the subject lying comfortably supine on an examination bed, the stimulation intensity was slowly increased starting from 0 V to allow for
+adaptation to the stimulation-induced effects. These
+effects included, in sequence of their occurrence with
+increasing stimulation: sensory perception of the stimulation under the paraspinal and subsequently the
+abdominal electrodes, contraction of the paraspinal
+and abdominal muscles, and paraesthesias in the lower
+limbs. tSCS was applied for 30 minutes at intensities
+producing paraesthesias in most of the lower limb dermatomes, yet subthreshold for generating lower limb
+
+204
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+motor activity. Particularly, the average intensity
+applied amounted to 20 V ± 2 V ( per phase of the
+biphasic stimulation pulse), corresponding to 68% ±
+16% of individual lower limb PRM reflex threshold.19,24
+Discomfort during the stimulation was not reported by
+any subject.
+
+Assessments
+All assessments were performed prior to and immediately following the 30-minute session of 50-Hz tSCS.
+The Wartenberg pendulum test (WPT) is a quantitative method for the assessment of spastic hypertonia of
+the Q muscle.34 With the subject in a sitting position,
+reclined at approximately 45°, the examiner lifted the
+relaxed test limb to a horizontal position, then released
+it and let it oscillate passively until it stopped in a
+gravity-neutral position. The test was repeated three
+times on each side.
+Electromyographic (EMG) recordings from Q, hamstrings (Ham), tibialis anterior (TA), and TS muscles
+bilaterally were acquired using pairs of silver–silver
+chloride recording electrodes (Intec Medizintechnik
+GmbH, Klagenfurt, Austria), each placed centrally
+over the muscle bellies and oriented along the long
+
+Hofstoetter et al.
+
+axis of the muscles with an inter-electrode distance of
+3 cm.35 Inter-electrode impedance was reduced to
+below 5 kΩ using abrasive paste. EMG signals were
+amplified (EMS-Handels GmbH, Korneuburg,
+Austria) with a gain of 502, filtered to a bandwidth of
+10–500 Hz and digitized at 2048 samples per second
+per channel. Electro-goniometers (Penny & Giles
+Biometrics, Ltd., Gwent, UK) were used to measure
+knee and ankle movements. The goniometric data
+were synchronized to the EMG, bandpass-filtered
+between 0 and 100 Hz and sampled at 2048 Hz.
+Reflex activities and motor tasks tested included, in
+the supine position, passive unilateral hip and knee
+flexion and extension movements, the manual elicitation
+of ankle clonus by rapid stretch of the Achilles tendon,
+and foot withdrawal by non-noxious mechanical
+plantar stimulation. Each of the maneuvers was
+repeated three times on each side, separated by phases
+of relaxation. In the sitting position, rhythmic voluntary
+unilateral ankle dorsiflexion and plantar flexion
+attempted at a self-selected speed was performed five
+times on each side.
+The 10-m walking speed was acquired with subjects
+using walking aids (Table 1) as required for safety.36
+Each test was videotaped for offline visual examination.
+In subjects 1 and 2, all segments of the assessment
+were completed in a single recording session. In
+subject 3, passive lower limb movements and plantar
+stimulation were performed in one session, and ankle
+clonus, volitional ankle movement, and the timed
+10-m walk test were accomplished in a second session.
+The WPT was repeated in both sessions, and the respective measures were averaged, hence contributing single
+values per leg to the group results.
+
+Data analysis
+Data were analyzed offline using WinDaq Waveform
+Browser playback software (DATAQ Instruments,
+Inc., Akron, OH, USA) and Matlab R2012a (The
+MathWorks, Inc., Natick, MA, USA).
+Wartenberg pendulum test
+The index of spasticity, R2n, was calculated as described
+by Bajd and Vodovnik37:
+(peak knee flexion angle of first swing)
+− (starting knee angle)
+R2n =
+1.6[(finalrestingkneeangle)
+−(starting knee angle)]
+Scores ≥1 signify non-spastic conditions, while R2n = 0
+is obtained in case of extreme spasticity. The index correlates well with the clinical evaluation of muscle
+
+Modification of tSCS on lower-limb spasticity
+
+hypertonia graded on the Ashworth scale, and provides
+a more objective and finely graded measurement.38
+Here, mean R2n values were averaged over the three repetitions on each side.
+In addition, the magnitude of total ipsilateral lower
+limb EMG activity generated during the pendulum
+test was calculated as the sum of the root mean square
+(RMS) of the EMG activity across the four ipsilateral
+muscle groups, between the onset of the maneuver,
+drop of leg from horizontal position, and the time
+when the resting angle was reached. Data for each
+muscle were baseline-corrected by subtracting the
+RMS calculated from a 1-second period preceding the
+maneuver. Mean values of the three repetitions for
+each limb were evaluated. The corresponding value
+after tSCS was then individually normalized to the
+value before stimulation and normalized mean group
+results Ātotal of these ratios (derived from n = 6 lower
+limbs) were calculated.
+Volitional ankle dorsiflexion and plantar flexion
+The total maneuver-related magnitudes of ipsilateral
+muscle activation during five consecutive flexion and
+extension phases (identified by ankle goniometric
+data) were calculated based on the RMS values as
+described above and averaged. Agonist muscle activity
+during each movement phase was normalized to the
+total activity recorded across all ipsilateral muscles.
+Thus, the amount of TA activity (RMSTA) relative to
+the total magnitude of ipsilateral muscle activation
+(RMStotal ) during dorsiflexion was individually calculated as RMSTA/RMStotal, and group results were
+obtained across the subjects. Accordingly, the relative
+TS activity during plantar flexion was computed as
+RMSTS/RMStotal. Mean peak angles of the ankle
+movement for the five repetitions were also obtained.
+Passive lower limb flexion-extension, ankle clonus,
+and plantar stimulation
+In case of passive lower limb flexion and extension
+movements, base-line corrected RMS from ipsilateral
+muscles were calculated between the onsets and offsets
+plus 3 seconds for the movement identified by knee
+goniometric data. For ankle clonus and plantar stimulation, RMS of ipsilateral lower limb EMG activity
+was computed for 5-second time windows following
+the initiation of the maneuvers. Mean values for the
+maneuver-related magnitude of ipsilateral muscle activation were obtained from the three repetitions of each
+task, and normalized group mean results Ātotal were calculated from the available data sets.
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+205
+
+Hofstoetter et al.
+
+Modification of tSCS on lower-limb spasticity
+
+10-m walk test
+The time required to walk a distance of 10 m before and
+after stimulation with the same walking aids was
+measured.
+
+Results
+Pendulum test
+The average spasticity index R2n was 0.8 ± 0.4 before
+and 0.9 ± 0.3 after tSCS. The group result Ātotal of the
+magnitude of ipsilateral muscle activation after stimulation normalized to the corresponding value before
+stimulation was 0.9 ± 0.0. The EMG activities produced
+during the WPT were decreased evenly across all subjects after stimulation, while the R2n score improved in
+subject 3 only, who had the lowest pre-stimulation
+scores, with no changes in the R2n in subjects 1 and
+2. The R2n scores obtained in subject 3 in the two sessions were reproducible for both lower limbs and the
+pre- and post-tSCS assessments, respectively. Before
+stimulation, the pendulum test documented restraints
+in the free-swinging movements of the lower leg in
+subject 3 (Fig. 2, left). The passive, gravity-driven movement toward the gravity-neutral end-point position was
+interrupted by numerous short bursts of stretch-elicited
+Q activity, accompanied by activation of Ham and, to
+some extent, of TA. After stimulation, activation of
+the Q only occurred during the initial two flexion–extension oscillations of the leg and the knee movements were
+a pseudo-sinusoidal, damped motion (Fig. 2, right).
+
+Effects of tSCS on exaggerated reflex responses
+Passive hip and knee flexion and extension movements
+(Fig. 3A) before tSCS induced responses with a spread
+of EMG activity to all ipsilateral lower limb muscles.
+These responses were almost completely absent in the
+post-tSCS assessment. Pre-tSCS, a brisk manual
+
+stretch of the calf muscle elicited clonus-like activity in
+TS that spread to Ham and TA in the example given
+in Fig. 3B. After tSCS, no muscle activities except for
+a brief stretch-related reflex response in TS were detected
+when the same maneuver was performed. Non-noxious,
+cutaneous stimulation to the plantar surface of the foot
+with a blunt probe (Fig. 3C) resulted in withdrawalreflex EMG activity in all ipsilateral lower limb
+muscles but after tSCS, was largely diminished.
+The general decline in exaggerated reflex activities
+was reflected by the group results Ātotal of the maneuver-related magnitudes of ipsilateral lower limb EMG
+activity obtained for the post-tSCS assessment normalized to the corresponding values before tSCS
+(Fig. 3D). The post-tSCS RMS values were considerably reduced across all maneuvers and lower limbs,
+with the exception of the values derived from the
+ankle clonus tested in the respective left lower limbs of
+subjects 1 and 3. Specifically, Ātotal amounted to:
+passive lower limb movement, 0.2 ± 0.1; ankle clonus,
+0.7 ± 0.3; and plantar stimulation, 0.4 ± 0.1.
+
+Effects of tSCS on voluntary movements
+The EMG activity during volitional ankle dorsiflexion
+and plantar flexion performed before stimulation was
+generally characterized by co-activation patterns in the
+TA and TS muscles during both phases of movement
+(Fig. 4A, left). After stimulation, this co-activation
+was decreased (Fig. 4A, right). Furthermore, active
+range of motion for dorsiflexion was increased. The
+mean total range of ankle movement of the different
+subjects was increased after stimulation by a factor of
+1.2 ± 0.1. In addition, clonus-like activity in TA and
+TS that occurred in subjects 1 and 2 during the
+execution of the voluntary motor task was eliminated
+after tSCS (Fig. 4A and B).
+
+Figure 2 Wartenberg pendulum test. Electromyographic (EMG) activity from quadriceps (Q), hamstrings (Ham), tibialis anterior (TA),
+and triceps surae (TS) along with knee goniometric data before and after transcutaneous spinal cord stimulation in subject 3. Dotted
+lines mark the drop of leg from the horizontal position and the final resting knee angle reached. After stimulation, EMG activity is
+clearly reduced and the knee angle oscillations are a damped, pseudo-sinusoidal motion.
+
+206
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+Hofstoetter et al.
+
+Modification of tSCS on lower-limb spasticity
+
+Figure 3 Assessment of different manifestations of spasticity before and after transcutaneous spinal cord stimulation (tSCS).
+(A) Manually performed hip and knee flexion and extension movements; (B) the attempt to elicit an ankle clonus; and (C) a light stroke
+of the plantar surface with a blunt rod. Arrow heads in (B) and (C) depict onsets of the respective mechanical stimuli. Exemplary
+recordings were derived from subject 2. (D) Group results (n = 6) of maneuver-induced magnitudes of ipsilateral lower limb muscle
+activity after tSCS relative to corresponding values before tSCS. Note the general decline in exaggerated reflex activity in the
+post-tSCS assessment.
+
+Group results (Fig. 4C) revealed that the magnitude
+of ipsilateral EMG activity during dorsiflexion
+remained almost unchanged compared to that from
+before stimulation (Ātotal = 0.9 ± 0.4). Yet, a more selective activation of the ankle flexor TA during dorsiflexion
+was observed in the post-tSCS assessment, as reflected
+by the group mean results of RMSTA/RMStotal (0.6 ±
+0.1 before stimulation and 0.8 ± 0.2 afterwards;
+Fig. 4D, left). During plantar flexion, the magnitude
+of ipsilateral EMG activity was reduced after stimulation (Ātotal = 0.5 ± 0.2). There was no increase in
+selectivity in agonist muscle activation, with the relative
+TS activity RMSTS/RMStotal remaining at a low level
+(0.3 ± 0.2 before and 0.2 ± 0.2 after stimulation;
+Fig. 4D, right).
+
+and 54 vs. 32 seconds for subject 2. Clonus-like activity
+interfering with the subjects’ ability to walk before
+stimulation was visibly reduced after stimulation in
+these two subjects. Subject 3 had the fastest 10-m time
+prior to stimulation and did not show any increase
+after stimulation (23 vs. 23.5 seconds).
+
+Subjects’ reports
+Apart from the anti-spastic effect, the participants
+described a feeling of lightness of the lower limbs, and
+increased sensation, especially of the foot sole during
+ground contact. The anti-spastic effects were subjectively reported to have persisted for 2–6 hours after
+tSCS. No negative effects were reported.
+
+Discussion
+Effects of tSCS on the walking ability
+Two of the three participants increased their overground walking speed after stimulation. Times required
+to walk 10 m at a self-selected fast, yet secure speed were
+54 before and 34 seconds after stimulation for subject 1,
+
+We described the effects of a 30-minute session of 50-Hz
+transcutaneous lumbar SCS in three motor-incomplete
+SCI subjects with clinically evident spasticity. We
+observed that the responsiveness to muscle stretch,
+both tonic and phasic was decreased, as was the
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+207
+
+Hofstoetter et al.
+
+Modification of tSCS on lower-limb spasticity
+
+Figure 4 Volitional unilateral dorsiflexion and plantar flexion in sitting position. (A) EMG patterns showing co-activation and ankle
+clonus (left) are reduced post-stimulation (right). Dashed lines superimposed on the ankle goniograms show the range between the
+neutral extended position of the ankle at rest and maximum dorsiflexion before stimulation, and a flexion bias of the rhythmic
+movement after stimulation is documented by the shift of the goniometric trace. Boxes are displayed with enlarged scales in (B)
+depicting the interference of clonus-like activity before stimulation that is eliminated after stimulation. (C) Group mean magnitudes
+of ipsilateral EMG activity during dorsiflexion and plantar flexion after stimulation normalized to the corresponding values before
+stimulation. (D) The contribution of TA to the total magnitude of ipsilateral muscle activation during dorsiflexion was increased after
+stimulation. TS activity during plantar flexion was at a low level before and after stimulation.
+
+response to non-noxious, cutaneous stimulation of the
+plantar surface of the foot. Also, TA was more selectively activated during volitional dorsiflexion movements after tSCS. Finally, two of the three subjects
+increased their walking speeds considerably after tSCS.
+To understand these observations, we must first look
+to the neuroanatomy stimulated by tSCS. The electrode
+set-up and stimulation frequency of tSCS resemble that
+of transcutaneous electrical nerve stimulation (TENS).
+However, clinical TENS therapies normally excite
+more superficially located neural structures, and the
+major application is in the treatment of localized pain
+conditions. On the other hand, tSCS targets deeply
+located neural structures within the vertebral canal
+with the aim to provide bilateral multi-segmental input
+to the spinal cord and subsequently modify the excitability of its circuits.22 Within the vertebral canal, large
+diameter afferent fibers of the L2–S2 posterior rootlets
+
+208
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+to spinal cord junctions have the lowest thresholds for
+direct, electrical depolarization.29 The ligaments and
+discs between the vertebral bones reduce the transverse
+electrical resistance of the thoraco-lumbar spine and
+allow some current to flow through the vertebral
+canal.30,39,40 The excitation thresholds for the posterior
+root fibers are considerably reduced at their point of
+entry into the spinal cord due to non-uniformities of
+the anatomy and its electrical conductivities along the
+fiber paths and changes of the fiber path direction with
+respect to the generated field.30,39,40 Among the fibers
+within the posterior roots, the Ia afferents have the
+largest fiber diameters. It is known that the Ia afferents,
+presumably among the fibers depolarized during tSCS,
+make strong synaptic connections to Ia inhibitory interneurons.41 Independently, there is indirect evidence in
+humans that epidural SCS can activate spinal circuitries
+mediating reciprocal inhibition.32,42 Reciprocal
+
+Hofstoetter et al.
+
+inhibition might be one of the mechanisms sub-serving
+an inhibitory plurisegmental network situated within
+the lumbar spinal cord that was thought to be involved
+in the amelioration of severe lower-limb spasticity in a
+group of clinically complete mid-thoracic SCI people
+when epidural electrodes were placed over the lumbar
+posterior roots.25
+Another potential source of the effects observed here
+can be drawn from the reports that stimulation of the
+long tracts of the spinal cord reduces responsiveness to
+muscle spindle afferent input after spinal cord lesioning
+in cat models and SCI in humans.23,24,43,44 Here, we
+applied tSCS with adequate intensity to produce paraesthesias that are generally associated with posteriorcolumn depolarization during epidural SCS.45–47
+Modeling of tSCS-induced currents, however, has
+shown that posterior column fibers have considerably
+higher thresholds than the posterior root fibers.40
+Thus, at the intensities applied here, tSCS was probably
+not depolarizing long-tract fibers directly. Posterior
+roots contain fibers from cutaneous mechanoreceptors
+and their depolarization can also produce such sensations.48 Therefore, the report of parasthesias experienced here and the incomplete nature of the lesions in
+this study support the possibility that long loop, spinal–
+brainstem–spinal mechanisms might be involved in the
+suppression of segmental excitability.23 Such combined
+posterior roots activation and increased descending inhibition via brainstem loops in the control of spinal spasticity was suggested by other human studies.17,23,25,49
+Therefore, the most likely explanation for the effects
+seen in the three subjects reported here is a combination
+of both direct activation of local inhibitory circuits by
+posterior root fibers and the potentially more complex
+involvement of descending activation of presynaptic
+inhibition brought by long-loop mechanisms. This
+would also explain the observed reduction in the excessive withdrawal-like response elicited by non-noxious
+stimulation of the plantar surface of the foot, interpreted
+as a sign of decreased descending inhibitory control and
+altered intraspinal processing due to SCI.50 Finally, a
+generalized reduction of motor outputs by post-synaptic
+inhibition only is less probable since there was no
+deterioration of the voluntary activation of motor
+neuron pools during single ankle joint movements and
+walking. The improvements in the 10-m walk test in
+two of the three incomplete SCI participants after
+tSCS were partially attributable to the reduced clonuslike activity interfering with gait. The influence of a
+practice effect was less probable since the increase in
+gait speed of the two subjects was definitely beyond
+the normal variability of the subjects’ condition.
+
+Modification of tSCS on lower-limb spasticity
+
+To what extent the above-discussed mechanisms contribute to the temporarily persisting modifications of the
+spinal cord neural circuits’ excitability as assessed after
+tSCS was ended remains to be elucidated. Yet, this
+carry-over effect and its subjectively reported persistence
+for 2 to several hours after cessation of stimulation were
+not unexpected. In epidural SCS in motor disorders, it
+was repetitively observed that degradation of the
+improved function after withdrawal of stimulation
+could take hours or days.13,19,23,24 Temporary carryover effects were also described in functional electrical
+stimulation of peripheral nerves.51–53 However, proposed physiological mechanisms underlying these
+carry-over effects are speculative and include activitydependent, temporarily persisting changes of synaptic
+transmission such as long-term potentiation and longterm depression behavior of spinal motor neurons.54
+The results were derived from few individuals and
+thus, generalization to a population with a variety of
+SCI profiles should be cautioned.55 Further, the
+obvious sensory effects of the active stimulation limits
+the applicability of more conclusive study designs such
+as crossover studies with sham stimulation. Yet, we conducted thorough and quantitative assessment of many
+parameters of a highly integrative sensory-motor
+system.55 The antispastic effect of tSCS was apparent
+from complementary biomechanical, neurophysiological, and clinical evaluations and there were no discrepancies in the modifications across the parameters
+after stimulation. The promising results justify a clinical
+study with a statistically appropriate subject population
+with different severities of SCI. The close investigation
+of the carry-over effects as well as methods for prolonging this beneficial period, e.g. by several sessions of tSCS
+over a longer period of time, should be also addressed.
+
+Conclusion
+Independent from the specific mechanisms, the present
+results suggest that 50-Hz tSCS for 30 minutes leads to
+the diminution of pathophysiology (spasticity) and the
+improvement of normal physiology (voluntary motor
+control). If shown to be of wide prevalence, it is possible
+that this therapeutic approach could be used instead of
+systemically applied medications or ablative treatments
+with their unfortunate and long-lasting side effects.
+The temporary relief of spasticity with tSCS could be
+a non-invasive treatment of use for even short periods,
+perhaps prior to a physical therapy session where
+decreased co-contractions and dyssynergias and
+improved voluntary control could be better trained.
+Thus, this report serves as evidence that more study
+designed to characterize the extent and potential
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+209
+
+Hofstoetter et al.
+
+Modification of tSCS on lower-limb spasticity
+
+mechanisms of tSCS effect on motor neuron excitability
+is needed. Taken together, these results suggest that
+tSCS may be able to modify spinal motor responsiveness
+to external inputs from muscle, tendon, joint and
+cutaneous receptors while maintaining its responsiveness to input from spinal motor processing generated
+from within the CNS.
+
+Acknowledgments
+Special thanks to Milan R. Dimitrijevic, Department of
+Physical Medicine and Rehabilitation, Baylor College of
+Medicine, Houston, TX, USA, and Foundation for
+Movement Recovery, Oslo, Norway. We wish to
+acknowledge the support of the Austrian Science Fund
+(FWF), Proj.Nr. L512-N13, the Vienna Science and
+Technology Fund (WWTF), Proj.Nr. LS11-057, and
+the Wings for Life Spinal Cord Research Foundation
+(WfL), Proj.Nr. WFL-AT-007/11.
+
+References
+1 Sheean G. The pathophysiology of spasticity. Eur J Neurol 2002;
+9(S1):3–9.
+2 Biering-Sørensen F, Nielsen JB, Klinge K. Spasticity-assessment: a
+review. Spinal Cord 2006;44(12):708–22.
+3 Krawetz P, Nance P. Gait analysis of spinal cord injured subjects:
+effects of injury level and spasticity. Arch Phys Med Rehabil 1996;
+77(7):635–8.
+4 Adams MM, Hicks AL. Spasticity after spinal cord injury. Spinal
+Cord 2005;43(10):577–86.
+5 Tansey K, Dimitrijevic MM, Mayr W, Bijak M, Dimitrijevic MR.
+Restorative neurology of motor control after spinal cord injury. In:
+Dimitrijevic MR, Byron A, Vrbova G, McKay WB, (eds.)
+Restorative neurology of spinal cord injury. New York: Oxford
+University Press; 2011. p. 43–64.
+6 Elbasiouny SM, Moroz D, Bakr MM, Mushahwar VK.
+Management of spasticity after spinal cord injury: current techniques and future directions. Neurorehabil Neural Repair 2010;
+24(1):23–33.
+7 Smyth MD, Peacock WJ. The surgical treatment of spasticity.
+Muscle Nerve 2000;23(2):153–63.
+8 Foerster O. Über eine neue operative Methode der Behandlung
+spastischer
+Lähmung
+mittels
+Resektion
+hinterer
+Rückenmarkswurzeln. Z Orthop Chir 1909;22:203–22.
+9 Nielsen JB, Crone C, Hultborn H. The spinal pathophysiology of
+spasticity – from a basic science point of view. Acta Physiol (Oxf )
+2007;189(2):171–80.
+10 Sindou M, Pregelj R, Boisson D, Eyssette M, Goutelle A. Surgical
+selective lesions of nerve fibers and myelotomies for modifying
+muscle hypertonia. In: Eccles J, Dimitrijevic MR, (eds.) Upper
+motor neuron functions and dysfunctions. Recent achievements in
+restorative neurology, Vol. 1. Basel: S Karger AG; 1985. p. 10–26.
+11 Shealy CN, Mortimer JT, Reswick JB. Electrical inhibition of pain
+by stimulation of the dorsal columns: preliminary clinical report.
+Anesth Analg 1967;46(4):489–91.
+12 Cook AW, Weinstein SP. Chronic dorsal column stimulation in
+multiple sclerosis. Preliminary report. N Y State J Med 1973;
+73(24):2868–72.
+13 Cook AW. Electrical stimulation in multiple sclerosis. Hosp Pract
+1976;11(4):51–8.
+14 Dooley DM. Percutaneous electrical stimulation of the spinal cord.
+43rd Annual Meeting of the American Association of Neurological
+Surgeons. Miami Beach, Florida, April 1975.
+15 Illis LS, Oygar AE, Sedgwick EM, Awadalla MA. Dorsal-column
+stimulation in the rehabilitation of patients with multiple sclerosis.
+Lancet 1976;1(7974):1383–6.
+
+210
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+16 Richardson RR, McLone DG. Percutaneous epidural neurostimulation for paraplegic spasticity. Surg Neurol 1978;9(3):153–5.
+17 Richardson RR, Cerullo LJ, McLone DG, Gutierrez FA, Lewis V.
+Percutaneous epidural neurostimulation in modulation of paraplegic spasticity. Six case reports. Acta Neurochir 1979;49(3–4):
+235–43.
+18 Siegfried J, Lazorthes Y, Broggi G. Electrical spinal cord stimulation for spastic movement disorders. Appl Neurophysiol 1981;
+44(1-3):77–92.
+19 Barolat G, Myklebust JB, Wenninger W. Effects of spinal cord
+stimulation on spasticity and spasms secondary to myelopathy.
+Appl Neurophysiol 1988;51(1):29–44.
+20 Barolat G, Singh-Sahni K, Staas WE, Shatin D, Ketcik B, Allen K.
+Epidural spinal cord stimulation in the management of spasms in
+spinal cord injury: a prospective study. Stereotact Funct
+Neurosurg 1995;64(3):153–64.
+21 Waltz JM. Chronic stimulation for motor disorders. In: Gindelberg
+PL, Tasker RR, (eds.) Textbook for stereotactic and functional
+neurosurgery. New York: McGraw-Hill; 1998. p. 1087–99.
+22 Minassian K, Hofstoetter U, Tansey K, Mayr W.
+Neuromodulation of lower limb motor control in restorative neurology. Clin Neurol Neurosurg 2012;114(5):489–97.
+23 Dimitrijevic MM, Dimitrijevic MR, Illis LS, Nakajima K,
+Sharkey PC, Sherwood AM. Spinal cord stimulation for the
+control of spasticity in patients with chronic spinal cord injury:
+I. Clinical observations. Cent Nerv Syst Trauma 1986;3(2):129–44.
+24 Dimitrijevic MR, Illis LS, Nakajima K, Sharkey PC, Sherwood
+AM. Spinal cord stimulation for the control of spasticity in patients
+with chronic spinal cord injury: II. Neurophysiologic observations.
+Cent Nerv Syst Trauma 1986;3(2):145–52.
+25 Pinter MM, Gerstenbrand F, Dimitrijevic MR. Epidural electrical
+stimulation of posterior structures of the human lumbosacral cord:
+3. Control of spasticity. Spinal Cord 2000;38(9):524–31.
+26 Murg M, Binder H, Dimitrijevic MR. Epidural electric stimulation
+of posterior structures of the human lumbar spinal cord: 1. muscle
+twitches – a functional method to define the site of stimulation.
+Spinal Cord 2000;38(7):394–402.
+27 Rattay F, Minassian K, Dimitrijevic MR. Epidural electrical
+stimulation of posterior structures of the human lumbosacral
+cord: 2. quantitative analysis by computer modeling. Spinal
+Cord 2000;38(8):473–89.
+28 Dimitrijevic MR, Dimitrijevic MM, Kern H, Minassian K, Rattay
+F. Electrophysiological characteristics of H-reflexes elicited by percutaneous stimulation of the cauda equina. Program No. 417.11.
+Abstract viewer/itinerary planner. Washington, DC: Society for
+Neuroscience; 2004.
+29 Minassian K, Persy I, Rattay F, Dimitrijevic MR, Hofer C, Kern
+H. Posterior root-muscle reflexes elicited by transcutaneous stimulation of the human lumbosacral cord. Muscle Nerve 2007;35(3):
+327–36.
+30 Minassian K, Hofstoetter U, Rattay F. Transcutaneous lumbar
+posterior root stimulation for motor control studies and modification of motor activity after spinal cord injury. In: Dimitrijevic
+MR, Byron A, Vrbova G, McKay WB, (eds.) Restorative neurology of spinal cord injury. New York: Oxford University Press;
+2011. p. 226–55.
+31 Hofstoetter US, Minassian K, Hofer C, Mayr W, Rattay F,
+Dimitrijevic MR. Modification of reflex responses to lumbar posterior root stimulation by motor tasks in healthy subjects. Artif
+Organs 2008;32(8):644–8.
+32 Minassian K, Persy I, Rattay F, Pinter MM, Kern H, Dimitrijevic
+MR. Human lumbar cord circuitries can be activated by extrinsic
+tonic input to generate locomotor-like activity. Hum Mov Sci 2007;
+26(2):275–95.
+33 Roy FD, Gibson G, Stein RB. Effect of percutaneous stimulation
+at different spinal levels on the activation of sensory and motor
+roots. Exp Brain Res 2012;223(2):281–9.
+34 Wartenberg R. Pendulousness of the legs as a diagnostic test.
+Neurology 1951;1(1):18–24.
+35 Sherwood AM, McKay WB, Dimitrijević MR. Motor control
+after spinal cord injury: assessment using surface EMG. Muscle
+Nerve 1996;19(8):966–79.
+36 Scivoletto G, Tamburella F, Laurenza L, Foti C, Ditunno JF,
+Molinari M. Validity and reliability of the 10-m walk test and
+
+Hofstoetter et al.
+
+the 6-min walk test in spinal cord injury patients. Spinal Cord
+2011;49(6):736–40.
+37 Bajd T, Vodovnik L. Pendulum testing of spasticity. J Biomed Eng
+1984;6(1):9–16.
+38 Leslie GC, Muir C, Part NJ, Roberts RC. A comparison of the
+assessment of spasticity by the Wartenberg pendulum test and
+the Ashworth grading scale in patients with multiple sclerosis.
+Clin Rehabil 1992;6(1):41–8.
+39 Ladenbauer J, Minassian K, Hofstoetter US, Dimitrijevic MR,
+Rattay F. Stimulation of the human lumbar spinal cord with
+implanted and surface electrodes: a computer simulation study.
+IEEE Trans Neural Syst Rehabil Eng 2010;18(6):637–45.
+40 Danner SM, Hofstoetter US, Ladenbauer J, Rattay F, Minassian
+M. Can the human lumbar posterior columns be stimulated by
+transcutaneous spinal cord stimulation? A modeling study. Artif
+Organs 2011;35(3):257–62.
+41 Jankowska E. Interneuronal relay in spinal pathways from proprioceptors. Prog Neurobiol 1992;38(4):335–78.
+42 Hofstoetter US. Model of spinal cord reflex circuits in humans: stimulation frequency-dependence of segmental activities and their interactions [PhD dissertation]. Vienna University of Technology, 2009.
+43 Chapman CE, Ruegg DG, Wiesendanger M. Effects of dorsal cord
+stimulation on stretch reflexes. Brain Res 1983;258(2):211–5.
+44 Siegfried J, Krainick JU, Haas H, Adorjani C, Meyer M, Thoden
+U. Electrical spinal cord stimulation for spastic movement disorders. Appl Neurophysiol 1978;41(1-4):134–41.
+45 Barolat G, Massaro F, He J, Zeme S, Ketcik B. Mapping of
+sensory responses to epidural stimulation of the intraspinal
+neural structures in man. J Neurosurg 1993;78(2):233–9.
+
+Modification of tSCS on lower-limb spasticity
+
+46 Holsheimer J. Computer modelling of spinal cord stimulation and
+its contribution to therapeutic efficacy. Spinal Cord 1998;36(8):
+531–40.
+47 Holsheimer J. Which neuronal elements are activated directly by
+spinal cord stimulation. Neuromodulation 2002;5(1):25–31.
+48 Hunter JP, Ashby P. Segmental effects of epidural spinal cord
+stimulation in humans. J Physiol 1994;474(3):407–19.
+49 Gybels J, Van Roost D. Spinal cord stimulation for the modification of dystonic and hyperkinetic conditions: a critical review.
+In: Eccles J, Dimitrijevic MR, (eds.) Recent achievements in
+restorative neurology. Basel: Karger; 1985. p. 56–70.
+50 Sandrini G, Serrao M, Rossi P, Romaniello A, Cruccu G, Willer
+JC. The lower limb flexion reflex in humans. Prog Neurobiol
+2005;77(6):353–95.
+51 Vodovnik L, Bowman BR, Hufford P. Effects of electrical
+stimulation on spinal spasticity. Scand J Rehabil Med 1984;16(1):
+29–34.
+52 Bajd T, Gregoric M, Vodovnik L, Benko H. Electrical stimulation
+in treating spasticity resulting from spinal cord injury. Arch Phys
+Med Rehabil 1985;66(8):515–7.
+53 Stein RB. Functional electrical stimulation after spinal cord injury.
+J Neurotrauma 1999;16(8):713–7.
+54 Nielsen JF, Sinkjaer T. Long-lasting depression of soleus motoneurons excitability following repetitive magnetic stimuli of the
+spinal cord in multiple sclerosis patients. Mult Scler 1997;3(1):
+18–30.
+55 Edgerton VR, Harkema S. Epidural stimulation of the spinal cord
+in spinal cord injury: current status and future challenges. Expert
+Rev Neurother 2011;11(10):1351–3.
+
+The Journal of Spinal Cord Medicine
+
+2014
+
+VOL. 37
+
+NO. 2
+
+211
+
+

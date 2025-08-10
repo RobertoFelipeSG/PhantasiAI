@@ -1,0 +1,1251 @@
+Neuromodulation: Technology at the Neural Interface
+Received: February 5, 2024
+
+Revised: April 30, 2024
+
+Accepted: May 18, 2024
+
+https://doi.org/10.1016/j.neurom.2024.05.005
+
+Non-invasive Transcutaneous Spinal Cord
+Stimulation Programming Recommendations
+for the Treatment of Upper Extremity
+Impairment in Tetraplegia
+Kristen Gelenitis, PhD1 ; Andrea Santamaria, MD, MBA1;
+Jared Pradarelli, DPT1; Markus Rieger, PT, PhD1; Fatma Inanici, MD, PhD2;
+Candace Tefertiller, DPT, PhD3; Edelle Field-Fote, PT, PhD4;
+James Guest, MD, PhD5; Jenny Suggitt, MSc, OT1; Amanda Turner, BSc1;
+Jessica M. D’Amico, PhD1,6,7,a; Chet Moritz, PhD2,8,a
+ABSTRACT
+Objectives: This study analyzes the stimulation parameters implemented during two successful trials that used non-invasive
+transcutaneous spinal cord stimulation (tSCS) to effectively improve upper extremity function after chronic spinal cord injury
+(SCI). It proposes a framework to guide stimulation programming decisions for the successful translation of these techniques into
+the clinic.
+Materials and Methods: Programming data from 60 participants who completed the Up-LIFT trial and from 17 participants who
+subsequently completed the LIFT Home trial were analyzed. All observations of stimulation amplitudes, frequencies, waveforms,
+and electrode conﬁgurations were examined. The incidence of adverse events and relatedness to stimulation parameters is
+reported. A comparison of parameter usage across the American Spinal Injury Association Impairment Scale (AIS) subgroups was
+conducted to evaluate stimulation strategies across participants with varying degrees of sensorimotor preservation.
+Results: Active (cathodal) electrodes were typically placed between the C3/C4 and C6/C7 spinous processes. Most sessions
+featured return (anodal) electrodes positioned bilaterally over the anterior superior iliac spine, although clavicular placement was
+frequently used by 12 participants. Stimulation was delivered with a 10-kHz carrier frequency and typically a 30-Hz burst frequency. Biphasic waveforms were used in 83% of sessions. Average stimulation amplitudes were higher for biphasic waveforms.
+The AIS B subgroup required signiﬁcantly higher amplitudes than did the AIS C and D subgroups. Device-related adverse events
+were infrequent, and not correlated with speciﬁc waveforms or amplitudes. Within the home setting, participants maintained
+their current amplitudes within 1% of the preset values. The suggested stimulation programming framework dictates the
+following hierarchical order of parameter adjustments: current amplitude, waveform type, active/return electrode positioning,
+and burst frequency, guided by clinical observations as required.
+Conclusions: This analysis summarizes effective stimulation parameters from the trials and provides a decision-making framework for clinical implementation of tSCS for upper extremity functional restoration after SCI. The parameters are aligned with
+existing literature and proved safe and well tolerated by participants.
+Address correspondence to: Chet Moritz, PhD, University of Washington, Seattle, WA, USA. Email: ctmoritz@uw.edu
+1
+
+ONWARD Medical, Lausanne, Switzerland;
+Departments of Rehabilitation Medicine, Electrical & Computer Engineering, Center for Neurotechnology, University of Washington. Seattle, WA, USA;
+3
+Craig Hospital. Englewood, CO, USA;
+4
+Shepherd Center, Crawford Research Institute, Emory University School of Medicine, Department of Rehabilitation Medicine, School of Biological Sciences, Georgia
+Institute of Technology, Atlanta, GA, USA;
+5
+Neurological Surgery and the Miami Project to Cure Paralysis, Miller School of Medicine, University of Miami, Miami, FL, USA;
+6
+Glenrose Rehabilitation Hospital, Alberta Health Services. Edmonton, Canada;
+7
+Department of Medicine, University of Alberta. Edmonton, Canada; and
+8
+Department of Physiology & Biophysics, University of Washington. Seattle, WA, USA
+2
+
+a
+
+Indicates equal contribution.
+
+162
+
+For more information on author guidelines, an explanation of our peer review process, and conﬂict of interest informed consent policies, please see the journal’s Guide
+for Authors.
+Source(s) of ﬁnancial support: The study was sponsored by ONWARD Medical.
+
+www.neuromodulationjournal.org
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+
+Keywords: Amplitude, frequency, motor threshold, noninvasive spinal cord stimulation, spinal cord injury, transcutaneous spinal
+cord stimulation, waveform
+
+INTRODUCTION
+Upper extremity paralysis or paresis resulting from cervical spinal
+cord injury (SCI) severely limits independence, making restoration of
+hand function the highest priority for individuals with tetraplegia.1,2
+Despite clinical practice guidelines,3 there is lack of consensus on
+optimal methods to restore function. Reconstructive upper extremity
+surgery can restore speciﬁc joint motion.4–6 Occupational therapy
+and task-oriented activity-based training aim to retrain the nervous
+system to recover speciﬁc motor tasks, teach compensatory strategies, and improve residual strength and range of motion.7–10 Assistive technologies, including orthoses or robotic exoskeletons, enable
+hand postures11,12 but do not restore voluntary movement. Noninvasive electrical stimulation techniques, such as functional electrical
+stimulation and neuromuscular electrical stimulation, can be applied
+over the skin to stimulate peripheral nerves and/or muscles directly
+to initiate muscle contractions in people with SCI.13–15 However,
+despite movement-based therapies, preserved neural circuits are
+unable to effectively drive synaptic activity in the absence of
+adequate descending supraspinal input, leading to a plateau in
+functional improvement.16
+Current SCI rehabilitation approaches are constrained by the extent
+of functional connections between residual neural tissue and supraspinal circuits.17–20 Transcutaneous spinal cord stimulation (tSCS) can
+target spinal cord circuits by applying currents through surface
+
+electrodes placed on the skin over the spine.21–26 tSCS modulates
+spinal network excitability, enabling preserved descending input to
+the injured spinal cord to facilitate voluntary motor output.23,26,27
+Eight studies to date have explored the use of tSCS for upper
+extremity rehabilitation in individuals with SCI.21–23,25,28–31 A recent
+prospective, multicenter trial (Up-LIFT—NCT04697472) revealed the
+ability of tSCS in conjunction with rehabilitation to improve arm and
+hand function after cervical SCI.32 A subsequent home-based trial (LIFT
+Home—NCT05284201) validated the safety and feasibility of using
+tSCS during take-home exercises in the home environment.
+Although the Up-LIFT trial represents the largest cohort of individuals with SCI receiving tSCS in a prospective trial, best practices
+for programming this type of stimulation are yet to be established.
+This retrospective analysis reports the stimulation parameters used
+during the successful Up-LIFT and LIFT Home trials, assesses the
+stimulation parameters used in relation to previous exploratory
+studies, and introduces a programming ﬂowchart to guide future
+clinical implementation.
+
+MATERIALS AND METHODS
+Brief Summary of the Up-LIFT and LIFT Home Clinical Trials
+The Up-LIFT trial evaluated the safety and effectiveness of programmed non-invasive spinal cord stimulation (ARCEX Therapy,
+ONWARD Medical, Inc., Boston, MA) in conjunction with
+
+Figure 1. The ARCEX System. a. The System comprises an application running on a programmer that allows the user to deﬁne or control stimulation programs
+
+www.neuromodulationjournal.org
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+163
+
+delivered by the stimulator through active and return electrodes (accessories) via the splitter box and extension cables. For upper extremity training, electrodes are
+placed over the cervical spine. The device has a voltage-controlled output and measures impedance to ensure that the target current intensity is delivered. Programmed, noninvasive electrical spinal cord stimulation (ARCEX Therapy) is delivered during in-clinic rehabilitation or during take-home exercise. b. Biphasic and
+monophasic waveforms both comprise bursts of rectangular pulses. The monophasic waveform includes a charge balance pulse after each burst, with charge balance
+amplitudes and durations dependent on the set cathodic (negative current) pulse phase amplitude. The charge balance amplitude was 12.5% of the set cathodic
+amplitude, producing charge balance pulse durations of 4000 μs. [Color ﬁgure can be viewed at www.neuromodulationjournal.org]
+
+GELENITIS ET AL
+
+Table 1. Up-LIFT Trial Enrollment Criteria.
+Inclusion criteria (must fulﬁll ALL of the following):
+• Aged ≥22 y and ≤75 y at the time of enrollment
+• Nonprogressive cervical SCI from C2 to C8 inclusive
+• ASIA AIS classiﬁcation B, C, or D
+• Indicated for upper extremity training procedures by participant’s treating physician, occupational therapist, or physical therapist
+• GRASSP-Prehension Performance score ≥ 10 or GRASSP-Strength score ≥ 30
+• Minimum 12 mo postinjury
+• If prescribed antispasticity or pain medications, must be at stable dose for ≥4 wk before commencing study procedures
+• Capable of providing informed consent
+Exclusion criteria (may not fulﬁll ANY of the following):
+• Has uncontrolled cardiopulmonary disease or cardiac symptoms as determined by the investigator
+• Has any unstable or signiﬁcant medical condition that is likely to interfere with study procedures or likely to confound study end point evaluations such as
+severe neuropathic pain, depression, mood disorders, or other cognitive disorders
+• Has been diagnosed with autonomic dysreﬂexia that is severe, unstable, and uncontrolled
+• Requires ventilator support
+• Has an autoimmune etiology of spinal cord dysfunction/injury
+• History of additional neurologic disease such as stroke, multiple sclerosis, or traumatic brain injury
+• Peripheral neuropathy (diabetic polyneuropathy, entrapment neuropathy, etc)
+• Spasms that limit the ability of the participants to participate in the study training as determined by the investigator
+• Received botulinum toxin injections in their upper extremity, neck, or hand within 6 mo before enrollment
+• Has urinary tract infection or any of the following issues in the upper extremity or the cervical spine region at the time of enrollment: painful musculoskeletal
+dysfunction unrelated to SCI, unhealed fracture, contracture, pressure sore
+• Breakdown in skin area that will come into contact with electrodes
+• Presence of syringomyelia as conﬁrmed by an MRI
+• Currently undergoing treatment for cancer or has been in remission for <2 y
+• Received stem cell treatment within the past 2 y before enrollment
+• Prior nerve or tendon transfer procedure in the upper extremities
+• Total baclofen dose >30 mg/d
+• Has any active implanted medical device
+• Pregnant, planning to become pregnant, or currently breastfeeding
+• Concurrent participation in another drug or device trial that may interfere with this study
+• Has undergone a prior course of spinal stimulation therapy directed at UE improvement
+• In the opinion of the investigators, the study is not safe or appropriate for the participant, and/or the participant is unlikely to return for the follow-up visits
+per the protocol
+ASIA, American Spinal Injury Association; MRI, magnetic resonance imaging; UE, upper extremity.
+Information adapted from Moritz et al 202432 and clinicaltrials.gov (NCT04697472).
+
+164
+
+rehabilitation, using an earlier generation of the ARCEX System
+(Fig. 1). The trial enrolled 65 participants with chronic, cervical
+incomplete SCI (American Spinal Injury Association Impairment
+Scale [AIS] B, C, and D) across 14 centers. A list of all inclusion/
+exclusion criteria can be found in Table 1. All treatment outcomes
+and programming guidelines presented in this study are the result
+of testing in individuals with SCI meeting these criteria.
+A two-month “run-in phase” of upper extremity rehabilitation
+was followed by a two-month “treatment phase,” combining tSCS
+and rehabilitation (tSCS+rehab). The rehabilitation program was
+deﬁned to ensure homogeneity across sites. This program involved
+approximately one hour of training, three to four times per week,
+with functional task categories that included repetitive activities of
+gross upper extremity movement, isolated ﬁnger movements,
+simple and complex pinch, and grasping activities. Each participant
+performed one to two exercises within each category during each
+treatment session. Typical movement patterns were encouraged by
+guidance and feedback, whereas compensatory movements, such
+as wrist tenodesis, were strongly discouraged.
+Sixty subjects completed ≥24 sessions (12 sessions/month) during each phase. At baseline and after each month of therapy, a
+battery of assessments was performed to assess upper extremity
+strength, function, and sensation, in addition to quality of life and
+www.neuromodulationjournal.org
+
+activities of daily living.32 All assessments were performed without
+stimulation to assess neuroplastic rather than immediate neuroprosthetic effects of tSCS+rehab. Ultimately, 72% of assessable
+participants were responders, achieving clinically meaningful
+improvements in at least one strength and one functional assessment.32 Furthermore, 90% of assessable participants achieved
+clinically meaningful improvements in at least one strength or
+functional assessment.32
+The subsequent LIFT Home trial assessed the safety of tSCS
+during take-home exercises in the home setting. A total of 17
+participants in the previous Up-LIFT trial received a device preprogrammed with treatment parameters found to facilitate their
+upper extremity function during in-clinic sessions. On average,
+participants completed three to four at-home training sessions per
+week for one month. Training encompassed many of the same
+functional tasks as during the Up-LIFT trial, personalized to the
+participants’ activities of daily living and using objects available in
+the home. More than 96% of attempted at-home training sessions
+were successfully completed. No serious adverse events (AEs) and
+no device-related AEs were reported. Importantly, effectiveness
+analyses revealed participants were able to further improve on the
+progress achieved during in-clinic rehabilitation after only one
+month of at-home therapy (Δ Capabilities of Upper Extremity Test
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+www.neuromodulationjournal.org
+
+60 min/session
+Clavicles or iliac crests 60–90 mA
+
+55 ± 2 min/session
+5–68 mA
+Clavicles
+
+60 ± 20 min/session
+60–120 min/session
+60–120 min/session
+20 min/session
+Not speciﬁed
+80–120 mA
+20–100 mA
+10–250 mA
+55–95 mA
+102 mA
+ASIS
+ASIS
+Iliac crests
+Iliac crests
+Clavicles
+
+40–90 mA
+ASIS
+
+Biphasic and monophasic One above and one below
+level of injury
+1 ms
+Biphasic
+C3/C4 and C6/C7
+Not speciﬁed Not speciﬁed
+C5 spinous process
+1 ms
+Biphasic and monophasic C3/C4 and C6/C7
+2 ms
+Biphasic
+C5/C6
+2 ms
+Biphasic
+T2–T4 posterior, C4/C5
+anterior
+1 ms
+Not speciﬁed
+Single large electrode spanning C5–T2 spinous
+processes
+1 ms
+Biphasic
+C3/C4, C5/C6, C7/T1, and
+T11–T12
+5 kHz
+Sharma et al, 202328
+
+30 Hz
+
+NA
+Murray and Knikou, 201725 0.2 Hz
+
+30 Hz
+5–30 Hz
+30 Hz
+30 Hz
+0.2 Hz
+Inanici et al, 201822
+Freyvert et al, 201830
+Gad et al, 201823
+Benavides et al, 202029
+Wu et al, 202031
+
+Inanici et al, 2021
+
+10 kHz
+NA
+10 kHz
+5 kHz
+NA
+
+1 ms
+10 kHz
+30 Hz
+
+Amplitude
+Return electrode
+Active electrode
+Stimulation waveform
+Burst frequency Carrier frequency Pulse width
+
+21
+
+Publication
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+165
+
+Adjustment of Stimulation Parameters Throughout the Up-LIFT
+Trial
+Baseline abilities without stimulation were assessed through
+quick measurements such as the time to complete a task (eg, fasten
+a shirt button), voluntary force using a dynamometer, and the
+number of task repetitions before fatigue (eg, lifting a full cup), or
+through evaluating movement quality (eg, handwriting). Once
+baseline was established, study personnel began stimulation with
+the recommended initial parameters above.
+Therapeutic amplitudes were determined in the Up-LIFT and LIFT
+Home trials by gradually increasing amplitude at continuous
+stimulation burst frequency (typically 30 Hz) from 0 mA until the
+baseline ability improved or until the participant reached their
+tolerance for stimulation intensity. The gradual increase in intensity
+allowed time for some habituation to the sensation of stimulation
+so that individuals could tolerate intensities that may have initially
+been uncomfortable. Just as prior tSCS studies used posterior root
+muscle reﬂexes or twitch responses to determine stimulation
+amplitudes,21,33,34 Up-LIFT investigators could optionally determine
+twitch thresholds (TTs), the amplitude at which the ﬁrst visible
+upper extremity muscle twitches occurred, and voluntary movement thresholds (VMTs), to guide therapeutic amplitude selection.
+Visual observation of a muscle twitch (TT) is commonly used to
+help identify stimulation parameters for spinal cord stimulation.
+VMT was deﬁned as the amplitude at which the clinician observed
+or the participant reported improved performance, such as easier
+
+Table 2. Stimulation Parameters Used in Feasibility Studies of tSCS for Upper Extremity Rehabilitation After SCI.
+
+Initial Stimulation Parameters
+Study personnel received a study manual for the LIFT device and
+training on device capabilities, parameter ranges, and troubleshooting. Stimulation was delivered using two round (1.25-inch
+diameter) active (cathodal) electrodes and two rectangular (1.5inch × 3.5-inch) return (anodal) electrodes (Axelgaard
+Manufacturing Co Ltd). Stimulation comprised bursts of rectangular
+pulses delivered in charge-balanced monophasic or biphasic
+waveforms modulated by a carrier frequency (Fig. 1). The two
+active electrodes were supplied by two independent stimulation
+channels. Each stimulation channel was connected to both return
+electrodes through a branched cable connection. Initial therapy
+recommended settings were informed by early feasibility studies
+and existing literature (Table 2).21–23 These included positioning the
+active electrodes over the C3/C4 and C6/C7 spinous processes
+through palpation, placing the return electrodes bilaterally over the
+anterior superior iliac spine (ASIS) with the long axis parallel to the
+most prominent bony structure, selecting a carrier frequency of 10
+kHz, a burst frequency of 30 Hz, a pulse width of 1 millisecond, and
+a biphasic stimulation waveform. Each site, however, had the
+ﬂexibility to explore additional conﬁgurations based on individual
+participant anatomy, tolerance, and responses to tSCS. Before athome use, participants and persons providing assistance also
+received training on device usage. To ensure effective and safe
+stimulation, at-home reprogramming capabilities were limited to
+adjusting the amplitude within ±10% of the value set by the
+researchers and informed by the participant’s performance during
+in-clinic sessions.
+
+Duration
+
+score = 1.9; Δ pinch force = 4.6 N; Δ grasp force = 6.0 N) (Tefertiller
+et al, in preparation). Both the Up-LIFT and LIFT Home trials
+received institutional review board or ethics committee approval at
+each site.
+
+Up to 120 min/session
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+
+GELENITIS ET AL
+initiation of movement or increased readiness to move. During
+these optional, intermittent tests, stimulation amplitude was progressively increased with a burst frequency of 30 Hz for VMT and
+0.5 to 1 Hz for TT until the threshold was obtained.
+The efﬁcacy of programming conﬁgurations was assessed over a
+minimum of three sessions before readjusting stimulation parameters. Study personnel evaluated functional performance within
+and across these sessions, often using quick assessments to
+determine parameter efﬁcacy. User feedback, including participantreported sensations, stimulation tolerance, ease of movement,
+muscle tone and spasticity, and secondary effects of the stimulation, such as soreness or fatigue, and new perceived changes in
+ability, were also considered. Safety, including device-related AEs,
+and particularly the maintenance of skin integrity around electrode
+sites, was carefully monitored. If the stimulation appeared effective
+after multiple therapy sessions, training continued with the
+selected parameters. If discomfort or no improvement was
+observed, one parameter was adjusted at a time to seek more
+effective settings, except for pulse width, which always remained at
+1 millisecond. This cycle was repeated with different conﬁgurations
+until satisfactory settings were found.
+Data Collection and Analysis
+Device parameter and usage data from both the Up-LIFT and LIFT
+Home trials were analyzed, along with thorough reviews of participant and clinician comments and ﬁeld observations. The placement
+of active and return electrodes, burst and carrier frequencies, and
+stimulation waveform usage were summarized. Amplitudes, TTs, and
+VMTs were summarized using descriptive statistics for all relevant
+observations of each waveform and each AIS subgroup. Normality of
+the amplitude data was conﬁrmed using the Shapiro-Wilk test. Statistical comparisons of current amplitude across AIS subgroups were
+conducted using a one-way repeated-measures analysis of variance,
+with post hoc Bonferroni corrections for multiple comparisons.
+Threshold data, being nonnormal, were compared using the twosided Wilcoxon signed-rank test. All statistical analyses were conducted using validated statistical software (Python version 3.9 with
+SciPy package version 1.7.3) with a signiﬁcance level of 0.05. Data are
+reported as mean ± standard deviation.
+
+RESULTS
+Active Electrode Placement
+Active electrode placement with one electrode placed rostrally
+and another electrode caudally to the injury level were shown to be
+effective in feasibility studies.21–23 Given the high incidence of
+injuries near the C4 to C5 level,35 it was initially advised to position
+the upper and lower active electrodes on the midline above the C3/
+C4 and C6/C7 spinous processes, respectively. Adherence to these
+guidelines was high, with 52% of all observations using the C3/C4
+and C6/C7 active electrode placements, irrespective of return
+placement. Although other active electrode locations were tested,
+they remained within the recommended levels of C3 to T1 (rostral
+range: C3/C4–C6/C7; caudal range: C5/C6–C7/T1). Distribution of
+rostral and caudal active electrode placements was similar whether
+return electrodes were placed over the ASIS or clavicles (Fig. 2).
+
+166
+
+Return Electrode Placement
+Although most sessions (89%) used bilateral return electrodes over
+the ASIS, several sessions explored alternate placement over the
+clavicles (Table 3). Similar to placement over the ASIS, the long axes of
+www.neuromodulationjournal.org
+
+Figure 2. Active electrode placements across Up-LIFT sessions. A total of 1502
+instances of reported active electrode conﬁgurations were used, with 1342
+instances using ASIS return electrode placement and 160 instances using
+clavicular return electrode placement. Placement of rostral and caudal active
+electrodes with return electrode placed over the ASIS (darker pink and gray
+bars) and clavicles (lighter pink and gray bars). [Color ﬁgure can be viewed at
+www.neuromodulationjournal.org]
+
+the rectangular return electrodes were placed parallel to the orientation of the clavicle bones in these instances. Clavicle placement was
+primarily attempted in nonresponsive participants who continued to
+exhibit slow progress after other stimulation program modiﬁcations or
+who experienced aversion to stimulation with return electrodes over
+the ASIS. Of 60 participants, 18 (30%) used clavicle placement in at
+least one session, with 11 participants (61%) expressing a preference
+for clavicle placement over ASIS owing to improved sensation/stimulation tolerance (n = 6, 55%) or improved function (n = 5, 45%). Only
+one participant attempting clavicle placement reported reduced
+comfort. For the remaining participants, clavicle placement was
+tolerable but did not lead to substantial changes in performance, so
+the original ASIS placement was resumed.
+The utilization of bilateral clavicle placement varied depending
+on preference and the timing of its introduction, with 12 participants using it in >20% of their total sessions. The proportions of
+participants in AIS B, C, and D subgroups who frequently used
+clavicle return electrode placements were 56% (5/9), 21% (6/28),
+and 4% (1/23) respectively. Among frequent users of clavicle
+placement, seven participants (58%, all AIS C or D) were classiﬁed
+as responders at study completion.
+Stimulation Parameters
+Burst and Carrier Frequencies
+The stimulator enabled adjustment of burst and carrier frequencies. On the basis of feasibility studies (Table 2), a burst frequency of 30 Hz and carrier frequency of 10 kHz were initially
+recommended. All participants used the 10-kHz carrier frequency
+for all exercises, and >98% of exercise observations used the 30-Hz
+burst frequency (Table 4).
+Although several participants attempted exercises with varying
+burst frequencies (from 20–100 Hz), only two continued using
+these different burst frequencies during ≥10% of their recorded
+exercises. These participants reported excessive tone and spasticity,
+which hindered active participation in therapy sessions, prompting
+investigators to explore alternate frequencies. Frequencies >30 Hz
+were noted to decrease tone and facilitate participation in
+rehabilitation.
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+
+Table 3. Use of Clavicles for Return Electrode Placement During the Up-LIFT Trial.
+Use of clavicles for return electrode placement
+
+n
+
+%
+
+Total tSCS+rehab training sessions
+Sessions with return electrodes on clavicles
+Total participants (modiﬁed intent-to-treat population*)
+Participants testing return electrodes on clavicles
+Participants indicating clavicles preferred
+Preference due to:
+Improved sensation
+Improved function
+Participants documenting discomfort with clavicles
+Participants with frequent clavicle use (>20% sessions)
+Frequent clavicle users who were responders
+AIS C
+AIS D
+Frequent clavicle users who were nonresponders
+AIS B
+
+1504
+162
+60
+18
+11
+6
+5
+1
+12
+7
+6
+1
+5
+5
+
+11%
+30%
+61%
+55%
+45%
+5.6%
+67%
+58%
+86%
+14%
+42%
+100%
+
+*Modiﬁed intent-to-treat population includes all individuals who completed ≥24 sessions (12/mo) of rehab alone, and ≥24 sessions (12/mo) of tSCS+rehab.
+
+Stimulation Waveforms
+Both biphasic and monophasic waveforms were charge-balanced,
+with monophasic waveforms including a comparatively long, low
+amplitude return phase after each burst (Fig. 1). Biphasic waveforms
+provide milder stimulation with a more gradual ramp-up in stimulation amplitude, which may limit the development of excessive
+muscle tone that may interfere with motor function. Therefore, UpLIFT investigators were advised to begin with biphasic stimulation
+but had the ﬂexibility to test either waveform. Most exercises (83%)
+during the Up-LIFT trial used biphasic stimulation (Fig. 3).
+Current Amplitude
+Therapeutic current amplitudes were identiﬁed on the basis of
+visual observations of motor performance and participant feedback, with frequent adjustments within and between sessions. The
+average amplitudes used across all exercises and participants were
+39.3 ± 25.5 mA and 52.4 ± 31.0 mA for monophasic and biphasic
+stimulation waveforms, respectively (Fig. 3, p < 0.001).
+Notably, the AIS B subgroup used higher therapeutic amplitudes
+than did the AIS C and D subgroups for both monophasic (Δ
+mean = 22.7 ± 40.0] and 22.0 ± 41.3, respectively) and biphasic
+stimulation (Δ mean = 16.1 ± 45.0 and 26.7 ± 42.3, respectively) (all
+p < 0.001). AIS C and D subgroups differed signiﬁcantly in
+
+Table 4. Summary of Burst and Carrier Frequencies Used in the Up-LIFT
+Trial.
+Observations (%)
+
+Participants (%)
+
+20
+30
+60
+90
+100 Hz
+All others (30–90 Hz)
+
+4 (0.04%)
+8893 (98.83%)
+47 (0.52%)
+40 (0.45%)
+3 (0.03%)
+11 (0.12%)
+
+2 (3.3%)
+60 (100%)
+3 (5%)
+3 (5%)
+1 (1.7%)
+8 (13%)
+
+Carrier frequency (kHz)
+
+Observations (%)
+
+Participants (%)
+
+10
+
+8998 (100%)
+
+60 (100%)
+
+www.neuromodulationjournal.org
+
+Twitch Thresholds and Voluntary Movement Thresholds
+The optional TTs and VMTs were recorded for at least one session
+in 33 of 60 participants (55%) across eight of the 14 sites (57%).
+Average TT and VMT values were 40.6 ± 12.8 mA and 50.8 ± 17.9
+mA, respectively, for monophasic stimulation, and 64.3 ± 33.3 mA
+and 59.6 ± 35.5 for biphasic stimulation (Fig. 5). The recorded mean
+VMT values were signiﬁcantly higher than the TT values for
+monophasic stimulation but signiﬁcantly lower for biphasic stimulation (all p < 0.001).
+Parameters in Use During Device-Related AEs
+The incidence of device-related AEs occurring during stimulation
+was low, and these events were only mild to moderate in severity
+and promptly resolved when stimulation was turned off or current
+amplitude was reduced. To determine whether speciﬁc stimulation
+parameters were associated with a higher likelihood of AEs, we
+examined the waveform and average current amplitudes within
+sessions in which “at least possibly” device-related AEs occurred
+(Table 5). There were no serious AEs related to the device or study
+procedures in either trial. In addition, the incidence of nonserious,
+device-related AEs was low (1.5% of all tSCS+rehab sessions). The
+distribution of monophasic and biphasic waveforms used during
+these occurrences mirrored the overall waveform usage in the
+study. Stimulation amplitudes used during these occurrences were
+lower than the average amplitudes used for each waveform, and
+signiﬁcantly below the maximum amplitudes tested throughout
+the study.
+Programming Adjustments in the Home Setting
+In the LIFT Home trial, stimulators were preconﬁgured with up to
+two home-use therapy programs based on parameters found to be
+comfortable and effective during in-clinic sessions. Although participants primarily used program 1, program 2 allowed an alternate
+waveform or amplitude range for speciﬁc exercises as needed. The
+training dose completed by participants in LIFT Home was equivalent to one month of in-clinic therapy (Table 6).
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+167
+
+Burst Frequency (Hz)
+
+amplitude only within the biphasic waveform (Δ mean = 10.6 ±
+41.3] mA; p < 0.001) (Fig. 4).
+
+GELENITIS ET AL
+
+Figure 3. Waveform usage. a. Monophasic and biphasic stimulation waveform usage within the Up-LIFT trial (number of observations = 8998). b. Distribution of
+amplitudes used with monophasic and biphasic waveforms. All reported amplitudes represent the cathodic pulse phase amplitude for each waveform. Vertical
+dashed lines represent the mean amplitudes for each waveform, calculated as the average amplitudes across both active electrodes for all participants and all relevant
+exercise observations within each waveform (monophasic: number of observations = 3042, number of participants = 36; biphasic: number of observations = 14,954,
+number of participants = 58). Mean monophasic and biphasic amplitudes were signiﬁcantly different (*p < 0.001). [Color ﬁgure can be viewed at
+www.neuromodulationjournal.org]
+
+Participants typically did not need to adjust the preset current
+amplitudes. Considering all sessions, the amplitudes delivered at
+home through both programs remained within 1% ± 4% of the
+investigator-determined, prespeciﬁed values. When adjustments
+were made, increases in amplitude within the allowed 10% range
+
+were more common than decreases. Average increases were 9% ±
+2%, and average decreases were 6% ± 3% across both programs.
+No participant required set-point reprogramming, indicating the
+preprogrammed settings were well tolerated at home and that
+participants were generally satisﬁed with the values identiﬁed by
+
+168
+
+Figure 4. Amplitude usage by AIS subgroup. Panel a shows monophasic and panel b biphasic waveforms. Vertical dashed lines represent the mean amplitudes for
+each subgroup, calculated as the average amplitudes across both active electrodes for all participants and all relevant exercise observations within each waveform. N
+refers to the total number of participants within each AIS subgroup, n refers to the number of participants contributing to the observations within each subgroup and
+waveform, and o refers to the number of observations. *Statistically signiﬁcant difference among designated AIS subgroups (all p < 0.001). [Color ﬁgure can be viewed
+at www.neuromodulationjournal.org]
+www.neuromodulationjournal.org
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+recent research shows electrode arrays aligned with the segmental
+location of cervical motor pools increase the relative amplitude of
+speciﬁc evoked responses,36 the clinical utility of this feature has
+not been methodically addressed for people with SCI. Moreover,
+anatomical variations pose challenges in determining precisely
+which segmental neural circuits are being stimulated, with lack of
+speciﬁcity an inherent property of tSCS.37 Indeed, this therapy is
+not meant to drive speciﬁc muscle group functions but to enhance
+basal excitability to enable voluntary activation of preserved
+neuronal substrates, and lack of speciﬁcity does not preclude the
+clinical value of the intervention. Therefore, active electrode repositioning is a lower priority for adjustments and reserved mainly for
+instances when discomfort or poor electrode adherence due to
+prior scars are evident.
+
+Figure 5. Twitch thresholds (TTs) and voluntary movement thresholds (VMTs)
+identiﬁed in the Up-LIFT trial. Thresholds are averaged across all relevant
+measurements within each waveform (TT monophasic: number of observations = 40, number of participants = 9; TT biphasic: number of observations =
+156, number of participants = 33; VMT monophasic: number of observations =
+41, number of participants = 10; VMT biphasic: number of observations = 152,
+number of participants = 31). Error bars indicate standard error of the mean.
+*p < 0.001. [Color ﬁgure can be viewed at www.neuromodulationjournal.org]
+
+study personnel through their sessions in the Up-LIFT trial. Still,
+65% of LIFT Home participants (11/17) made at least one adjustment at home, indicating ease of use and conﬁdence with selfadjustment. Only two incidences of extra research clinic visits
+were required to adjust stimulation parameters, and these were
+speciﬁc to the stimulation waveform within a single at-home
+therapy program.
+
+DISCUSSION
+The Up-LIFT and LIFT Home trials showed the safety and effectiveness of tSCS combined with rehabilitation or take-home exercises
+in improving upper extremity strength and function in individuals
+with chronic incomplete cervical SCI. No serious device-related AEs
+were reported during the trials, and nonserious device-related AEs did
+not correlate with any particular stimulation parameter used.
+
+www.neuromodulationjournal.org
+
+Stimulation Frequencies
+The 10-kHz carrier frequency was consistently used in all stimulation sessions during the Up-LIFT and LIFT Home trials.27,38
+Although the use of alternative carrier frequencies was not systematically investigated, the low incidence of device-related AEs,
+particularly those related to pain or discomfort, across both trials
+supports the safety and recommendation for continued use of this
+parameter.
+Although most stimulation sessions used a 30-Hz burst frequency, higher burst frequencies were tested for participants
+experiencing hand spasticity and increased tone hindering therapy
+participation. Higher frequencies have been reported to decrease
+spasticity in individuals with SCI.39,40 Higher burst frequencies (50
+Hz) can decrease exaggerated reﬂex responsiveness,39 decrease
+clonus and cutaneous-input-evoked spasms evoked by cutaneous
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+169
+
+Active Electrodes
+Multisite stimulation was favored in the Up-LIFT and LIFT Home
+trials, speciﬁcally positioning active electrodes between C3/C4 and
+C6/C7 spinous processes. This electrode montage spans the cervical enlargement, allowing current delivery to many neural circuits
+involved in upper extremity function. Multisite stimulation is also
+effective for distal muscle contraction and enhances motor evoked
+potential responses.24 Preliminary studies have similarly shown
+improved motor function with multisite stimulation.21–23 Although
+
+Return Electrodes
+Although most prior tSCS studies for upper extremity rehabilitation in SCI used ASIS placement for return electrodes, some
+studies have indicated successful evoked upper extremity
+responses with return electrodes positioned over the clavicles
+(Table 2).25,28,31 It was hypothesized that this clavicle conﬁguration
+may provide a more focused current path that could potentially
+beneﬁt participants who did not sufﬁciently respond otherwise.
+Return electrode placement over the clavicles was well tolerated
+and seemed beneﬁcial for participants unresponsive to tSCS when
+the electrodes were placed over the ASIS. Although the manipulation of return electrode placement to the clavicles allowed all
+participants who were previously unresponsive in the AIS C or D
+groups to meet the predeﬁned responder criteria, this was not the
+case for individuals with more severe impairments in the AIS B
+group. It is important to note that the AIS B subgroup was the least
+responsive to tSCS+rehab overall.32 This suggests that the lack of
+response is more likely related to the severity of their injuries and
+signiﬁcantly reduced preservation of residual descending neural
+connectivity when compared with the other subgroups. It is likely
+that individuals with more severe injuries may require more
+frequent and signiﬁcant adjustments in stimulation parameters to
+achieve observable improvements. These ﬁndings should be
+interpreted cautiously owing to small sample sizes and confounding factors. The recommendation for initial return electrode
+placement remains over the ASIS on the basis of success in feasibility studies and for most participants in the Up-LIFT and LIFT
+Home trials, but placement on the clavicles may be explored as
+needed should other parameter adjustments not sufﬁce.
+
+GELENITIS ET AL
+
+Table 5. Stimulation Parameters Associated With Device-Related AEs in the Up-LIFT Trial.
+
+Total tSCS+rehab sessions
+tSCS+rehab sessions with AE possibly device-related
+Causality:
+Possibly related*
+Probably related†
+Causal relationship‡
+AE MedDRA preferred term:
+Autonomic dysreﬂexia†
+Bladder spasm*,†
+Burning sensation†
+Dizziness*
+Erythema‡
+Headache†
+Hyperhidrosis*,†
+Malaise†
+Medical device site reaction*
+Nausea†
+Pain*,‡
+Respiratory rate increased†
+Skin irritation†
+Urinary incontinence*
+Stimulation waveform during device-related AEs
+Monophasic
+Biphasic
+Stimulation amplitudes during device-related AEs
+Mean (SD)
+Median
+Min, max
+
+Count (% of sessions)
+
+Participants (% of mITT population)
+
+1504 (100%)
+23 (1.5%)
+
+60 (100%)
+11 (18%)
+
+Count (% of device-related AEs)
+
+Count (% of patients experiencing AEs)
+
+9 (39%)
+12 (52%)
+2 (9%)
+
+6 (55%)
+5 (45%)
+2 (18%)
+
+2 (9%)
+4 (7%)
+1 (4%)
+2 (9%)
+1 (4%)
+2 (9%)
+3 (13%)
+1 (4%)
+1 (4%)
+1 (4%)
+2 (9%)
+1 (4%)
+1 (4%)
+1 (4%)
+
+1 (9%)
+1 (9%)
+1 (9%)
+1 (9%)
+1 (9%)
+2 (18%)
+3 (27%)
+1 (9%)
+1 (9%)
+1 (9%)
+2 (18%)
+1 (9%)
+1 (9%)
+1 (9%)
+
+5 (22%)
+18 (78%)
+Monophasic
+22.7 (13.5)
+24.2
+5.8, 37.9
+
+4 (36%)
+7 (64%)
+Biphasic
+36.6 (9.7)
+33.5
+17.9, 51.7
+
+mITT population includes all individuals who completed ≥24 sessions of rehab alone, followed by ≥24 sessions of tSCS+rehab.
+MedDRA, Medical Dictionary for Regulatory Activities; mITT, modiﬁed intent-to-treat.
+*Possibly related; †probably related; and ‡causal relationship to device use.
+
+input,41 and decrease hyperreﬂexic stretch responses42 in people
+with SCI. Although the use of higher frequencies was limited to two
+participants with problematic spasticity, the observed results and
+the potential facilitation of motor function through decreasing
+muscle tone are supported by existing literature.
+Relationships Between Waveform, Amplitude, and Thresholds
+Transcutaneous biphasic stimulation may be superior in facilitating ﬁne motor control tasks, whereas monophasic stimulation
+
+may be more effective at improving strength.21 Interestingly, the
+recorded VMTs were signiﬁcantly higher than the TTs for monophasic stimulation, whereas they were signiﬁcantly lower for
+biphasic stimulation (Fig. 5). This suggests that biphasic stimulation
+may facilitate voluntary movement before inducing unwanted
+twitch contractions, supporting the initial use of the biphasic
+setting for therapy.
+Appropriate determination of stimulation amplitudes relative
+to motor thresholds is debated. Submotor, motor, and
+
+Table 6. Duration of tSCS+rehab During the Up-LIFT and LIFT Home Trials.
+Sessions/mo
+Up-LIFT (2-mo tSCS+rehab phase)
+Mean (SD)
+12.5 (1.2)
+Median
+12
+Min, max
+9, 16
+LIFT Home (1-mo tSCS+rehab phase)
+Mean (SD)
+12.3 (2.9)
+Median
+12
+Min, max
+6, 20
+
+Total sessions
+
+Duration of stimulation/session (HH:mm)
+
+Cumulative stimulation duration (HH:mm)
+
+25.1 (1.5)
+24
+24, 29
+
+1:00 (0:05)
+1:00
+0:25, 1:29
+
+25:10 (1:54)
+24:14
+21:30, 30:31
+
+12.3 (2.9)
+12
+6, 20
+
+0:59 (0:10)
+1:00
+0:41, 1:13
+
+12:08 (3:10)
+12:08
+4:28, 18:15
+
+170
+www.neuromodulationjournal.org
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+
+Figure 6. tSCS parameter determination ﬂowchart based on strategies used in the successful Up-LIFT trial. MEP, motor evoked potential; UE, upper extremity. [Color
+ﬁgure can be viewed at www.neuromodulationjournal.org]
+
+www.neuromodulationjournal.org
+
+Programming Recommendations
+The initial programming guidance and unique site-by-site
+processes used to determine effective stimulation parameters
+in each participant were informed by personnel with expertise in
+tSCS and SCI rehabilitation. Combining this historical knowledge
+with the resultant successful programming outputs previously
+outlined, an updated tSCS programming ﬂowchart has been
+created to guide future implementation of this technology
+(Fig. 6). Amplitude remains the most frequently manipulated
+parameter. Should simple amplitude adjustments fail to facilitate
+meaningful improvement, we suggest reducing the amplitude
+and changing the waveform to monophasic, given clinical
+effectiveness was shown within the clinical trials with both
+waveforms. We then suggest adjusting in order as needed: active
+electrode location, return electrode location, and ﬁnally, burst
+frequency. Burst frequency is the ﬁnal suggested adjustment
+because to date, there is a lack of existing evidence supporting
+upper extremity improvement as a function of burst frequency,
+whereas adjustments in other parameters were shown to be
+beneﬁcial in the trials.
+
+CONCLUSIONS
+The Up-LIFT and LIFT Home trials represent a signiﬁcant milestone in the ﬁeld of neuromodulation by indicating the safety,
+usability, and effectiveness of tSCS therapy for recovery after SCI in
+clinical and home environments. SCI is an intricate condition, with
+various injury characteristics determining the trajectory of neurologic recovery, extent of SCI secondary health conditions (ie,
+spasticity), and overall treatment plans (pharmacologic, surgical,
+etc). Trial exclusion criteria aimed to minimize this variability;
+however, the need to individually optimize stimulation strategies
+across various speciﬁc deﬁcits remains apparent. The proposed
+workﬂow provides structured guidance, incorporating practices
+that showed beneﬁcial outcomes within the heterogeneous study
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+171
+
+supramotor thresholds have all been reported as methods to
+optimize particular upper extremity responses.43 One study
+showed that using submotor threshold stimulation led to
+improved pinch force, The Graded Redeﬁned Assessment of
+Strength, Sensibility and Prehension (GRASSP) sensibility, and
+GRASSP prehension abilities for individuals with SCI.21 A separate
+study found using amplitudes equivalent to motor threshold led
+to improvements in grip strength.23 Still others have indicated
+positive outcomes in upper extremity functions when using
+supramotor threshold stimuli. 31,34 In both the Up-LIFT and LIFT
+Home trials, stimulation amplitude was not restricted to predetermined motor thresholds. Instead, it was individualized on
+the basis of visual observations and feedback. Amplitudes used
+in the AIS B subgroup were signiﬁcantly higher than in participants in AIS C and D, indicating a potential need for more
+intense stimulation in individuals with more severe SCI. This
+aligns with previous studies, in which participants in AIS B
+generally required higher current amplitudes.21 This trend also
+suggests that participants in AIS B might tolerate higher amplitudes before experiencing discomfort, possibly owing to differences in sensory sparing. Importantly, stimulation amplitude did
+not correlate with the incidence of potentially device-related
+AEs, reinforcing the safety and tolerance across the full range
+of the stimulation amplitudes used in the trials (1–180 mA).
+Comparisons of stimulation parameters (amplitudes, waveforms, active and return electrode placements) used by
+responders and nonresponders in the Up-LIFT trial were performed, with no signiﬁcant differences found. Because 99% of
+observations used a 30-Hz burst frequency and all observations
+used a 10-kHz carrier frequency, a comparison of frequencies in
+responders and nonresponders was not feasible. A lack of clear
+distinction between universally effective and noneffective
+parameters is unsurprising owing to the heterogeneity of the
+participant population, differences in sensory preservation, skin
+impedance, and anatomy, which can affect effective stimulation
+parameters.
+
+GELENITIS ET AL
+population. The intention is not to prescribe a rigid protocol but
+rather to assist users with a reﬁned decision-making algorithm that
+will facilitate the implementation of this novel intervention in the
+clinic and home settings.
+
+Acknowledgements
+The authors acknowledge Dr Sukhvinder Kalsi-Ryan, BScPT, MSc,
+PhD; Dr Randy Trumbower, PT, PhD; Dr Leslie Morse, DO; Dr Ralph
+Marino, MD; Dr Kristin Zhao, PhD; Dr Andrei Krassioukov, MD, PhD;
+Dr Linda Murray, PhD; Dr Thomas Janssen, PhD; Dr Ilse van Nes, MD,
+PhD; and Dr Margaret Purcell, MD, for their support as investigators
+during the UP-LIFT trial. The authors also thank Dr Mark S. Nash,
+PhD; Dr Noam Harel, MD, PhD; and Dr Graham Creasey, MBChB,
+who were part of the trial’s safety monitoring board.
+
+Authorship Statements
+Kristen Gelenitis and Jessica M. D’Amico performed the study
+analysis and interpretation of results. Kristen Gelenitis, Andrea
+Santamaria, and Jessica M. D’Amico prepared the manuscript. Jared
+Pradarelli and Markus Rieger assisted in revising the ﬂow diagram
+to its ﬁnal form on the basis of their experience as ONWARD ﬁeld
+clinical specialists involved in the Up-LIFT and LIFT Home trials.
+Fatma Inanici created the initial version of the programming ﬂow
+diagram that helped guide investigators during the Up-LIFT trial.
+Edelle Field-Fote, James Guest, Chet Moritz, and Candace Tefertiller
+were investigators during the Up-LIFT trial and collaborated on
+manuscript editing and reﬁnement. Jenny Suggitt and Amanda
+Turner were study personnel for the Up-LIFT and LIFT Home trials.
+All authors approved the ﬁnal manuscript.
+
+Conﬂict of Interest
+Kristen Gelenitis, Jared Pradarelli, Jenny Suggitt, Amanda Turner,
+and Markus Rieger are employees of ONWARD Medical. Andrea
+Santamaria, Jessica M D’Amico, Edelle Field-Fote, and Chet Moritz
+are paid consultants of ONWARD Medical. The remaining authors
+reported no conﬂict of interest.
+
+
+
+How to Cite This Article
+
+
+
+Gelenitis K., Santamaria A., Pradarelli J., Rieger M.,
+Inanici F., Tefertiller C., Field-Fote E., Guest J., Suggitt J.,
+Turner A., D’Amico J.M., Moritz C. 2025. Non-invasive
+Transcutaneous Spinal Cord Stimulation Programming
+Recommendations for the Treatment of Upper Extremity
+Impairment in Tetraplegia.
+Neuromodulation 2025; 28: 162–173.
+
+
+
+
+
+REFERENCES
+
+172
+
+1. Anderson KD. Targeting recovery: priorities of the spinal cord-injured population.
+J Neurotrauma. 2004;21:1371–1383.
+2. Snoek GJ, IJzerman MJ, Hermens HJ, Maxwell D, Biering-Sorensen F. Survey of the
+needs of patients with spinal cord injury: impact and priority for improvement in
+hand function in tetraplegics. Spinal Cord. 2004;42:526–532.
+
+www.neuromodulationjournal.org
+
+3. Paralyzed Veterans of America Consortium for Spinal Cord Medicine. Preservation
+of upper limb function following spinal cord injury: a clinical practice guideline for
+health-care professionals. J Spinal Cord Med. 2005;28:434–470.
+4. Bertelli JA, Ghizoni MF. Nerve transfers for elbow and ﬁnger extension reconstruction in midcervical spinal cord injuries. J Neurosurg. 2015;122:121–127.
+5. van Zyl N, Hahn JB, Cooper CA, Weymouth MD, Flood SJ, Galea MP. Upper limb
+reinnervation in C6 tetraplegia using a triple nerve transfer: case report. J Hand
+Surg Am. 2014;39:1779–1783.
+6. Bryden AM, Peljovich AE, Hoyen HA, Nemunaitis G, Kilgore KL, Keith MW. Surgical
+restoration of arm and hand function in people with tetraplegia. Top Spinal Cord Inj
+Rehabil. 2012;18:43–49.
+7. Hoffman H, Sierro T, Niu T, et al. Rehabilitation of hand function after spinal cord
+injury using a novel handgrip device: a pilot study. J Neuroeng Rehabil. 2017;14:22.
+8. Beekhuizen KS, Field-Fote EC. Sensory stimulation augments the effects of massed
+practice training in persons with tetraplegia. Arch Phys Med Rehabil. 2008;89:602–
+608.
+9. Harness ET, Astorino TA, Knoblach SM, Feather J. Change in neuroplasticity-related
+proteins in response to acute activity-based therapy in persons with spinal cord
+injury. Top Spinal Cord Inj Rehabil. 2014;20:147–157.
+10. Jones ML, Evans N, Tefertiller C, et al. Activity-based therapy for recovery of
+walking in individuals with chronic spinal cord injury: results from a randomized
+clinical trial. Arch Phys Med Rehabil. 2014;95:2239–2246.e2.
+11. Correia C, Nuckols K, Wagner D, et al. Improving grasp function after spinal cord
+injury with a soft robotic glove. IEEE Trans Neural Syst Rehabil Eng. 2020;28:1407–
+1415.
+12. Cappello L, Meyer JT, Galloway KC, et al. Assisting hand function after spinal cord
+injury with a fabric-based soft robotic glove. J Neuroeng Rehabil. 2018;15:59.
+13. Luo S, Xu H, Zuo Y, Liu X, All AH. A review of functional electrical stimulation
+treatment in spinal cord injury. NeuroMolecular Med. 2020;22:447–463.
+14. Kapadia N, Moineau B, Popovic MR. Functional electrical stimulation therapy for
+retraining reaching and grasping after spinal cord injury and stroke. Front Neurosci.
+2020;14:718.
+15. de Freitas GR, Szpoganicz C, Ilha J. Does neuromuscular electrical stimulation
+therapy increase voluntary muscle strength after spinal cord injury? A systematic
+review. Top Spinal Cord Inj Rehabil. 2018;24:6–17.
+16. Taccola G, Sayenko D, Gad P, Gerasimenko Y, Edgerton VR. And yet it moves: recovery
+of volitional control after spinal cord injury. Prog Neurobiol. 2018;160:64–81.
+17. Dimitrijevic MR, Dimitrijevic MM, Faganel J, Sherwood AM. Suprasegmentally
+induced motor unit activity in paralyzed muscles of patients with established
+spinal cord injury. Ann Neurol. 1984;16:216–221.
+18. Kakulas BA. Pathology of spinal injuries. Cent Nerv Syst Trauma. 1984;1:117–129.
+19. Sherwood AM, Dimitrijevic MR, McKay WB. Evidence of subclinical brain inﬂuence in
+clinically complete spinal cord injury: discomplete SCI. J Neurol Sci. 1992;110:90–98.
+20. Dimitrijevic MR, Faganel J, Lehmkuhl D, Sherwood A. Motor control in man after
+partial or complete spinal cord injury. Adv Neurol. 1983;39:915–926.
+21. Inanici F, Brighton LN, Samejima S, Hofstetter CP, Moritz CT. Transcutaneous spinal
+cord stimulation restores hand and arm function after spinal cord injury. IEEE Trans
+Neural Syst Rehabil Eng. 2021;29:310–319.
+22. Inanici F, Samejima S, Gad P, Edgerton VR, Hofstetter CP, Moritz CT. Transcutaneous electrical spinal stimulation promotes long-term recovery of upper
+extremity function in chronic tetraplegia. IEEE Trans Neural Syst Rehabil Eng.
+2018;26:1272–1278.
+23. Gad P, Lee S, Terrafranca N, et al. Non-invasive activation of cervical spinal networks after severe paralysis. J Neurotrauma. 2018;35:2145–2158.
+24. Einhorn J, Li A, Hazan R, Knikou M. Cervicothoracic multisegmental transpinal
+evoked potentials in humans. PLoS One. 2013;8:e76940.
+25. Murray LM, Knikou M. Remodeling brain activity by repetitive cervicothoracic
+transspinal stimulation after human spinal cord injury. Front Neurol. 2017;8:50.
+26. Milosevic M, Masugi Y, Sasaki A, Sayenko DG, Nakazawa K. On the reﬂex mechanisms of cervical transcutaneous spinal cord stimulation in human subjects.
+J Neurophysiol. 2019;121:1672–1679.
+27. Gerasimenko Y, Gorodnichev R, Moshonkina T, Sayenko D, Gad P, Reggie
+Edgerton V. Transcutaneous electrical spinal-cord stimulation in humans. Ann Phys
+Rehabil Med. 2015;58:225–231.
+28. Sharma P, Panta T, Ugiliweneza B, et al. Multi-site spinal cord transcutaneous
+stimulation facilitates upper limb sensory and motor recovery in severe cervical
+spinal cord injury: a case study. J Clin Med. 2023;12:4416.
+29. Benavides FD, Jo HJ, Lundell H, Edgerton VR, Gerasimenko Y, Perez MA. Cortical
+and subcortical effects of transcutaneous spinal cord stimulation in humans with
+tetraplegia. J Neurosci. 2020;40:2633–2643.
+30. Freyvert Y, Yong NA, Morikawa E, et al. Engaging cervical spinal circuitry with noninvasive spinal stimulation and buspirone to restore hand function in chronic
+motor complete patients. Sci Rep. 2018;8:15546.
+31. Wu YK, Levine JM, Wecht JR, et al. Posteroanterior cervical transcutaneous spinal
+stimulation targets ventral and dorsal nerve roots. Clin Neurophysiol. 2020;131:451–
+460.
+32. Moritz CT, Field-Fote EC, Tefertiller C, et al. Non-invasive spinal cord electrical
+stimulation for arm and hand function in chronic tetraplegia: a safety and efﬁcacy
+trial. Nat Med. 2024;30:1276–1283.
+33. Al’joboori Y, Massey SJ, Knight SL, Donaldson NN, Duffell LD. The effects of adding
+transcutaneous spinal cord stimulation (tSCS) to sit-to-stand training in people
+with spinal cord injury: a pilot study. J Clin Med. 2020;9:2765.
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+CERVICAL TSCS PROGRAMMING RECOMMENDATIONS
+34. Kumru H, Rodríguez-Cañón M, Edgerton VR, et al. Transcutaneous electrical neuromodulation of the cervical spinal cord depends both on the stimulation intensity
+and the degree of voluntary activity for training. A pilot study. J Clin Med.
+2021;10:3278.
+35. Alizadeh A, Dyck SM, Karimi-Abdolrezaee S. Traumatic spinal cord injury: an
+overview of pathophysiology, models and acute injury mechanisms. Front Neurol.
+2019;10:282.
+36. Oh J, Steele AG, Varghese B, et al. Cervical transcutaneous spinal stimulation for
+spinal motor mapping. iScience. 2022;25:105037.
+37. Ludwisiak K, Podgórski M, Biernacka K, et al. Variation in the morphology of
+spinous processes in the cervical spine - an objective and parametric assessment
+based on CT study. PLoS One. 2019;14:e0218885.
+38. Gorodnichev RM, Pivovarova EA, Pukhov A, et al. [Transcutaneous electrical
+stimulation of the spinal cord: non-invasive tool for activation of locomotor circuitry in human]. Fiziol Cheloveka. 2012;38:46–56.
+39. Hofstoetter US, McKay WB, Tansey KE, Mayr W, Kern H, Minassian K. Modiﬁcation of
+spasticity by transcutaneous spinal cord stimulation in individuals with incomplete
+spinal cord injury. J Spinal Cord Med. 2014;37:202–211.
+40. Pinter MM, Gerstenbrand F, Dimitrijevic MR. Epidural electrical stimulation of
+posterior structures of the human lumbosacral cord: 3. Control of spasticity. Spinal
+Cord. 2000;38:524–531.
+
+41. Hofstoetter US, Freundl B, Danner SM, et al. Transcutaneous spinal cord stimulation induces temporary attenuation of spasticity in individuals with spinal cord
+injury. J Neurotrauma. 2020;37:481–493.
+42. Estes SP, Iddings JA, Field-Fote EC. Priming neural circuits to modulate spinal reﬂex
+excitability. Front Neurol. 2017;8:17.
+43. Rehman MU, Sneed D, Sutor TW, Hoenig H, Gorgey AS. Optimization of transspinal
+stimulation applications for motor recovery after spinal cord injury: scoping
+review. J Clin Med. 2023;12:854.
+
+COMMENT
+This research provides analysis of, in addition to promising details
+and insights for guidance in, the use of tSCS therapy in a patient
+population when there are limited treatment options for upper
+extremity functional recovery in patients with SCI.
+Chong Kim, MD
+Cleveland, OH, USA
+
+173
+
+www.neuromodulationjournal.org
+
+© 2024 The Authors. Published by Elsevier Inc. on behalf of the
+International Neuromodulation Society. This is an open access article
+under the CC BY-NC-ND license (http://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+Neuromodulation 2025; 28: 162–173
+
+

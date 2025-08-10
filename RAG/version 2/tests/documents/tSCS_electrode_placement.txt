@@ -1,0 +1,2293 @@
+Journal of
+
+Clinical Medicine
+Review
+
+Neural Substrates of Transcutaneous Spinal Cord Stimulation:
+Neuromodulation across Multiple Segments of the Spinal Cord
+Trevor S. Barss 1,2,3 , Behdad Parhizi 1,2,3 , Jane Porter 2,3 and Vivian K. Mushahwar 1,2,3, *
+1
+
+2
+
+3
+
+*
+
+
+
+Citation: Barss, T.S.; Parhizi, B.;
+Porter, J.; Mushahwar, V.K. Neural
+
+Neuroscience and Mental Health Institute, University of Alberta, Edmonton, AB T6G 2R3, Canada;
+tbarss@ualberta.ca (T.S.B.); parhizi@ualberta.ca (B.P.)
+Division of Physical Medicine and Rehabilitation, Department of Medicine, University of Alberta,
+Edmonton, AB T6G 2R3, Canada; jporter@ualberta.ca
+Sensory Motor Adaptive Rehabilitation Technology (SMART) Network, University of Alberta,
+Edmonton, AB T6G 2R3, Canada
+Correspondence: vivian.mushahwar@ualberta.ca
+
+Abstract: Transcutaneous spinal cord stimulation (tSCS) has the potential to promote improved sensorimotor rehabilitation by modulating the circuitry of the spinal cord non-invasively. Little is currently
+known about how cervical or lumbar tSCS influences the excitability of spinal and corticospinal
+networks, or whether the synergistic effects of multi-segmental tSCS occur between remote segments
+of the spinal cord. The aim of this review is to describe the emergence and development of tSCS as a
+novel method to modulate the spinal cord, while highlighting the effectiveness of tSCS in improving
+sensorimotor recovery after spinal cord injury. This review underscores the ability of single-site tSCS
+to alter excitability across multiple segments of the spinal cord, while multiple sites of tSCS converge
+to facilitate spinal reflex and corticospinal networks. Finally, the potential and current limitations
+for engaging cervical and lumbar spinal cord networks through tSCS to enhance the effectiveness of
+rehabilitation interventions are discussed. Further mechanistic work is needed in order to optimize
+targeted rehabilitation strategies and improve clinical outcomes.
+
+Substrates of Transcutaneous Spinal
+Cord Stimulation: Neuromodulation
+across Multiple Segments of the
+
+Keywords: neuromodulation; interlimb coordination; rehabilitation; neurophysiology; Hoffmann
+(H)-reflex; motor-evoked potential; locomotion; spinal cord injury
+
+Spinal Cord. J. Clin. Med. 2022, 11,
+639. https://doi.org/10.3390/
+jcm11030639
+Academic Editors: Ursula S. Hofstoetter
+and Karen Minassian
+Received: 19 November 2021
+Accepted: 18 January 2022
+Published: 27 January 2022
+Publisher’s Note: MDPI stays neutral
+with regard to jurisdictional claims in
+published maps and institutional affiliations.
+
+Copyright: © 2022 by the authors.
+Licensee MDPI, Basel, Switzerland.
+This article is an open access article
+distributed under the terms and
+conditions of the Creative Commons
+Attribution (CC BY) license (https://
+creativecommons.org/licenses/by/
+4.0/).
+
+1. Introduction
+Neuromodulation of the spinal cord by means of non-invasive transcutaneous (tSCS)
+and implanted epidural (eSCS) spinal cord stimulation may improve sensorimotor rehabilitation after spinal cord injury (SCI) [1–4]. However, developing an optimal treatment
+approach requires taking advantage of the intrinsic ability of the spinal circuits by facilitating preserved sensorimotor pathways that could drive spinal plasticity [5]. The
+influence of spinal cord stimulation (SCS) does not necessarily depend on the nature of
+the neurological disorder, but on the operational and functional status of residual neural
+networks [6]. Epidural SCS has been shown to modulate neuronal circuits in persons with
+motor-complete SCI, including corticospinal, [7–9] propriospinal [10,11], and corticoreticulospinal [12] tracts. The resulting neuroplasticity is thought to improve spinal motor output
+and volitional movements even in cases of severely reduced supraspinal input, without
+negatively impacting residual motor function [3,13–17]. Most recently, eSCS applied to
+the lumbar spinal cord, in conjunction with intensive locomotor training, enabled persons
+with clinically motor-complete SCI to walk over ground for short distances [4,13,18]. This
+demonstrates that dormant neurons that survive the injury may be reengaged with spinal
+neuromodulation, and can produce stepping-like movements [19,20].
+While eSCS has important implications for rehabilitation after SCI, its invasive nature,
+high cost, and limited accessibility are limitations for rapid translation to a broad population. Transcutaneous SCS is a non-invasive, accessible, and cost-effective alternative that
+
+J. Clin. Med. 2022, 11, 639. https://doi.org/10.3390/jcm11030639
+
+https://www.mdpi.com/journal/jcm
+
+J. Clin. Med. 2022, 11, 639
+
+2 of 18
+
+is thought to be a safe assistive technology with important implications for both furthering our understanding of the mechanisms controlling locomotion, and for rehabilitating
+sensorimotor function after SCI [21–23]. It has been suggested that tSCS of the lumbar
+spinal cord may activate similar spinal circuitry to eSCS [24–26]; if accurate, tSCS is likely
+to enhance functional recovery in a similar manner to eSCS when paired with rehabilitation
+strategies. This would also allow for the tSCS to build on the foundation of knowledge
+of the intrinsic circuitry recruited by eSCS. In case studies and small clinical trials, tSCS
+improved hand and arm function [2,27–29], produced locomotor-like stepping [1,30], and
+improved walking function [22,31,32] in participants with neurological deficits including
+incomplete and complete SCI, stroke, and cerebral palsy. Evidence suggests that tSCS
+may also be used as a viable alternative to pharmacological anti-spasticity approaches,
+altering the excitability of spinal pathways and possibly augmenting pre- and post-synaptic
+inhibitory mechanisms [33,34]. Understanding the impact that tSCS has on spinal cord
+circuitry is vital to ensuring that the stimulation is applied at therapeutically appropriate
+sites, and that the parameters of stimulation are chosen so as to optimize the desired
+rehabilitative effects.
+It is critical to realize that not all of the studies using tSCS follow the same pattern of
+stimulation. Transcutaneous SCS patterns including single pulses, trains of pulses, and
+waveforms with and without carrier frequencies have been used. The present review focuses on the use of alternating current (AC) tSCS, because most studies aimed at improving
+functional recovery after SCI have used this type of stimulation. Direct current (DC) tSCS
+also modulates spinal excitability, and may be another promising and novel tool to pair
+with activity-based interventions [35,36]; however, this technique is beyond the scope of
+this review, and requires further research in order to determine the specific mechanisms
+involved. In this review, the two common patterns of AC tSCS that have been employed to
+date will be included and discussed in detail. The first pattern, which will be referred to
+as unmodulated tSCS, does not include a carrier frequency, and is generally composed of
+rectangular pulses delivered as single individual pulses, or in trains of 1–90 Hz frequency.
+The second stimulation pattern, which will be referred to as modulated tSCS, includes
+rectangular pulses with a carrier frequency of 2.5–10 kHz, delivered at a rate of 5–40 Hz [37].
+While both patterns have been reported to modulate neural circuitry across the central
+nervous system and produce functional outcomes, it is unlikely that they share identical
+mechanisms of action. The fundamental differences between the two patterns will be
+highlighted throughout this review as the different studies are discussed.
+The aims of this review are as follows: first, to identify the parameters and the
+potential underlying mechanisms that allow tSCS to facilitate ongoing motor output;
+secondly, to highlight the effects of tSCS on excitability across multiple segments of the
+spinal cord; thirdly, to address the ability of multiple sites of tSCS to converge and enhance
+modulation of spinal reflex and corticospinal pathways; and finally, to explore the potential
+and limitations for engaging cervical and lumbar spinal cord networks through tSCS to
+enhance the effectiveness of rehabilitation interventions. This review will also underscore
+the need for further mechanistic work to optimize tSCS parameters that, when paired with
+targeted rehabilitation strategies, can effectively improve clinical outcomes.
+2. Historical Perspective
+The use of electricity for neuromodulation has a storied history, ultimately leading
+to a variety of therapeutic electrical stimulation techniques that target spinal networks,
+including tSCS, eSCS, and intraspinal microstimulation (ISMS) [38,39]. Epidural SCS
+initially emerged in the pain literature in 1967 [40], and is currently most commonly used for
+the treatment of intractable chronic pain; while originally designed to alleviate pain, it was
+used in 1971 as a method for facilitating motor control in persons with multiple sclerosis [41],
+and to reduce spasticity after incomplete SCI [42–44]. In 1979, tonic stimulation of dorsal
+roots of the spinal cord was shown to generate locomotion in low-spinal cats [45,46]. This
+work then led to initial investigations demonstrating improved stepping in humans, and
+
+J. Clin. Med. 2022, 11, 639
+
+3 of 18
+
+providing the potential for this technology to be used as a translational tool to facilitate
+improved function after neural injury [3,15,47,48].
+In humans, eSCS involves implanting electrodes over the dura mater encasing the
+lumbosacral segments of the spinal cord. Dorsal root fibers are the first to be recruited, with
+the lowest thresholds, while the ventral root fibers are the least accessible [49]. This recruitment leads to the activation of motor neurons through monosynaptic and polysynaptic
+proprioceptive circuits, and increases the overall excitability of the spinal cord, allowing for
+greater responsiveness of spinal circuits to descending signals and sensory feedback [14].
+Extensive evidence from animal studies has led to the hypothesis that electrically stimulating the human spinal cord through the epidural space can facilitate improvements in
+motor function.
+Transcutaneous SCS was inspired by high-voltage percutaneous electrical stimulation over the lumbosacral spinal column to activate peripheral motor axons [50]. In 1997,
+the generation of locomotor-like activity with the application of tSCS over the lumbar
+enlargement was demonstrated in individuals with SCI [51]. It was then suggested that
+there are low-threshold sites in the posterior structure of the human lumbosacral cord
+that could be accessed from the surface [49]. In 2007, and encouraged by earlier discoveries, Minassian et al. revealed that posterior root afferents can be accessed by tSCS with
+single pulses (unmodulated), and they reported monosynaptic reflex responses in multiple muscles of the legs [52]. Later, it was shown that unmodulated tSCS can enhance
+voluntary locomotor-like electromyographic (EMG) activity [53] and modify spasticity in
+individuals with incomplete SCI [54]. In 2015, tSCS was used with a novel waveform that
+included a carrier frequency (i.e., modulated) to activate spinal networks while reducing
+the perception of pain associated with the necessarily high stimulus amplitudes [22,30].
+The tSCS parameters were based on a previous finding that a 10 kHz carrier frequency of
+transcutaneous stimulation reduces the likelihood of activating pain fibers [55]. Building
+on these exciting initial investigations, the tSCS literature has incorporated a diverse set
+of stimulation parameters that are vital to understand, as they may have important implications for improving function in persons experiencing sensorimotor impairments due to
+neurological conditions.
+3. Properties of Transcutaneous Spinal Cord Stimulation (tSCS)
+3.1. Parameters of tSCS
+Typically, tSCS is applied through circular adhesive electrodes of 2–3 cm diameter
+that are placed on the skin overlying the lumbar or cervical segments of the spinal cord
+(Figure 1). Optimal placement of electrodes is dependent on the individual symptoms,
+desired rehabilitation outcomes, and paired rehabilitation strategies, on a case-by-case
+basis. When targeting the lower extremities, the most common cathode placement is over
+the T11–T12 and/or L1–L2 spinous processes, while C6–C7 or C7–T1 is the most common
+placement for the upper extremities [37]. The anode electrodes are placed either over the
+iliac crests or the anterior superior iliac spine [37].
+In addition to electrode placement, it is important to consider the waveform characteristics of the applied current for maximal therapeutic outcomes [5,17,21]. With unmodulated
+tSCS, which evolved from the eSCS literature, rectangular mono- or biphasic pulses of
+0.4–2 ms duration are typically delivered at a frequency range of 1–90 Hz and stimulation
+intensity of up to 170 mA [21,37]. On the other hand, the novelty of the modulated stimulation pattern comes from its unique waveform, which includes a carrier frequency of up
+to 10 kHz within a given pulse. Such high-frequency stimulation approaches were originally used to reduce the perception of pain during transcutaneous nerve stimulation [55].
+The waveform in the modulated stimulation pattern generally consists of 0.3–1 ms long
+rectangular biphasic or monophasic pulses that repeat at a frequency of 5–40 Hz. Each
+of these pulses encompasses a carrier frequency of 2.5–10 kHz, aimed at suppressing the
+user’s perceived pain and, thus, allowing for greater current amplitudes to be employed.
+The amplitude of the current for modulated tSCS is similar to that of unmodulated tSCS,
+
+J. Clin. Med. 2022, 11, x FOR PEER REVIEW
+
+4 of 18
+
+J. Clin. Med. 2022, 11, 639
+
+4 of 18
+
+the user’s perceived pain and, thus, allowing for greater current amplitudes to be employed. The amplitude of the current for modulated tSCS is similar to that of unmodulated
+and ranges
+from 30
+to 180
+depending
+on the stimulation
+site and the
+tSCS,
+and ranges
+from
+30 mA,
+to 180
+mA, depending
+on the stimulation
+sitedesired
+and theoutcome.
+desired
+In neurologically
+intact participants,
+the intensity
+modulated
+tSCS (with atSCS
+5 kHz
+carrier
+outcome.
+In neurologically
+intact participants,
+theofintensity
+of modulated
+(with
+a5
+frequency)
+for maximal
+tolerable
+current
+amplitudes
+103 mA, while
+unmodulated
+kHz
+carrierallows
+frequency)
+allows for
+maximal
+tolerable
+currentofamplitudes
+of 103
+mA, while
+tSCS has maximal
+amplitudes
+of 39amplitudes
+mA. However,
+consideringwhen
+maximal
+tolunmodulated
+tSCStolerable
+has maximal
+tolerable
+of 39when
+mA. However,
+considerable
+stimulation
+with
+respect
+to
+the
+stimulation
+levels
+needed
+to
+evoke
+motor
+responses,
+ering maximal tolerable stimulation with respect to the stimulation levels needed to evoke
+tSCS with
+a carrier
+frequency
+was nofrequency
+different was
+thanno
+unmodulated
+tSCS
+in reducingtSCS
+the
+motor
+responses,
+tSCS
+with a carrier
+different than
+unmodulated
+perception
+pain
+[56].
+in reducingofthe
+perception
+of pain [56].
+
+Figure
+SCS
+is commonly
+delivered
+viavia
+twotwo
+2.5
+Figure 1.
+1. Typical
+TypicaltSCS
+tSCSelectrode
+electrodeplacement:
+placement:Transcutaneous
+Transcutaneous
+SCS
+is commonly
+delivered
+cm round cathodic electrodes placed over the C3–4 and C6–7 (cervical) or T11 and L1 (lumbar) spi2.5 cm round cathodic electrodes placed over the C3–4 and C6–7 (cervical) or T11 and L1 (lumbar)
+nous processes. Two 5 × 10 cm rectangular anodic electrodes are placed bilaterally over the iliac
+spinous processes. Two 5 × 10 cm rectangular anodic electrodes are placed bilaterally over the
+crests.
+iliac crests.
+
+Interestingly, when using an array of electrodes and adjusting the parameters of stimInterestingly, when using an array of electrodes and adjusting the parameters of
+ulation—including
+intensity
+andand
+location—different
+patterns
+of independent
+and
+coordistimulation—including
+intensity
+location—different
+patterns
+of independent
+and
+coornated
+upper
+limb
+motion
+at
+both
+distal
+and
+proximal
+joints
+have
+been
+elicited,
+showing
+dinated upper limb motion at both distal and proximal joints have been elicited, showing
+the
+the potential
+potential of
+of tSCS
+tSCS without
+without aa carrier
+carrier frequency
+frequency to
+to evoke
+evoke functional
+functional movements
+movements [28].
+[28].
+Therefore,
+the
+chosen
+parameters
+of
+tSCS
+can
+have
+a
+meaningful
+effect
+the recruited
+recruited
+Therefore, the chosen parameters of tSCS can have a meaningful effect on
+on the
+circuitry
+and the
+the functional
+functional movements
+movements that
+that are
+are facilitated
+facilitated or
+or inhibited.
+inhibited. Understanding
+Understanding
+circuitry and
+how
+the
+applied
+electrical
+current
+is
+integrated
+into
+the
+spinal
+circuitry
+is
+vital.
+how the applied electrical current is integrated into the spinal circuitry is vital.
+3.2. Current Flow Involved in tSCS
+The current flow and electrical potential generated by eSCS and tSCS are markedly
+different
+[24,25].With
+WitheSCS,
+eSCS,80–90%
+80–90%
+ionic
+current
+flows
+between
+the active
+elecdifferent [24,25].
+of of
+thethe
+ionic
+current
+flows
+between
+the active
+electrodes
+trodes
+through
+the cerebrospinal
+In tSCS,
+currentflow
+flowisisstrongly
+strongly influenced
+through
+the cerebrospinal
+fluid fluid
+[57]. [57].
+In tSCS,
+thethe
+current
+by the
+thethe
+numerous
+conductivity
+boundaries
+of body
+tissues
+(e.g.,
+theelectrical
+electricalproperties
+propertiesofof
+numerous
+conductivity
+boundaries
+of body
+tissues
+(e.g.,
+fat, muscle,
+and bone),
+computer
+simulations
+estimating
+of
+skin, skin,
+fat, muscle,
+and bone),
+withwith
+computer
+simulations
+estimating
+that that
+onlyonly
+~8%~8%
+of the
+the overall
+current
+flows
+through
+cerebrospinal
+fluid
+[25].
+With
+dramatic
+difference
+overall
+current
+flows
+through
+the the
+cerebrospinal
+fluid
+[25].
+With
+thethe
+dramatic
+difference
+in
+in current
+flow
+proximity
+of neural
+structures
+to electrodes
+the electrodes
+between
+current
+flow
+andand
+thethe
+proximity
+of neural
+structures
+to the
+between
+eSCSeSCS
+and
+and tSCS,
+the selectivity
+of spinal
+circuitry
+the required
+stimulation
+tSCS,
+both both
+the selectivity
+of spinal
+circuitry
+and theand
+required
+stimulation
+intensityintensity
+are disare
+dissimilar.
+Modelling
+studies
+suggest
+that
+the
+superficially
+located
+large-diameter
+similar. Modelling studies suggest that the superficially located large-diameter posterior
+posterior
+column
+fibers
+with multiple
+collaterals
+have a threshold
+threehigher
+times than
+higher
+than
+column fibers
+with
+multiple
+collaterals
+have a threshold
+three times
+that
+of
+that of posterior
+root[26].
+fibers
+both
+tSCS
+andlarge-diameter
+eSCS, large-diameter
+proprioceptive
+posterior
+root fibers
+For[26].
+bothFor
+tSCS
+and
+eSCS,
+proprioceptive
+sensory
+sensory fibers within the posterior rootlets/roots have the lowest thresholds of all neural
+structures within the vertebral canal [24], making it unlikely that the effects of SCS arise
+
+J. Clin. Med. 2022, 11, 639
+
+5 of 18
+
+exclusively from dorsal column stimulation [57]. Computer modeling indicates that action
+potentials generated by tSCS are initiated in the posterior root fibers at their entry into the
+spinal cord, or along the longitudinal portions of the afferent fiber trajectories, depending
+on the cathode position [25]. Evidence suggests that the reflex nature of unmodulated
+tSCS exploits the difference in the strength–duration properties of sensory and motor
+axons; however, future research should be conducted to explore how modulated tSCS
+generates action potentials in neural tissue [58]. At stimulation intensities that result in the
+recruitment of posterior column axons, co-activation of posterior root fibers of large and
+small diameters is observed, demonstrating the substantial differences in the thresholds of
+activation of various components of the spinal cord [26]. Moreover, increasing stimulation
+intensity engages spinal interneurons via synaptic projections which, in turn, activate
+motor neurons [22,59]. These simulation results provide a biophysical explanation for
+the electrophysiological findings of lower limb muscle responses that are induced by
+posterior root stimulation (Figure 2A). However, it should be noted that these computer
+simulation studies have all applied unmodulated tSCS (i.e., without carrier frequency), and
+the results may not necessarily be generalizable to other types of pulses. Understanding
+the potential unique properties associated with modulated tSCS is vital for implementing
+tSCS in a manner that optimizes functional recovery after neural injury or disease. Similar
+simulation studies using high carrier frequencies are necessary in order to extend the
+knowledge regarding current flow in tSCS.
+3.3. Transcutaneous SCS Carrier Frequency Is Important for Reducing Discomfort, but Its Role in
+Restoring Motor Function Remains Unclear
+The inclusion of a carrier frequency within a given stimulation pulse is used for
+its ability to disrupt synchronous firing of the high-threshold C-fibers related to pain
+perception [60]. Pain management through SCS is based on the gate control theory
+introduced in 1965 [57], which proposed that the activation of Aβ mechanoreceptor fibers that synapse onto a range of neurons within the dorsal horn that release
+inhibitory neurotransmitters—including γ-amino butyric acid (GABA) and adenosine [61]—reduces the activity of nociceptive projection neurons in laminae I and V
+traveling along the spinothalamic tract. It has also been proposed that high-frequency
+stimulation of the spinal cord blocks discomfort by inactivating paresthesia-inducing
+large-diameter fibers and activating medium–small-diameter fibers that suppress widedynamic-range neurons encoding neuropathic pain [62]. Sub-perception SCS at 1 kHz
+was more effective for pain relief compared to low-frequency supra-perception stimulation [63]. Moreover, a recent eSCS study suggested that there was no observable
+difference between 1 kHz and 10 kHz stimulation for the relief of back pain [64]. Charge
+per pulse is lower in high-frequency eSCS in comparison with low-frequency stimulation, while charge per second is higher [61]. While these studies did not use tSCS, and
+were only aimed at pain management, they can play an important role in explaining
+the potential mechanisms that reduce discomfort in modulated tSCS. Manson et al.
+have recently shown that the maximal tolerable stimulation intensity is significantly
+greater during modulated tSCS compared to unmodulated tSCS [56]; however, the
+stimulation intensity required to evoke a muscle response (motor threshold) was correspondingly higher with a carrier frequency, leading to no difference in the relative
+current amplitude required to evoke a motor response [56]. This study indicated that
+the addition of a carrier frequency reduces discomfort for a given current amplitude
+compared to unmodulated tSCS, but does not reduce discomfort when evoking the
+same motor response.
+
+J. Clin.
+Med.
+2022,
+11,11,
+639
+J. Clin.
+Med.
+2022,
+x FOR PEER REVIEW
+
+6 of
+6 of
+1818
+
+Figure 2. Schematic of networks within the spinal cord that are potentially altered with tSCS: The
+Figure 2. Schematic of networks within the spinal cord that are potentially altered with tSCS: The
+main figure highlights the ability of tSCS to modulate ongoing motor output through dorsal root
+main
+figure
+highlights
+the abilityfacilitate
+of tSCS motor
+to modulate
+motor
+output through
+dorsal
+root
+afferents
+that
+trans-synaptically
+output ongoing
+by bringing
+previously
+inaccessible
+motor
+afferents
+that
+trans-synaptically
+facilitate
+motor
+output
+by
+bringing
+previously
+inaccessible
+motor
+units closer to their threshold, allowing them to contribute to the execution of a desired task. (A)
+units
+closer to their
+threshold,
+them toand
+contribute
+theseveral
+execution
+ofof
+a desired
+task. (A)
+Large-diameter
+afferents
+are allowing
+likely activated
+synapsetoon
+types
+interneurons
+thatLargefacilitate ongoing
+motor
+output.activated
+(B) Among
+interneurons
+aretypes
+propriospinal
+interneurons,
+which
+diameter
+afferents
+are likely
+andthese
+synapse
+on several
+of interneurons
+that facilitate
+transmitmotor
+this input
+to multiple
+segments
+of the spinalare
+cord
+in order to alter
+excitability
+and impact
+ongoing
+output.
+(B) Among
+these interneurons
+propriospinal
+interneurons,
+which
+transmit
+ongoing
+motor
+output
+throughout
+the
+cord.
+Solid
+lines
+indicate
+that
+transmission
+remains
+to
+this input to multiple segments of the spinal cord in order to alter excitability and impactintact
+ongoing
+the point of injury to the spinal cord, while dashed lines indicate that transmission is impaired, and
+motor output throughout the cord. Solid lines indicate that transmission remains intact to the point
+may be facilitated by tSCS. Typically, tSCS is applied in single unmodulated or modulated monophofasic
+injury
+to the spinal
+while
+or biphasic
+pulsescord,
+or trains
+of dashed
+pulses. lines indicate that transmission is impaired, and may be
+facilitated by tSCS. Typically, tSCS is applied in single unmodulated or modulated monophasic or
+biphasic pulses or trains of pulses.
+
+J. Clin. Med. 2022, 11, 639
+
+7 of 18
+
+What is less clear is the impact that the carrier frequency has on the neural circuitry
+recruited during tSCS, and the specific role it serves to improve functional recovery when
+paired with rehabilitation strategies. Recently, hand and arm function improved significantly during a single session of cervical tSCS with a 5 kHz carrier frequency applied in
+individuals with an SCI compared to when a carrier frequency was not included [65]. However, limited data are available as to the differences in specific neural substrates recruited
+by tSCS with and without a carrier frequency. Overall, integrating a carrier frequency
+may be an important feature of tSCS that not only circumvents pain compared to other
+stimulation profiles, but also promotes effective restoration of function after SCI. Further
+exploration is required in order to understand whether the carrier frequency is a unique
+feature necessary for optimizing the use of tSCS for sensorimotor recovery. Incorporating
+this knowledge into a mechanistic framework for the implementation of tSCS is essential in
+order to facilitate optimal functional recovery after neurological damage.
+3.4. Mechanisms of tSCS Recruitment
+The principal mechanism by which tSCS non-invasively activates inaccessible neuronal
+networks of the spinal cord likely includes the recruitment of afferent fibers (large–medium)
+in the posterior root in order to elevate spinal network excitability [66,67]. The excitability
+of spinal interneuronal networks can be readily modulated (changing the networks’ physiological state) without directly producing action potentials [22]. The route of stimulation
+propagation is through the dorsal root afferents, as indicated by the significant inhibition
+of cervical tSCS responses when using paired stimuli, during passive muscle stretching,
+and during muscle–tendon vibration [67]. Moreover, it has been suggested that eSCS and
+modulated tSCS can engage both afferent and efferent pathways, based on observations of
+early- and medium-response components of evoked potentials that are partially ascribed to
+posterior roots/group Ia/group II and motor neurons/anterior roots [22,68]. It is proposed
+that as stimulation intensity is increased, in addition to the Ia afferents, the smaller diameter
+afferents such as group Ib, larger diameter cutaneous afferents, group II muscle spindle
+afferents, and even more intraspinal connections and spinal interneurons are recruited
+through tSCS, similarly to what has been observed in eSCS [22,59]. This, in turn, brings
+interneurons and motor neurons closer to their firing threshold, making them more likely
+to respond to limited post-injury descending drive and improving supraspinal control
+after both modulated and unmodulated tSCS [24,30]. Both electrophysiological and computer modeling studies to date suggest that unmodulated tSCS excites posterior root fibers
+similarly to eSCS [24,52].
+Recently, a few studies have compared the different effects of modulated and unmodulated tSCS on descending input. Benavides et al. reported that single-site tSCS
+applied with a 5 kHz carrier frequency at the C5–C6 level facilitated the amplitude of
+cervicomedullary-evoked potentials (CMEPs), but did not increase the amplitude of the
+motor-evoked potentials (MEPs) [65]; this was accompanied by an increase in the level of
+short-interval cortical inhibition (SICI). When tSCS was applied without the carrier frequency, both cortically and subcortically driven responses were facilitated. This is similar
+to our recent investigation, which found that modulated tSCS (33 Hz trains of 1 m long
+pulses with a 10 kHz carrier frequency) applied over the C3–4 and C6–7 spinous processes
+in neurologically intact individuals did not alter MEPs assessed in the forearm flexors [69].
+Moreover, data from a paired associative stimulation (PAS) paradigm involving single
+pulses of transcranial magnetic stimulation (TMS) and unmodulated tSCS arriving at the
+same time at spinal motor neurons revealed increases in corticospinal excitability, but
+facilitation of MEPs following tSCS was less pronounced when tSCS pulses were filled
+with a carrier frequency [70]. These studies highlight the fact that in the presence of a
+carrier frequency, tSCS may be unable to facilitate MEPs. In contrast, it was shown that
+sub-motor-threshold tSCS without a carrier frequency, applied for a short period of 10 min
+to the cervical region, did not alter the excitability of the corticospinal and spinal reflex
+pathways [71]. At first glance, these results seem contradictory; however, the stimulation
+
+J. Clin. Med. 2022, 11, 639
+
+8 of 18
+
+duration, stimulation amplitude, frequency of stimulation, stimulation waveform (modulated/unmodulated), and target muscles varied across these studies, which may have
+influenced the neuromodulatory effects of tSCS. By priming neural structures at the level
+of the spinal cord, unmodulated tSCS modulated spinal reflex excitability and reduced
+spasticity in a manner similar to that seen with passive cycling movements [34]. This
+suggests that alterations in spinal circuitry—including presynaptic influences—are likely
+the primary target of tSCS, and play an important role in the recovery of arm and hand
+function in persons with SCI.
+Importantly, dorsal root stimulation is likely not entirely responsible for the effects of
+tSCS. Group Ia muscle spindle afferent fibres, which travel in the dorsal roots, have a lower
+threshold of activation compared to the largest cutaneous fibres [72]. If the effects of tSCS
+are only due to the activation of dorsal root afferents, then at low stimulation amplitudes
+the large-diameter group Ia afferents should be activated, leading to muscle contractions
+and proprioceptive errors via monosynaptic reflexes [57]. However, cutaneous sensation
+typically occurs over a large range of stimulus amplitudes that are lower than those
+required to produce motor responses mediated by purely monosynaptic reflex pathways,
+and proprioceptive errors are not a significant occurrence [73], making it unlikely that
+tSCS functions entirely by stimulating dorsal root afferents. Epidural SCS at 1–2 Hz
+has been shown to activate inhibitory interneurons in laminae I–III, albeit with latencies
+consistent with trans-synaptic (i.e., indirect) activation [74]. Therefore, it is important to
+consider whether inhibitory neurons in this region are the main or, at least, a contributing
+mechanism underlying the therapeutic benefit of tSCS; that is, tSCS may restore inhibition
+by enhancing dorsal horn GABAergic systems. It has been suggested that islet cells in the
+substantia gelatinosa require further consideration as prime candidates for the inhibitory
+effects on pain [57].
+Moreover, while it is widely believed that tSCS depolarizes sensory afferents in the dorsal roots and dorsal horn that trans-synaptically recruit motor pools, it remains possible that
+polysynaptic connections from cutaneous mechanoreceptors in the skin act on both sensory
+processes and motor pools in the spinal cord. This, in turn, alters the excitability at both the
+level of the spinal cord—where the stimulation is provided—as well as remote levels of the
+spinal cord, through propriospinal interneuronal connections. Cutaneous inputs are known
+to have diffuse input that is specific to the task, phase, and amplitude at which stimulation is
+delivered [75,76]. It is therefore plausible that the recruitment of cutaneous mechanoreceptors
+surrounding the electrodes may contribute to the neuromodulatory effects of tSCS through
+these polysynaptic connections. The potential role of cutaneous mechanoreceptors in the skin
+with tSCS remains an important avenue to explore in future work [77–79].
+A potential mechanism by which tSCS improves upon previously developed rehabilitation interventions is potentiation. Guiho et al. observed potentiation of supraspinal
+evoked responses with both dorsal eSCS and modulated tSCS over the C3–4 and C7–T1
+intervertebral spaces in monkeys, but facilitation was stronger with dorsal eSCS [80]. It is
+vital to identify the capability of unmodulated tSCS to alter supraspinally driven responses
+compared to eSCS and modulated tSCS, in order to identify whether unique stimulation
+parameters are required for individual outcomes. Similarly, PAS with tSCS and TMS induced facilitation of corticospinal excitability for at least 30 min after the PAS, which is
+indicative of long-term potentiation (LTP)-like plasticity in the lower limb region of the
+primary motor cortex [81]. An important component of tSCS is its neuromodulatory effect
+on remote segments of the spinal cord, which must be considered during SCI rehabilitation.
+4. Transcutaneous SCS Alters Excitability across Multiple Levels of the Spinal Cord
+Evidence indicates that tSCS alters the excitability of multiple segments of the spinal
+cord [70,82]. These multi-segmental effects were specifically investigated in our recent
+work exploring how stimulation alters excitability across multiple levels of the spinal
+cord in neurologically intact participants, using the setup described in Figure 3. We first
+determined that cervical tSCS suppresses the amplitude of the soleus Hoffmann (H)-reflex
+
+4. Transcutaneous SCS Alters Excitability across Multiple Levels of the Spinal Cord
+J. Clin. Med. 2022, 11, 639
+
+Evidence indicates that tSCS alters the excitability of multiple segments of the spinal
+9 of 18
+cord [70,82]. These multi-segmental effects were specifically investigated in our recent
+work exploring how stimulation alters excitability across multiple levels of the spinal cord
+in neurologically intact participants, using the setup described in Figure 3. We first detercervical tSCS suppresses the amplitude of the soleus Hoffmann (H)-reflex by
+bymined
+22.9%that
+(Figure
+4B), which was similar to the 19.7% reduction produced by rhythmic
+22.9% (Figure 4B), which was similar to the 19.7% reduction produced by rhythmic arm
+arm cycling (Figure 4C), demonstrating that cervical tSCS alters lumbar excitability [59].
+cycling (Figure 4C), demonstrating that cervical tSCS alters lumbar excitability [59]. The
+The suppression of H-reflexes evoked in one limb by rhythmic movements of the remote
+suppression of H-reflexes evoked in one limb by rhythmic movements of the remote limbs
+limbs demonstrates coupling between the arms and legs in humans [83–85]. A bidirectional
+demonstrates coupling between the arms and legs in humans [83–85]. A bidirectional linklinkage between the cervical and lumbar segments of the spinal cord exists during rhythmic
+age between the cervical and lumbar segments of the spinal cord exists during rhythmic
+movements
+in both quadrupedal mammals and humans [86,87], facilitated primarily by
+movements in both quadrupedal mammals and humans [86,87], facilitated primarily by
+propriospinal
+Therefore,ititwas
+washypothesized
+hypothesized
+that
+a similar
+reciprocal
+propriospinalconnections
+connections[83,88].
+[83,88]. Therefore,
+that
+a similar
+reciprocal
+organization
+may
+also
+be
+revealed
+by
+tSCS
+applied
+to
+the
+cervical
+and
+lumbar
+networks,
+organization may also be revealed by tSCS applied to the cervical and lumbar networks,
+suggesting
+similarnetworks
+networkstotothose
+those
+activated
+during
+rhythmic
+suggestingthat
+thattonic
+tonictSCS
+tSCS activates
+activates similar
+activated
+during
+rhythmic
+activity
+of
+the
+arms
+or
+legs
+[76,89].
+In
+contrast
+to
+our
+hypothesis,
+lumbar
+tSCS
+significantly
+activity of the arms or legs [76,89]. In contrast to our hypothesis, lumbar tSCS significantly
+facilitated
+the
+(FCR)by
+by11.1%
+11.1%relative
+relative to
+facilitated
+theamplitude
+amplitudeofofthe
+theH-reflex
+H-reflexin
+inthe
+theflexor
+flexor carpi
+carpi radialis
+radialis (FCR)
+notostimulation
+(Figure
+4D),
+as
+opposed
+to
+the
+expected
+13.6%
+reduction
+in
+reflex
+amplitude
+no stimulation (Figure 4D), as opposed to the expected 13.6% reduction in reflex amduring
+legduring
+cycling
+[69].4E)
+This
+indicates
+that separate
+propriospinal
+networks
+plitude
+leg(Figure
+cycling4E)
+(Figure
+[69].
+This indicates
+that separate
+propriospinal
+net- are
+likely
+responsible
+for the effects
+and
+cycling. cycling.
+works
+are likely responsible
+for of
+thetSCS
+effects
+of rhythmic
+tSCS and rhythmic
+
+Figure3.3. Experimental
+Experimental setup
+investigating
+the the
+effect
+of modulated
+tSCS on
+cervicolumbar
+conFigure
+setupforfor
+investigating
+effect
+of modulated
+tSCS
+on cervicolumbar
+nectivity and corticospinal facilitation: (A) Hoffmann (H-) reflexes were evoked during tSCS via
+connectivity and corticospinal facilitation: (A) Hoffmann (H-) reflexes were evoked during tSCS via
+stimulation of the tibial nerve and recorded in the soleus (SOL) muscle. The left leg was held static
+stimulation
+of the
+tibial nerve
+and recorded
+in the
+(SOL)
+The
+left
+leg was
+held
+static
+in an extended
+position,
+and stimulation
+to evoke
+thesoleus
+H-reflex
+wasmuscle.
+delivered
+with
+either
+the left
+arm
+in held
+an extended
+position,
+stimulation
+to evoke
+theevoked
+H-reflex
+was tSCS
+delivered
+with either
+at 0° or during
+armand
+cycling.
+(B) H-reflexes
+were
+during
+via stimulation
+of the
+the left
+median
+nerve
+and
+recorded
+the flexor
+radialiswere
+(FCR)
+muscle,during
+while motor
+evoked
+potentials
+arm
+held at
+0◦ or
+during
+armincycling.
+(B)carpi
+H-reflexes
+evoked
+tSCS via
+stimulation
+of the
+(MEPs)nerve
+wereand
+evoked
+in the in
+contralateral
+motorradialis
+cortex and
+recorded
+in while
+the FCR
+muscle,
+either
+with
+median
+recorded
+the flexor carpi
+(FCR)
+muscle,
+motor
+evoked
+potentials
+the legs held static, or during leg cycling. Responses were evoked during a consistent background
+(MEPs) were evoked in the contralateral motor cortex and recorded in the FCR muscle, either with
+contraction of ≈5–10% peak muscle activity at the same position, regardless of condition.
+the legs held static, or during leg cycling. Responses were evoked during a consistent background
+contraction
+of results
+≈5–10%are
+peak
+muscle activity
+at the same
+position,
+regardlessof
+of spinal
+condition.
+These
+summarized
+in Figure
+4A, as
+tonic activation
+cord net-
+
+works via tSCS alters excitability over multiple segments of the spinal cord, and is not
+These results are summarized in Figure 4A, as tonic activation of spinal cord networks
+bidirectional in its effects. The mechanisms responsible for the disinhibition of the H-reviaflex
+tSCS
+altersbetween
+excitability
+over multiple
+segments
+ofunknown.
+the spinalFacilitation
+cord, and isofnot
+results
+the upper
+and lower
+limbs are
+thebidirectional
+H-reflex
+inpathway
+its effects.
+The
+mechanisms
+responsible
+for
+the
+disinhibition
+of
+the
+H-reflex
+results
+through tSCS may be due to reduced Ia presynaptic inhibition, or to facilitation
+between
+the
+upper
+and
+lower
+limbs
+are
+unknown.
+Facilitation
+of
+the
+H-reflex
+pathway
+of the motor pool through activation of posterior root afferents and interneuronal projec-
+
+through tSCS may be due to reduced Ia presynaptic inhibition, or to facilitation of the motor
+pool through activation of posterior root afferents and interneuronal projections [24]. It
+also remains possible that the stimulation of skin itself may be a larger contributing factor
+in altering the excitability of the spinal cord with tSCS than previously considered [77].
+Understanding the integration of tSCS across multiple segments of the spinal cord across
+the range of stimulation parameters is critical in order to determine whether facilitating
+or inhibiting the circuitry involved is desirable based on the individual, the available
+technology, and the primary clinical outcome. While single-site tSCS neuromodulates
+remote segments of the spinal cord, multiple sites of tSCS appear to converge and facilitate
+the spinal and corticospinal circuitry.
+
+J. Clin. Med. 2022, 11, 639
+
+tributing factor in altering the excitability of the spinal cord with tSCS than previously
+considered [77]. Understanding the integration of tSCS across multiple segments of the
+spinal cord across the range of stimulation parameters is critical in order to determine
+whether facilitating or inhibiting the circuitry involved is desirable based on the individual, the available technology, and the primary clinical outcome. While single-site tSCS
+10 of 18
+neuromodulates remote segments of the spinal cord, multiple sites of tSCS appear to converge and facilitate the spinal and corticospinal circuitry.
+
+Figure
+4. Effects
+Figure 4.
+Effects of
+of tSCS
+tSCS on
+on interlimb
+interlimb connectivity
+connectivity are
+are not
+not similar
+similar to
+to those
+those of
+of cycling
+cycling in
+in terms
+terms of
+of
+reciprocal
+organization:
+(A)
+The
+schematic
+highlights
+common
+spinal
+segments
+activated
+by
+reciprocal organization: (A) The schematic highlights common spinal segments activated by tSCS,
+tSCS,
+including the cervical (blue) and lumbar (pink) enlargements. The blue arrow indicates that tonic
+including the cervical (blue) and lumbar (pink) enlargements. The blue arrow indicates that tonic
+cervical tSCS inhibits lumbar excitability, while the red arrow indicates that lumbar tSCS facilitates
+cervical tSCS inhibits lumbar excitability, while the red arrow indicates that lumbar tSCS facilitates
+cervical excitability in neurologically intact individuals. (B) Spinal reflex excitability as assessed by
+cervical
+excitability
+in neurologically
+intact individuals.
+(B) Spinal
+excitability
+as assessed
+by (C)
+the
+the
+H-reflex
+in the soleus
+muscle is significantly
+inhibited
+in the reflex
+presence
+of cervical
+tSCS [82].
+H-reflex
+in
+the
+soleus
+muscle
+is
+significantly
+inhibited
+in
+the
+presence
+of
+cervical
+tSCS
+[82].
+(C)
+Spinal
+Spinal reflex excitability is similarly reduced in the lower limbs during arm cycling, which is a
+reflex excitability
+is similarly
+reduced in
+the lower via
+limbs
+during arm
+cycling, which
+is (D)
+a known
+known
+condition for
+altering interlimb
+connectivity
+presynaptic
+mechanisms
+[84,90].
+Conversely,
+spinal
+reflex
+excitability
+as
+assessed
+by
+the
+H-reflex
+in
+the
+FCR
+muscle
+is
+significantly
+facilcondition for altering interlimb connectivity via presynaptic mechanisms [84,90]. (D) Conversely,
+itated
+the presence
+of as
+lumbar
+tSCSby[70].
+Leg cycling
+continues
+toisinhibit
+spinal reflex
+excitaspinal in
+reflex
+excitability
+assessed
+the (E)
+H-reflex
+in the FCR
+muscle
+significantly
+facilitated
+in
+bility
+in
+the
+upper
+limbs.
+Panels
+(B–D)
+adapted
+from
+published
+data
+in
+[70,82].
+the presence of lumbar tSCS [70]. (E) Leg cycling continues to inhibit spinal reflex excitability in the
+upper limbs. Panels (B–D) adapted from published data in [70,82].
+
+5. Multiple Sites of tSCS Converge to Facilitate Alterations in Excitability
+5. Multiple
+of tSCS Converge
+to Facilitate of
+Alterations
+Excitabilitynetworks may
+FurtherSites
+improvements
+to the reengagement
+previouslyininaccessible
+
+Furtherusing
+improvements
+to the reengagement
+of previously
+networks
+may
+be possible
+multiple stimulation
+sites of tSCS.
+Previousinaccessible
+investigations
+have indibe
+possible
+using
+multiple
+stimulation
+sites
+of
+tSCS.
+Previous
+investigations
+have
+indicated
+cated that unmodulated tSCS delivered at the vertebral level T11 can activate the locomothatcircuitry
+unmodulated
+tSCS delivered
+at study
+the vertebral
+level when
+T11 can
+activate
+theplaced
+locomotor
+tor
+in neurologically
+intact
+participants
+their
+legs are
+in a
+circuitry in neurologically
+intact
+study participants
+whenof
+their
+legs are
+placed and
+in a gravitygravity-neutral
+position [91].
+Simultaneous
+stimulation
+cervical,
+thoracic,
+lumbar
+neutral(i.e.,
+position
+[91].and
+Simultaneous
+stimulation
+cervical,
+thoracic,
+and lumbar
+levels
+levels
+C5, T11,
+L1, respectively)
+with a of
+carrier
+frequency
+induced
+coordinated
+(i.e.,
+C5,
+T11,
+and
+L1,
+respectively)
+with
+a
+carrier
+frequency
+induced
+coordinated
+stepping
+stepping movements with a greater range of motion at multiple joints in five of six neuromovements
+with
+a greater range
+of motion
+at multipleofjoints
+five[92].
+of sixThe
+neurologically
+logically
+intact
+participants,
+compared
+to stimulation
+T11 in
+alone
+addition of
+intact
+participants,
+compared
+to
+stimulation
+of
+T11
+alone
+[92].
+The
+addition
+stimulation at L1 and/or at C5 to stimulation at T11 immediately resultedof
+instimulation
+enhancing
+at L1
+and/or at and
+C5 tointerlimb
+stimulation
+at T11 immediately
+in patterns
+enhancing
+kinematics
+the
+kinematics
+coordination
+as well asresulted
+the EMG
+in the
+proximal
+and
+and interlimb
+coordination
+as well
+as the
+EMG
+patterns
+in S1
+proximal
+andof
+distal
+muscles.
+distal
+leg muscles.
+Moreover,
+paired
+tSCS
+at the
+L2 and
+segments
+the leg
+spinal
+cord
+Moreover,
+at the L2ofand
+segments
+of the
+spinal
+cord
+resulted
+in greater
+resulted
+in paired
+greatertSCS
+potentiation
+the S1
+evoked
+response
+than
+from
+either
+site alone,
+indipotentiation of the evoked response than from either site alone, indicating synergistic
+effects of multi-segmental pathways [93]. The interactive and synergistic effects indicate
+multi-segmental convergence of descending, ascending and, most likely, propriospinal
+influences on the neuronal circuitry during tSCS [93].
+Interestingly, multisite (i.e., combined) modulated tSCS in both the cervical and lumbar
+segments of the spinal cord led to a convergence in the upper limbs (FCR muscle) that
+significantly increased H-reflex and MEP amplitude, by 19.6% (Figure 5B) and 19.7%
+(Figure 5C), respectively. Cervical tSCS alone did not increase H-reflex or MEP amplitude
+in the FCR, but both were significantly facilitated with the addition of lumbar tSCS. This
+indicates that tSCS alters excitability across multiple segments of the spinal cord, and
+
+J. Clin. Med. 2022, 11, 639
+
+tic effects indicate multi-segmental convergence of descending, ascending and, most
+likely, propriospinal influences on the neuronal circuitry during tSCS [93].
+Interestingly, multisite (i.e., combined) modulated tSCS in both the cervical and lumbar segments of the spinal cord led to a convergence in the upper limbs (FCR muscle) that
+significantly increased H-reflex and MEP amplitude, by 19.6% (Figure 5B) and 19.7% (Fig11 of 18
+ure 5C), respectively. Cervical tSCS alone did not increase H-reflex or MEP amplitude
+in
+the FCR, but both were significantly facilitated with the addition of lumbar tSCS. This
+indicates that tSCS alters excitability across multiple segments of the spinal cord, and conconverges
+to facilitate
+spinal
+and corticospinal
+transmission,
+as demonstrated
+in
+verges to facilitate
+bothboth
+spinal
+and corticospinal
+transmission,
+as demonstrated
+in Figure
+Figure
+5A.
+The facilitation
+of MEPs
+the FCR
+by combined
+cervical
+lumbar
+tSCS
+could
+5A. The
+facilitation
+of MEPs
+in theinFCR
+by combined
+cervical
+andand
+lumbar
+tSCS
+could
+be
+be
+to reinforced
+projection
+of ascending
+propriospinal
+corticospinal
+axons
+duedue
+to reinforced
+projection
+of ascending
+propriospinal
+andand
+corticospinal
+axons
+ontoonto
+cercervical
+spinal
+motor
+neurons
+[94].
+Therefore,
+the
+activation
+of
+proprioceptive
+inputs
+at
+vical spinal motor neurons [94]. Therefore, the activation of proprioceptive inputs at both
+both
+the
+cervical
+and
+lumbar
+spinal
+cord
+by
+tSCS,
+which
+synapse
+on
+cervical
+motor
+neurons,
+the cervical and lumbar spinal cord by tSCS, which synapse on cervical motor neurons,
+may
+of of
+H-reflexes
+andand
+MEPs
+to the
+FCRFCR
+muscle.
+An
+may be
+beaamajor
+majorcontributor
+contributortotothe
+thefacilitation
+facilitation
+H-reflexes
+MEPs
+to the
+muscle.
+important
+consideration
+withwith
+the potential
+use of
+tSCStSCS
+is the
+that that
+spasticity
+An important
+consideration
+the potential
+usemultisite
+of multisite
+is role
+the role
+spasplays
+in the in
+rehabilitation
+strategy;
+facilitating
+H-reflexes
+in muscles
+that have
+ticity plays
+the rehabilitation
+strategy;
+facilitating
+H-reflexes
+in muscles
+thatsignificant
+have sigspasticity
+could compound
+the effect.
+Further
+studystudy
+is required
+for understanding
+the
+nificant spasticity
+could compound
+the effect.
+Further
+is required
+for understanding
+effects
+of
+multisite
+tSCS
+in
+individuals
+living
+with
+an
+SCI,
+as
+well
+as
+its
+effects
+on
+spasticity
+the effects of multisite tSCS in individuals living with an SCI, as well as its effects on spasboth
+a session
+and after
+ticitywithin
+both within
+a session
+andtraining.
+after training.
+
+Figure 5. Convergence across multiple spinal segments facilitates spinal and corticospinal excitabilFigure 5. Convergence across multiple spinal segments facilitates spinal and corticospinal excitability:
+ity: (A) The schematic highlights that simultaneous cervical and lumbar tSCS (yellow) significantly
+(A) The schematic highlights that simultaneous cervical and lumbar tSCS (yellow) significantly
+facilitates cervical spinal reflex and corticospinal excitability. (B) Spinal reflex excitability as asfacilitates cervical spinal reflex and corticospinal excitability. (B) Spinal reflex excitability as assessed
+sessed by the H-reflex in the flexor carpi radialis (FCR) muscle is significantly facilitated in the presby
+theofH-reflex
+in the
+flexorand
+carpi
+radialis
+(FCR)
+is significantly
+facilitated
+in the
+presence by
+of
+ence
+combined
+cervical
+lumbar
+tSCS.
+(C)muscle
+Similarly,
+corticospinal
+excitability
+as assessed
+combined
+cervical
+and
+lumbar
+tSCS.
+(C)
+Similarly,
+corticospinal
+excitability
+as
+assessed
+by
+MEPs
+in
+MEPs in the FCR elicited from the contralateral motor cortex was also significantly facilitated by
+the
+FCR elicited
+from
+contralateral
+motor
+cortex
+was also
+significantly
+facilitated
+combined
+cervical
+andthe
+lumbar
+tSCS. Panels
+(B,C)
+adapted
+from
+published data
+in [69].by combined
+cervical and lumbar tSCS. Panels (B,C) adapted from published data in [69].
+
+Interestingly, in neurologically intact study participants, modulated tSCS was unable
+to alter the excitability of either H-reflexes or MEPs when combined with either arm or
+leg cycling, regardless of whether single-site or multisite tSCS was applied [70,82]. This
+indicates that in neurologically intact individuals where interlimb coordination and the
+corticospinal tract are intact, the effects of arm or leg cycling on cervicolumbar coupling and
+corticospinal drive were not impacted significantly by the tSCS intensity used. Therefore, it
+will be a vital next step to determine the role that multisite tSCS has on interlimb connectiv-
+
+J. Clin. Med. 2022, 11, 639
+
+12 of 18
+
+ity after SCI. The potential impact of using multisite tSCS as a strategy to neuromodulate
+the spinal circuitry has significant implications in furthering our understanding of the mechanisms controlling posture and locomotion, and for regaining significant sensorimotor
+function even after neural injury.
+6. Is There a Role for tSCS to Facilitate Cervicolumbar Coupling to Improve Walking?
+Since single-site modulated tSCS alters excitability at remote segments of the spinal
+cord, and multisite modulated tSCS shows a significant convergence effect, it is possible
+that tSCS may influence coupling between the arms and legs after SCI. The coordination
+between the legs and arms is an inherent feature of locomotor neural networks [80], with
+coupling between the cervical (arms) and lumbar (legs) spinal networks (cervicolumbar
+coupling) well demonstrated in both animals and humans [95–97]. Oscillatory movements
+are governed by separate locomotor centers known as central pattern generators (CPGs),
+which are located in the cervical and lumbar spinal cord segments [76,89]. Similarly to
+quadrupedal mammals, a bidirectional linkage between the cervical and lumbar segments
+of the spinal cord during rhythmic movements is present in humans [86,87], facilitated
+primarily by propriospinal connections [83,88].
+Engaging these connections with simultaneous arm and leg (A&L) cycling training
+improves walking capacity after both chronic incomplete SCI [98] and stroke [99,100].
+Highlighting the importance of these interlimb connections, arms-only cycling has also
+been shown to improve overground walking function after stroke [101]. A&L cycling often
+capitalizes on the incompleteness of the injury to the spinal cord, even in cases where the
+injury is clinically classified as complete. The effect of neuromodulation is maximized
+when accompanied by a residual intact descending/ascending input. While the beneficial
+effects of rehabilitation strategies such as arm and leg cycling on cervicolumbar coupling
+after incomplete SCI and stroke have been outlined previously, little is known about severe
+cases when the injury to the spinal cord is clinically complete. Pairing tSCS with A&L
+cycling may allow for similar improvements in interlimb connections after complete SCI or
+multiple sclerosis. However, the impact of tSCS on propriospinal connectivity has yet to be
+investigated. Enhancing cervicolumbar connectivity by pairing A&L cycling with tSCS to
+improve mobility outcomes also remains a vital avenue for future research.
+7. Trunk Stability Improvements with tSCS
+While direct evidence of tSCS influencing remote segments of the spinal cord is
+limited, enhancing trunk stability—which is often an overlooked component—may provide
+indirect evidence of the influence of tSCS. Postural stability via regulation of trunk function
+is an integral part of locomotor control and a key element of the kinematic chain for
+reaching movements [102,103]. Modulation of lumbosacral networks via modulated tSCS
+has enabled individuals with various levels of SCI to stand without assistance from a
+therapist; more importantly, individuals showed improved postural control after repeated
+sessions of training, as demonstrated by an increased range of the center of pressure
+excursion during self-initiated body weight displacement [67]. As argued by the authors,
+biphasic pulses were perceived similarly to the sensation caused by monophasic pulses;
+however, biphasic stimulation could not enable unassisted standing, and was ineffective in
+producing motor output in the lower extremities, even at higher stimulation intensities [67].
+Although critical, this observation is limited to one specific task of the lower extremity using
+only a modulated waveform; thus, future investigation is necessary in order to compare
+the effects and the underlying mechanisms of monophasic and biphasic tSCS paradigms,
+in an effort to uncover the best stimulation paradigm for improving functional outcomes.
+Moreover, modulated tSCS applied to the lumbar region increased the level of activity
+in the trunk muscles, adjusted the abnormal sitting posture, and extended the limits of
+multidirectional seated displacement, overall enhancing postural control [104]. The ability
+of lumbar tSCS to improve muscle activity in the trunk and postural control provides
+indirect evidence for tSCS inducing meaningful effects across multiple segments within
+
+J. Clin. Med. 2022, 11, 639
+
+13 of 18
+
+the spinal cord. While further investigation is necessary in order to determine the specific
+pathways responsible for improved postural control, there is an additional incentive to
+pair tSCS with rehabilitation interventions in order to improve functions that are often
+overlooked in research and rehabilitation interventions.
+8. Previously Developed Rehabilitative Approaches Are Enhanced through tSCS
+Understanding the role of tSCS across multiple converging segments of the spinal
+cord is an important consideration when designing optimal rehabilitation interventions.
+The use of tSCS in conjunction with functional training appears imperative for optimizing
+functional recovery after SCI [17,27,32,105]. When tSCS (either modulated or unmodulated)
+and training are combined, functional changes emerge more rapidly and to a greater degree
+than with either method alone, making these strategies vital to one another’s success [27,32].
+Importantly, participants with SCI previously considered to be at maximal functional
+capacity following walking-based therapy were able to gain significant improvements in
+the 6 min and 10 m walking tests after incorporating unmodulated tSCS into a paired tSCSand walking-based therapy intervention [32]. Likewise, unmodulated tSCS as an adjunct to
+locomotor training was shown to improve walking outcomes in individuals with subacute
+motor-incomplete SCI [106]. Furthermore, pairing modulated tSCS with walking using
+an exoskeleton can improve lower limb coordination [105]. Positive synergistic effects of
+tSCS neuromodulation and previously successful rehabilitation strategies are a promising
+avenue for increasing what is currently possible for recovery after neurotrauma. This may
+be enhanced by further understanding of the unique properties of tSCS, and how it may
+modulate spinal circuitry differentially based on stimulation parameters and waveforms,
+muscles of interest, and desired functional outcomes.
+9. Conclusions and Future Directions
+Collectively, this work demonstrates that the activation of spinal cord networks with
+tSCS alters excitability over multiple segments of the spinal cord, with differential properties depending on the site, waveform, and parameters of tSCS. Importantly, multiple sites
+of tSCS converge to enhance the modulation of spinal reflex and corticospinal pathways
+in neurologically intact individuals. Clinical data also indicate that multi-segmental functional improvements occur after SCI. This highlights the potential for engaging cervical and
+lumbar spinal cord networks through tSCS to enhance the effectiveness of rehabilitation
+interventions. An essential next step in the evolution of tSCS research is determining
+the unique contributions of cutaneous mechanoreceptors, islet cells, dorsal root afferents,
+interneuronal projections, and large afferents in the dorsal horn, all of which likely contribute to neuromodulation with tSCS. Understanding the mechanisms of action with
+tSCS and potential differences in recruitment between modulated and unmodulated tSCS
+will provide the foundation with which to establish optimal concomitant rehabilitation
+therapy to improve sensorimotor function after neural injury or disease [66,107]. In general,
+tSCS appears to be a safe approach for modulating the excitability of neural networks of
+the spinal cord. Several studies have reported that the stimulation is well tolerated with
+minimal skin irritation or adverse changes in blood pressure, heart rate, spasticity, and/or
+incontinence [2,27]. However, two studies have reported side effects after tSCS including
+unintentional voiding during standing, skin damage and redness, fluctuation of blood
+pressure and heart rate, and nausea [63,105], and significant work is still required in order
+to ensure the safety of tSCS, including its application to locations where autonomic nerves
+are located. Specific caution should also be taken to ensure that tSCS is not applied to areas
+containing a metal implant or medical device, because the potential interactions between
+tSCS and such devices have not been explored [106].
+
+J. Clin. Med. 2022, 11, 639
+
+14 of 18
+
+Author Contributions: Conceptualization, T.S.B. and V.K.M.; literature review, T.S.B., J.P. and B.P.;
+writing—original draft preparation, T.S.B.; writing—review and editing, T.S.B., J.P., B.P. and V.K.M.;
+visualization, T.S.B., J.P. and B.P.; supervision, V.K.M.; project administration, V.K.M.; funding acquisition, T.S.B. and V.K.M. All authors have read and agreed to the published version of the manuscript.
+Funding: This research was funded by the Canadian Institutes of Health Research (CIHR; PS 166015),
+the Canada Foundation for Innovation (CFI; LEF 30852), and the Spinal Cord Injury Treatment Centre
+Society (SCITCS). B.P. holds a Faculty of Medicine and Dentistry Dean’s Doctoral Scholarship. T.B.
+holds a CIHR Postdoctoral Fellowship, a Craig H. Neilsen Postdoctoral Fellowship Research Grant,
+and an Alberta Innovates Postgraduate Fellowship in Health Innovation. V.K.M. is a Canada Research
+Chair in Functional Restoration.
+Institutional Review Board Statement: All studies from our lab discussed in this review were
+conducted according to the guidelines of the Declaration of Helsinki, and approved by the Human
+Research Ethics Board of the University of Alberta.
+Informed Consent Statement: Informed consent was obtained from all study participants involved
+in published works completed within our laboratory and discussed in this review.
+Data Availability Statement: Processed data from reference [60] can be accessed in the Open Data
+Commons for Spinal Cord Injury at http://dx.doi.org/10.34945/F5B59T that was published on 9
+March 2021 [108], and last accessed on 17 January 2022.
+Acknowledgments: The experiments described in this review were conducted in the Rehabilitation
+Innovations Core of the Sensory Motor Adaptive Rehabilitation Technology (SMART) Network at the
+University of Alberta.
+Conflicts of Interest: The authors declare no conflict of interest.
+
+References
+1.
+
+2.
+
+3.
+
+4.
+5.
+6.
+7.
+
+8.
+
+9.
+
+10.
+11.
+12.
+
+13.
+
+Balykin, M.V.; Yakupov, R.N.; Mashin, V.V.; Kotova, E.Y.; Balykin, Y.M.; Gerasimenko, Y.P. The influence of non-invasive electrical
+stimulation of the spinal cord on the locomotor function of patients presenting with movement disorders of central genesis. Vopr.
+Kurortol. Fizioter. Lech. Fiz. Kult. 2017, 94, 4–9. [CrossRef] [PubMed]
+Inanici, F.; Samejima, S.; Gad, P.; Edgerton, V.R.; Hofstetter, C.P.; Moritz, C.T. Transcutaneous electrical spinal stimulation
+promotes long-term recovery of upper extremity function in chronic tetraplegia. IEEE Trans. Neural Syst. Rehabil. Eng. 2018, 26,
+1272–1278. [CrossRef] [PubMed]
+Harkema, S.; Gerasimenko, Y.; Hodes, J.; Burdick, J.; Angeli, C.; Chen, Y.; Ferreira, C.; Willhite, A.; Rejc, E.; Grossman, R.; et al.
+Effect of Epidural stimulation of the lumbosacral spinal cord on voluntary movement, standing, and assisted stepping after motor
+complete paraplegia: A case study. Lancet 2011, 377, 1938–1947. [CrossRef]
+Angeli, C.A.; Boakye, M.; Morton, R.A.; Vogt, J.; Benton, K.; Chen, Y.; Ferreira, C.K.; Harkema, S.J. Recovery of over-ground
+walking after chronic motor complete spinal cord injury. N. Engl. J. Med. 2018, 379, 1244–1250. [CrossRef] [PubMed]
+Fregni, F.; Grecco, L.; Li, S.; Michel, S.; Castillo-Saavedra, L.; Mourdoukoutas, A.; Bikson, M. Transcutaneous spinal stimulation as
+a therapeutic strategy for spinal cord injury: State of the art. J. Neurorestoratol. 2015, 3, 73–82. [CrossRef]
+Dimitrijević, M.R. Residual motor functions in spinal cord injury. Adv. Neurol. 1988, 47, 138–155.
+Courtine, G.; Roy, R.R.; Raven, J.; Hodgson, J.; Mckay, H.; Yang, H.; Zhong, H.; Tuszynski, M.H.; Edgerton, V.R. Performance of
+locomotion and foot grasping following a unilateral thoracic corticospinal tract lesion in monkeys (Macaca mulatta). Brain 2005,
+128, 2338–2358. [CrossRef]
+Friedli, L.; Rosenzweig, E.S.; Barraud, Q.; Schubert, M.; Dominici, N.; Awai, L.; Nielson, J.L.; Musienko, P.; Nout-Lomas, Y.;
+Zhong, H.; et al. Pronounced species divergence in corticospinal tract reorganization and functional recovery after lateralized
+spinal cord injury favors primates. Sci. Transl. Med. 2015, 7, 302ra134. [CrossRef]
+Rosenzweig, E.S.; Courtine, G.; Jindrich, D.L.; Brock, J.H.; Ferguson, A.R.; Strand, S.C.; Nout, Y.S.; Roy, R.R.; Miller, D.M.; Beattie,
+M.S.; et al. Extensive spontaneous plasticity of corticospinal projections after primate spinal cord injury. Nat. Neurosci. 2010, 13,
+1505–1512. [CrossRef]
+Courtine, G.; Song, B.; Roy, R.R.; Zhong, H.; Herrmann, J.E.; Ao, Y.; Qi, J.; Edgerton, V.R.; Sofroniew, M.V. Recovery of supraspinal
+control of stepping via indirect propriospinal relay connections after spinal cord injury. Nat. Med. 2008, 14, 69–74. [CrossRef]
+Gerasimenko, Y.; Musienko, P.; Bogacheva, I.; Moshonkina, T.; Savochin, A.; Lavrov, I.; Roy, R.R.; Edgerton, V.R. Propriospinal
+bypass of the serotonergic system that can facilitate stepping. J. Neurosci. 2009, 29, 5681–5689. [CrossRef] [PubMed]
+Asboth, L.; Friedli, L.; Beauparlant, J.; Martinez-Gonzalez, C.; Anil, S.; Rey, E.; Baud, L.; Pidpruzhnykova, G.; Anderson, M.A.;
+Shkorbatova, P.; et al. Cortico-reticulo-spinal circuit reorganization enables functional recovery after severe spinal cord contusion.
+Nat. Neurosci. 2018, 21, 576–588. [CrossRef] [PubMed]
+Mayr, W.; Krenn, M.; Dimitrijevic, M.R. Epidural and transcutaneous spinal electrical stimulation for restoration of movement
+after incomplete and complete spinal cord injury. Curr. Opin. Neurol. 2016, 29, 721–726. [CrossRef] [PubMed]
+
+J. Clin. Med. 2022, 11, 639
+
+14.
+
+15.
+16.
+
+17.
+18.
+
+19.
+
+20.
+21.
+22.
+23.
+24.
+25.
+
+26.
+27.
+28.
+29.
+30.
+
+31.
+
+32.
+
+33.
+34.
+35.
+36.
+37.
+38.
+
+15 of 18
+
+Formento, E.; Minassian, K.; Wagner, F.; Mignardot, J.B.; Le Goff-Mignardot, C.G.; Rowald, A.; Bloch, J.; Micera, S.; Capogrosso, M.;
+Courtine, G. Electrical spinal cord stimulation must preserve proprioception to enable locomotion in humans with spinal cord
+injury. Nat. Neurosci. 2018, 21, 1728–1741. [CrossRef]
+Herman, R.; He, J.; D’Luzansky, S.; Willis, W.; Dilli, S. Spinal cord stimulation facilitates functional walking in a chronic,
+incomplete spinal cord injured. Spinal Cord 2002, 40, 65–68. [CrossRef]
+Wagner, F.B.; Mignardot, J.B.; Le Goff-Mignardot, C.G.; Demesmaeker, R.; Komi, S.; Capogrosso, M.; Rowald, A.; Seáñez, I.;
+Caban, M.; Pirondini, E.; et al. Targeted neurotechnology restores walking in humans with spinal cord injury. Nature 2018, 563,
+65–93. [CrossRef]
+Kou, J.; Cai, M.; Xie, F.; Wang, Y.; Wang, N.; Xu, M. Complex Electrical Stimulation Systems in Motor Function Rehabilitation after
+Spinal Cord Injury. Hindawi 2021, 2021, 2214762. [CrossRef]
+Gill, M.L.; Grahn, P.J.; Calvert, J.S.; Linde, M.B.; Lavrov, I.A.; Strommen, J.A.; Beck, L.A.; Sayenko, D.G.; Van Straaten, M.G.;
+Drubach, D.I.; et al. Neuromodulation of lumbosacral spinal networks enables independent stepping after complete paraplegia.
+Nat. Med. 2018, 24, 1677–1682. [CrossRef]
+Courtine, G.; Gerasimenko, Y.; Van Den Brand, R.; Yew, A.; Zhong, H.; Song, B.; Ao, Y.; Ichiyama, R.M.; Lavrov, I.; Roy, R.R.; et al.
+Transformation of nonfunctional spinal circuits into functional states after the loss of brain input. Nat. Neurosci. 2009, 12,
+1333–1342. [CrossRef]
+Angeli, C.A.; Edgerton, V.R.; Gerasimenko, Y.P.; Harkema, S.J. Altering spinal cord excitability enables voluntary movements
+after chronic complete paralysis in humans. Brain 2014, 137, 1394–1409. [CrossRef]
+García, A.M.; Serrano-Muñoz, D.; Taylor, J.; Avendaño-Coy, J.; Gómez-Soriano, J. Transcutaneous Spinal Cord Stimulation and
+Motor Rehabilitation in Spinal Cord Injury: A Systematic Review. Neurorehabil. Neural Repair 2020, 34, 3–12. [CrossRef] [PubMed]
+Gerasimenko, Y.; Gorodnichev, R.; Moshonkina, T.; Sayenko, D.; Gad, P.; Edgerton, V.R. Transcutaneous electrical spinal-cord
+stimulation in humans HHS Public Access. Ann. Phys. Rehabil. Med. 2015, 58, 225–231. [CrossRef] [PubMed]
+Martin, R. Utility and Feasibility of Transcutaneous Spinal Cord Stimulation for Patients with Incomplete SCI in Therapeutic
+Settings: A Review of Topic. Front. Rehabil. Sci. 2021, 2, 724003. [CrossRef]
+Hofstoetter, U.S.; Freundl, B.; Binder, H.; Minassian, K. Common neural structures activated by epidural and transcutaneous
+lumbar spinal cord stimulation: Elicitation of posterior root-muscle reflexes. PLoS ONE 2018, 13, e0192013. [CrossRef] [PubMed]
+Ladenbauer, J.; Minassian, K.; Hofstoetter, U.S.; Dimitrijevic, M.R.; Rattay, F. Stimulation of the human lumbar spinal cord
+with implanted and surface electrodes: A computer simulation study. IEEE Trans. Neural Syst. Rehabil. Eng. 2010, 18, 637–645.
+[CrossRef]
+Danner, S.M.; Hofstoetter, U.S.; Ladenbauer, J.; Rattay, F.; Minassian, K. Can the Human Lumbar Posterior Columns Be Stimulated
+by Transcutaneous Spinal Cord Stimulation? A Modeling Study. Artif. Organs 2011, 35, 257–262. [CrossRef]
+Gad, P.; Lee, S.; Terrafranca, N.; Zhong, H.; Turner, A.; Gerasimenko, Y.; Edgerton, V.R. Non-invasive activation of cervical spinal
+networks after severe paralysis. J. Neurotrauma 2018, 35, 2145–2158. [CrossRef]
+Zheng, Y.; Hu, X. Elicited upper limb motions through transcutaneous cervical spinal cord stimulation. J. Neural Eng. 2020, 17,
+036001. [CrossRef]
+Inanici, F.; Brighton, L.N.; Samejima, S.; Hofstetter, C.P.; Moritz, C.T. Transcutaneous Spinal Cord Stimulation Restores Hand and
+Arm Function after Spinal Cord Injury. IEEE Trans. Neural Syst. Rehabil. Eng. 2021, 29, 310–319. [CrossRef]
+Gerasimenko, Y.P.; Lu, D.C.; Modaber, M.; Zdunowski, S.; Gad, P.; Sayenko, D.G.; Morikawa, E.; Haakana, P.; Ferguson, A.R.;
+Roy, R.R.; et al. Noninvasive Reactivation of Motor Descending Control after Paralysis. J. Neurotrauma 2015, 32, 1968–1980.
+[CrossRef]
+Solopova, I.A.; Sukhotina, I.A.; Zhvansky, D.S.; Ikoeva, G.A.; Vissarionov, S.V.; Baindurashvili, A.G.; Edgerton, V.R.; Gerasimenko,
+Y.P.; Moshonkina, T.R. Effects of spinal cord stimulation on motor functions in children with cerebral palsy. Neurosci. Lett. 2017,
+639, 192–198. [CrossRef] [PubMed]
+McHugh, L.V.; Miller, A.A.; Leech, K.A.; Salorio, C.; Martin, R.H. Feasibility and utility of transcutaneous spinal cord stimulation
+combined with walking-based therapy for people with motor incomplete spinal cord injury. Spinal Cord Ser. Cases 2020, 6, 104.
+[CrossRef] [PubMed]
+Hofstoetter, U.S.; Freundl, B.; Danner, S.M.; Krenn, M.J.; Mayr, W. Transcutaneous Spinal Cord Stimulation Induces Temporary
+Attenuation of Spasticity in Individuals with Spinal Cord Injury. J. Neurotrauma 2020, 493, 481–493. [CrossRef] [PubMed]
+Madhavan, S.; Hofstoetter, U.; Estes, S.P.; Iddings, J.A.; Field-Fote, E.C. Priming neural circuits to Modulate spinal reflex
+excitability. Front. Neurol. 2017, 8, 17. [CrossRef]
+Cogiamanian, F.; Ardolino, G.; Vergari, M.; Ferrucci, R.; Ciocca, M.; Scelzo, E.; Barbieri, S.; Priori, A. Transcutaneous Spinal Direct
+Current Stimulation. Front. Psychiatry 2012, 3, 63. [CrossRef]
+Powell, E.S.; Carrico, C.; Salyers, E.; Westgate, P.M.; Sawaki, L. The effect of transcutaneous spinal direct current stimulation on
+corticospinal excitability in chronic incomplete spinal cord injury. NeuroRehabilitation 2018, 43, 125–134. [CrossRef]
+Taylor, C.; McHugh, C.; Mockler, D.; Minogue, C.; Reilly, R.B.; Fleming, N. Transcutaneous spinal cord stimulation and motor
+responses in individuals with spinal cord injury: A methodological review. PLoS ONE 2021, 16, e0260166. [CrossRef]
+Mushahwar, V.K.; Horch, K.W. Proposed specifications for a lumbar spinal cord electrode array for control of lower extremities in
+paraplegia. IEEE Trans. Rehabil. Eng. 1997, 5, 237–243. [CrossRef]
+
+J. Clin. Med. 2022, 11, 639
+
+39.
+40.
+41.
+42.
+43.
+44.
+45.
+46.
+47.
+48.
+49.
+50.
+51.
+52.
+53.
+
+54.
+55.
+56.
+
+57.
+58.
+59.
+60.
+
+61.
+62.
+63.
+
+64.
+65.
+66.
+
+16 of 18
+
+Mushahwar, V.K.; Jacobs, P.L.; Normann, R.A.; Triolo, R.J.; Kleitman, N. New functional electrical stimulation approaches to
+standing and walking. J. Neural Eng. 2007, 4, S181–S197. [CrossRef]
+Shealy, C.N.; Mortimer, J.T.; Reswick, J.B. Electrical Inhibition of Pain by Stimulation of the Dorsal Columns: Preliminary Clinical
+Report. Available online: https://pubmed.ncbi.nlm.nih.gov/4952225/ (accessed on 19 November 2020).
+Cook, A.W.; Weinstein, S.P. Chronic dorsal column stimulation in multiple sclerosis. Preliminary report. N. Y. State J. Med. 1973,
+73, 2868–2872.
+Richardson, R.R.; Cerullo, L.J.; McLone, D.G.; Gutierrez, F.A.; Lewis, V. Percutaneous epidural neurostimulation in modulation of
+paraplegic spasticity—Six case reports. Acta Neurochir. 1979, 49, 235–243. [CrossRef] [PubMed]
+Richardson, R.R.; McLone, D.G. Percutaneous epidural neurostimulation for paraplegic spasticity. Surg. Neurol. 1978, 9, 153–155.
+[PubMed]
+Pinter, M.M.; Gerstenbrand, F.; Dimitrijevic, M.R. Epidural electrical stimulation of posterior structures of the human lumbosacral
+cord: 3. Control Of spasticity. Spinal Cord 2000, 38, 524–531. [CrossRef] [PubMed]
+Andersson, O.; Forssberg, H.; Grillner, S.; Lindquist, M. Phasic gain control of the transmission in cutaneous reflex pathways to
+motoneurones during “fictive” locomotion. Brain Res 1978, 149, 503–507. [CrossRef]
+Grillner, S.; Zangger, P. On the central generation of locomotion in the low spinal cat. Exp. Brain Res. 1979, 34, 241–261. [CrossRef]
+Huang, H.; He, J.; Herman, R.; Carhart, M.R. Modulation effects of epidural spinal cord stimulation on muscle activities during
+walking. IEEE Trans. Neural Syst. Rehabil. Eng. 2006, 14, 14–23. [CrossRef]
+Carhart, M.R.; He, J.; Herman, R.; D’Luzansky, S.; Willis, W.T. Epidural Spinal-Cord Stimulation Facilitates Recovery of Functional
+Walking Following Incomplete Spinal-Cord Injury. IEEE Trans. Neural Syst. Rehabil. Eng. 2004, 12, 32–42. [CrossRef]
+Rattay, F.; Minassian, K.; Dimitrijevic, M.R. Epidural electrical stimulation of posterior structures of the human lumbosacral cord:
+2. Quantitative analysis by computer modeling. Spinal Cord 2000, 38, 473–489. [CrossRef]
+De Noordhout, A.M.; Rothwell, J.C.; Thompson, P.D.; Marsden, C.D. Percutaneous electrical stimulation of lumbosacral roots in
+man. Neurosurg. Psychiatry 1988, 51, 174–181. [CrossRef]
+Shapkova, E. Spinal locomotor capability revealed by electrical stimulation of the lumbar enlargement in paraplegic patients.
+Prog. Mot. Control 2004, 3, 253–289.
+Minassian, K.; Persy, I.; Rattay, F.; Dimitrijevic, M.; Hofer, C.; Kern, H. Posterior root–muscle reflexes elicited by transcutaneous
+stimulation of the human lumbosacral cord. Muscle Nerve 2007, 35, 327–336. [CrossRef] [PubMed]
+Hofstoetter, U.; Hofer, C.; Kern, H.; Danner, S.; Mayr, W.; Dimitrijevic, M.; Minassian, K. Effects of transcutaneous spinal
+cord stimulation on voluntary locomotor activity in an incomplete spinal cord injured individual. Biomed. Tech. 2013, 58, 2–3.
+[CrossRef] [PubMed]
+Hofstoetter, U.S.; McKay, W.B.; Tansey, K.E.; Mayr, W.; Kern, H.; Minassian, K. Modification of spasticity by transcutaneous spinal
+cord stimulation in individuals with incomplete spinal cord injury. J. Spinal Cord Med. 2014, 37, 202–211. [CrossRef] [PubMed]
+Ward, A.R.; Robertson, V.J. Sensory, motor, and pain thresholds for stimulation with medium frequency alternating current. Arch.
+Phys. Med. Rehabil. 1998, 79, 273–278. [CrossRef]
+Manson, G.A.; Calvert, J.S.; Ling, J.; Tychhon, B.; Ali, A.; Sayenko, D.G. The relationship between maximum tolerance and motor
+activation during transcutaneous spinal stimulation is unaffected by the carrier frequency or vibration. Physiol. Rep. 2020, 8, e14397.
+[CrossRef]
+Jensen, M.P.; Brownstone, R.M. Mechanisms of spinal cord stimulation for the treatment of pain: Still in the dark after 50 years.
+Eur. J. Pain (United Kingdom) 2019, 23, 652–659. [CrossRef]
+Burke, D. Clinical uses of H reflexes of upper and lower limb muscles. Clin. Neurophysiol. Pract. 2016, 1, 9. [CrossRef]
+Lavrov, I.; Gerasimenko, Y.P.; Ichiyama, R.M.; Courtine, G.; Zhong, H.; Roy, R.R.; Edgerton, V.R. Plasticity of spinal cord reflexes
+after a complete transection in adult rats: Relationship to stepping ability. J. Neurophysiol. 2006, 96, 1699–1710. [CrossRef]
+Wu, G.; Ringkamp, M.; Murinson, B.B.; Pogatzki, E.M.; Hartke, T.V.; Weerahandi, H.M.; Campbell, J.N.; Griffin, J.W.; Meyer, R.A.
+Degeneration of myelinated efferent fibers induces spontaneous activity in uninjured C-fiber afferents. J. Neurosci. 2002, 22,
+7746–7753. [CrossRef]
+Ahmed, S.; Yearwood, T.; De Ridder, D.; Vanneste, S. Burst and high frequency stimulation: Underlying mechanism of action.
+Expert Rev. Med. Devices 2018, 15, 61–70. [CrossRef]
+Arle, J.E.; Mei, L.; Carlson, K.W.; Shils, J.L. High-Frequency Stimulation of Dorsal Column Axons: Potential Underlying
+Mechanism of Paresthesia-Free Neuropathic Pain Relief. Neuromodulation 2016, 19, 385–397. [CrossRef] [PubMed]
+North, J.M.; Hong, K.S.J.; Cho, P.Y. Clinical Outcomes of 1 kHz Subperception Spinal Cord Stimulation in Implanted Patients with
+Failed Paresthesia-Based Stimulation: Results of a Prospective Randomized Controlled Trial. Neuromodulation Technol. Neural
+Interface 2016, 19, 731–737. [CrossRef] [PubMed]
+Chakravarthy, K.; Richter, H.; Christo, P.J.; Williams, K.; Guan, Y. Spinal Cord Stimulation for Treating Chronic Pain: Reviewing
+Preclinical and Clinical Data on Paresthesia-Free High-Frequency Therapy. Neuromodulation 2018, 21, 10–18. [CrossRef] [PubMed]
+Benavides, F.D.; Jo, H.J.; Lundell, H.; Edgerton, V.R.; Gerasimenko, Y.; Perez, M.A. Cortical and subcortical effects of transcutaneous spinal cord stimulation in humans with tetraplegia. J. Neurosci. 2020, 40, 2633–2643. [CrossRef]
+Sayenko, D.G.; Rath, M.; Ferguson, A.R.; Burdick, J.W.; Havton, L.A.; Edgerton, V.R.; Gerasimenko, Y.P. Self-assisted standing
+enabled by non-invasive spinal stimulation after spinal cord injury. J. Neurotrauma 2019, 36, 1435–1450. [CrossRef]
+
+J. Clin. Med. 2022, 11, 639
+
+67.
+68.
+69.
+70.
+
+71.
+
+72.
+73.
+74.
+75.
+76.
+
+77.
+
+78.
+79.
+80.
+81.
+82.
+83.
+84.
+85.
+86.
+87.
+88.
+89.
+90.
+91.
+
+92.
+
+93.
+
+17 of 18
+
+Milosevic, M.; Masugi, Y.; Sasaki, A.; Sayenko, D.G.; Nakazawa, K. On the reflex mechanisms of cervical transcutaneous spinal
+cord stimulation in human subjects. J. Neurophysiol. 2019, 121, 1672–1679. [CrossRef]
+Sayenko, D.G.; Angeli, C.; Harkema, S.J.; Reggie Edgerton, V.; Gerasimenko, Y.P. Neuromodulation of evoked muscle potentials
+induced by epidural spinal-cord stimulation in paralyzed individuals. J. Neurophysiol. 2014, 111, 1088–1099. [CrossRef]
+Parhizi, B.; Barss, T.S.; Mushahwar, V.K. Simultaneous Cervical and Lumbar Spinal Cord Stimulation Induces Facilitation of both
+Spinal and Corticospinal Circuitry in Humans. Front. Neurosci. 2021, 15, 379. [CrossRef]
+Al’joboori, Y.; Hannah, R.; Lenham, F.; Borgas, P.; Kremers, C.J.P.; Bunday, K.L.; Rothwell, J.; Duffell, L.D. The Immediate and
+Short-Term Effects of Transcutaneous Spinal Cord Stimulation and Peripheral Nerve Stimulation on Corticospinal Excitability.
+Front. Neurosci. 2021, 15, 749042. [CrossRef]
+Sasaki, A.; de Freitas, R.M.; Sayenko, D.G.; Masugi, Y.; Nomura, T.; Nakazawa, K.; Milosevic, M. Low-intensity and short-duration
+continuous cervical transcutaneous spinal cord stimulation intervention does not prime the corticospinal and spinal reflex
+pathways in able-bodied subjects. J. Clin. Med. 2021, 10, 3633. [CrossRef]
+Macefield, G.; Gandevia, S.C.; Burke, D. Conduction velocities of muscle and cutaneous afferents in the upper and lower limbs of
+human subjects. Brain 1989, 112, 1519–1532. [CrossRef] [PubMed]
+Rijken, N.H.M.; Vonhögen, L.H.; Duysens, J.; Keijsers, N.L.W. The effect of spinal cord stimulation (SCS) on static balance and
+gait. Neuromodulation 2013, 16, 244–250. [CrossRef] [PubMed]
+Dubuisson, D. Effect of dorsal-column stimulation on gelatinosa and marginal neurons of cat spinal cord. J. Neurosurg. 1989, 70,
+257–265. [CrossRef] [PubMed]
+Zehr, E.P.; Stein, R.B. What functions do reflexes serve during human locomotion? Prog. Neurobiol. 1999, 58, 185–205. [CrossRef]
+Zehr, E.P.; Barss, T.S.; Dragert, K.; Frigon, A.; Vasudevan, E.V.; Haridas, C.; Hundza, S.; Kaupp, C.; Klarner, T.; Klimstra, M.; et al.
+Neuromechanical interactions between the limbs during human locomotion: An evolutionary perspective with translation to
+rehabilitation. Exp. Brain Res. 2016, 234, 3059–3081. [CrossRef]
+Beekhuizen, K.S.; Field-Fote, E.C. Massed practice versus massed practice with stimulation: Effects on upper extremity function
+and cortical plasticity in individuals with incomplete cervical spinal cord injury. Neurorehabil. Neural Repair 2005, 19, 33–45.
+[CrossRef]
+Duysens, J.; Pearson, K.G. The role of cutaneous afferents from the distal hindlimb in the regulation of the step cycle of thalamic
+cats. Exp. Brain Res. 1976, 24, 245–255. [CrossRef]
+Vallbo, Å.B.; Hagbarth, K.-E. Activity from Skin Percutaneously Mechanoreceptors in Awake Human Recorded Subjects. Exp.
+Neurol. 1968, 289, 270–289. [CrossRef]
+Guiho, T.; Baker, S.N.; Jackson, A. Epidural and transcutaneous spinal cord stimulation facilitates descending inputs to upper-limb
+motoneurons in monkeys. J. Neural Eng. 2021, 18, 046011. [CrossRef]
+Kaneko, N.; Sasaki, A.; Masugi, Y.; Nakazawa, K. The Effects of Paired Associative Stimulation with Transcutaneous Spinal Cord
+Stimulation on Corticospinal Excitability in Multiple Lower-limb Muscles. Neuroscience 2021, 476, 45–59. [CrossRef]
+Barss, T.S.; Parhizi, B.; Mushahwar, V.K. Transcutaneous spinal cord stimulation of the cervical cord modulates lumbar networks.
+J. Neurophysiol. 2020, 123, 158–166. [CrossRef] [PubMed]
+Ferris, D.P.; Huang, H.J.; Kao, P.C. Moving the arms to activate the legs. Exerc. Sport Sci. Rev. 2006, 34, 113–120. [CrossRef]
+[PubMed]
+Hundza, S.R.; Zehr, E.P. Suppression of soleus H-reflex amplitude is graded with frequency of rhythmic arm cycling. Exp. Brain
+Res. 2009, 193, 297–306. [CrossRef] [PubMed]
+Zhou, R.; Parhizi, B.; Assh, J.; Alvarado, L.; Ogilvie, R.; Chong, S.L.; Mushahwar, V.K. Effect of cervicolumbar coupling on spinal
+reflexes during cycling after incomplete spinal cord injury. J. Neurophysiol. 2018, 120, 3172–3186. [CrossRef]
+Dietz, V. Do human bipeds use quadrupedal coordination? Trends Neurosci. 2002, 25, 462–467. [CrossRef]
+Zehr, E.P.; Hundza, S.R.; Vasudevan, E. V The quadrupedal nature of human bipedal locomotion. Exerc. Sport Sci. Rev. 2009, 37,
+102–108. [CrossRef]
+Frigon, A.; Collins, D.F.; Zehr, E.P. Effect of rhythmic arm movement on reflexes in the legs: Modulation of soleus H-reflexes and
+somatosensory conditioning. J. Neurophysiol. 2004, 91, 1516–1523. [CrossRef]
+Frigon, A. The neural control of interlimb coordination during mammalian locomotion. J. Neurophysiol. 2017, 117, 2224–2241.
+[CrossRef]
+de Ruiter, G.C.; Hundza, S.R.; Zehr, E.P. Phase-dependent modulation of soleus H-reflex amplitude induced by rhythmic arm
+cycling. Neurosci. Lett. 2010, 475, 7–11. [CrossRef]
+Gorodnichev, R.M.; Pivovarova, E.A.; Pukhov, A.; Moiseev, S.A.; Savokhin, A.A.; Moshonkina, T.R.; Shcherbakova, N.A.; Kilimnik,
+V.A.; Selionov, V.A.; Kozlovskaia, I.B.; et al. Transcutaneous electrical stimulation of the spinal cord: Non-invasive tool for
+activation of locomotor circuitry in human. Fiziol. Cheloveka 2012, 38, 46–56.
+Gerasimenko, Y.; Gorodnichev, R.; Puhov, A.; Moshonkina, T.; Savochin, A.; Selionov, V.; Roy, R.R.; Lu, D.C.; Edgerton, V.R.
+Initiation and modulation of locomotor circuitry output with multisite transcutaneous electrical stimulation of the spinal cord in
+noninjured humans. J. Neurophysiol. 2015, 113, 834–842. [CrossRef] [PubMed]
+Sayenko, D.G.; Atkinson, D.A.; Floyd, T.C.; Gorodnichev, R.M.; Moshonkina, T.R.; Harkema, S.J.; Edgerton, V.R.; Gerasimenko, Y.P.
+Effects of paired transcutaneous electrical stimulation delivered at single and dual sites over lumbosacral spinal cord. Neurosci.
+Lett. 2015, 609, 229–234. [CrossRef] [PubMed]
+
+J. Clin. Med. 2022, 11, 639
+
+18 of 18
+
+Rothwell, J. Control of Human Voluntary Movement, 2nd ed.; Chapman & Hall: London, UK, 1994.
+Yamaguchi, T. Descending pathways eliciting forelimb stepping in the lateral funiculus: Experimental studies with stimulation
+and lesion of the cervical cord in decerebrate cats. Brain Res. 1986, 379, 125–136. [CrossRef]
+96. Juvin, L.; Simmers, J.; Morin, D. Propriospinal circuitry underlying interlimb coordination in mammalian quadrupedal locomotion.
+J. Neurosci. 2005, 25, 6025–6035. [CrossRef]
+97. Juvin, L.; Le Gal, J.-P.; Simmers, J.; Morin, D. Cervicolumbar coordination in mammalian quadrupedal locomotion: Role of spinal
+thoracic circuitry and limb sensory inputs. J. Neurosci. 2012, 32, 953–965. [CrossRef]
+98. Zhou, R.; Alvarado, L.; Ogilvie, R.; Chong, S.L.; Shaw, O.; Mushahwar, V.K. Non-gait-specific intervention for the rehabilitation of
+walking after SCI: Role of the arms. J. Neurophysiol. 2018, 119, 2194–2211. [CrossRef]
+99. Klarner, T.; Barss, T.S.; Sun, Y.; Kaupp, C.; Loadman, P.M.; Zehr, E.P. Exploiting Interlimb Arm and Leg Connections for Walking
+Rehabilitation: A Training Intervention in Stroke. Neural Plast. 2016, 2016, 1517968. [CrossRef]
+100. Klarner, T.; Barss, T.; Sun, Y.; Kaupp, C.; Loadman, P.; Zehr, E. Long-Term Plasticity in Reflex Excitability Induced by Five Weeks
+of Arm and Leg Cycling Training after Stroke. Brain Sci. 2016, 6, 54. [CrossRef]
+101. Kaupp, C.; Pearcey, G.E.P.; Klarner, T.; Sun, Y.; Cullen, H.; Barss, T.S.; Zehr, E.P. Rhythmic arm cycling training improves walking
+and neurophysiological integrity in chronic stroke: The arms can give legs a helping hand in rehabilitation. J. Neurophysiol. 2018,
+119, 1095–1112. [CrossRef]
+102. Robertson, J.V.G.; Roby-Brami, A. The trunk as a part of the kinematic chain for reaching movements in healthy subjects and
+hemiparetic patients. Brain Res. 2011, 1382, 137–146. [CrossRef]
+103. Cetisli Korkmaz, N.; Can Akman, T.; Kilavuz Oren, G.; Bir, L.S. Trunk control: The essence for upper limb functionality in patients
+with multiple sclerosis. Mult. Scler. Relat. Disord. 2018, 24, 101–106. [CrossRef] [PubMed]
+104. Rath, M.; Vette, A.H.; Ramasubramaniam, S.; Li, K.; Burdick, J.; Edgerton, V.R.; Gerasimenko, Y.P.; Sayenko, D.G. Trunk Stability
+Enabled by Noninvasive Spinal Electrical Stimulation after Spinal Cord Injury. J. Neurotrauma 2018, 35, 2540–2553. [CrossRef]
+[PubMed]
+105. Gad, P.; Gerasimenko, Y.; Zdunowski, S.; Turner, A.; Sayenko, D.; Lu, D.C.; Edgerton, V.R. Weight bearing over-ground stepping
+in an exoskeleton with non-invasive spinal cord neuromodulation after motor complete paraplegia. Front. Neurosci. 2017, 11, 333.
+[CrossRef]
+106. Estes, S.; Zarkou, A.; Hope, J.M.; Suri, C.; Field-Fote, E.C. Combined transcutaneous spinal stimulation and locomotor training to
+improve walking function and reduce spasticity in subacute spinal cord injury: A randomized study of clinical feasibility and
+efficacy. J. Clin. Med. 2021, 10, 1167. [CrossRef]
+107. Wu, Y.K.; Levine, J.M.; Wecht, J.R.; Maher, M.T.; LiMonta, J.M.; Saeed, S.; Santiago, T.M.; Bailey, E.; Kastuar, S.; Guber, K.S.; et al.
+Posteroanterior cervical transcutaneous spinal stimulation targets ventral and dorsal nerve roots. Clin. Neurophysiol. 2020, 131,
+451–460. [CrossRef] [PubMed]
+108. Parhizi, B.; Barss, T.S.; Mushahwar, V.K. Alteration of H-reflex and MEP amplitude in the flexor carpi radialis muscle with
+transcutaneous spinal cord stimulation during static and leg cycling tasks in neurologically intact male and female humans. Front.
+Neurosci. 2021, 15, 379. [CrossRef]
+94.
+95.
+
+

@@ -1,0 +1,48 @@
+{
+    "filename": null,
+    "publication": "Hope, J. M., & Field-Fote, E. C. (2023). Assessment of Dorsiflexion Ability across Tasks in Persons with Subacute SCI after Combined Locomotor Training and Transcutaneous Spinal Stimulation. Bioengineering (Basel, Switzerland), 10(5), 528. https://doi.org/10.3390/bioengineering10050528",
+    "study_focus": "Assessment of dorsiflexion ability across tasks in persons with subacute SCI after combined locomotor training and transcutaneous spinal stimulation.",
+    "population": {
+        "sample_size": 10,
+        "sex_breakdown": "9 male, 1 female",
+        "age_range_years": "16–65",
+        "condition": null,
+        "time_since_injury": "2–6 months",
+        "inclusion_criteria": "qualify for participation in a clinical LT program as determined by their physical therapist, and able to walk 10 m without the use of an ankle–foot orthosis.",
+        "exclusion_criteria": null
+    },
+    "therapy": {
+        "modality": "Combined Locomotor Training (LT) and Transcutaneous Spinal Stimulation (TSS)",
+        "amplitude_mA": null,
+        "frequency_Hz": null,
+        "pulse_width_us": null,
+        "duration_min_per_session": null,
+        "sessions_per_week": null,
+        "electrode_active": null,
+        "electrode_reference": null,
+        "concurrent_training": "walking overground along a 10 m walkway"
+    },
+    "measurements": [
+        {
+            "variable": null,
+            "instrument": null,
+            "units": null,
+            "protocol": null
+        }
+    ],
+    "experimental_conditions": "overground walk, 10 m, no AFO",
+    "results": [
+        {
+            "outcome": null,
+            "group": null,
+            "timepoint": null,
+            "value": null
+        }
+    ],
+    "statistics": {
+        "tests_used": null,
+        "effect_sizes": null,
+        "significance_level": null
+    },
+    "discussion_summary": []
+}
