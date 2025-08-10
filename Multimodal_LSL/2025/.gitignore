@@ -4,3 +4,4 @@ __pycache__/
 emg-recordings/*
 !emg-recordings/.gitkeep
 dataset/*
+peak_verification_plots/
