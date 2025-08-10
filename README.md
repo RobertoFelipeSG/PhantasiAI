@@ -21,4 +21,4 @@ PhantasiAI/
 ├── requirements.txt        # List of Python dependencies
 └── README.md               # This file
 ```
-
+PS : to copy/paste to rbpi use : https://ctxt.io

@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """
 Fixed Batch Peak Analysis for Combined EMG Dataset
@@ -52,10 +53,12 @@ class BatchPeakAnalyzer:
     def load_data(self):
         """Load the combined dataset."""
         print(f"Loading dataset: {self.dataset_path}")
+
         self.df = pd.read_csv(self.dataset_path)
         print(f"Dataset shape: {self.df.shape}")
         print(f"Columns: {self.df.columns.tolist()}")
         
+
         # Check data structure
         subjects = sorted(self.df['Subject'].unique())
         mvcs = sorted(self.df['MVC'].unique())
@@ -94,6 +97,7 @@ class BatchPeakAnalyzer:
     
     def extract_trial_data(self, subject, mvc, trial):
         """Extract data for a specific trial."""
+
         trial_data = self.df[
             (self.df['Subject'] == subject) & 
             (self.df['MVC'] == mvc) & 
@@ -103,6 +107,7 @@ class BatchPeakAnalyzer:
         if trial_data.empty:
             print(f"No data found for {subject}, MVC={mvc}%, Trial={trial}")
             return None
+
         
         # Store the original start time before resetting
         original_start_time = trial_data['Time'].iloc[0]
@@ -124,12 +129,14 @@ class BatchPeakAnalyzer:
     
     def analyze_trial(self, subject, mvc, trial):
         """Analyze a single trial using the fixed peak analyzer."""
+
         print(f"Analyzing {subject}, MVC={mvc}%, Trial={trial}...")
         
         # Extract trial data
         trial_data = self.extract_trial_data(subject, mvc, trial)
         if trial_data is None:
             return None
+
         
         # Save to temporary CSV
         temp_csv_path = self.save_temporary_csv(trial_data, subject, mvc, trial)
@@ -137,6 +144,7 @@ class BatchPeakAnalyzer:
         try:
             # Run peak analysis
             analyzer = EMGPeakAnalyzerFixed(
+
                 csv_path=temp_csv_path,
                 sampling_rate=self.sampling_rate,
                 height_percentile=self.height_percentile,
@@ -145,6 +153,7 @@ class BatchPeakAnalyzer:
             
             results = analyzer.run(show_plots=False, save_results=False)
             
+
             # Clean up temporary file
             os.unlink(temp_csv_path)
             
@@ -347,6 +356,7 @@ def main():
     
     print(f"\nBatch analysis complete!")
     print(f"Check the results in: {results['output_dir']}")
+
 
 if __name__ == "__main__":
     main()

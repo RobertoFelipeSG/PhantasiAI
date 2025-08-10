@@ -107,13 +107,14 @@ class EMGPeakAnalyzer:
         """
         Extract multiple EMG features from the signal split into segments around peaks
         using pysiology functions. Number of segments equals number of peaks found.
+        ** Recommended to use epochs nor shorter to 125ms and not longer than 2s
         """
         if len(self.peaks) == 0:
             print("No peaks found - can't extract features")
             return None
 
         # Create segments centered around each peak
-        seg_len = int(0.5 * self.sampling_rate)  # 0.5 second segments
+        seg_len = int(2 * self.sampling_rate)  # 2 second segments
         segments = []
         for peak in self.peaks:
             start = max(0, peak - seg_len//2)

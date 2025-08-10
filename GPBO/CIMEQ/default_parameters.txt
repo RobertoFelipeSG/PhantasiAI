@@ -1,0 +1,3 @@
+Freq=100
+Amp=1
+DutyCycle=100
