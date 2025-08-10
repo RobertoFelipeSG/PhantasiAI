@@ -5,8 +5,9 @@ from PyQt5 import QtWidgets, QtGui
 from widgets.main_window import MainWindow
 from utils.style import APP_STYLESHEET
 from utils.scipy_patch import patch_scipy_welch
+import scipy.signal
 
-patch_scipy_welch()
+scipy.signal.welch = patch_scipy_welch
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

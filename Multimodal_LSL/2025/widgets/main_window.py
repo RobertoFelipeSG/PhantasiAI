@@ -351,8 +351,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.btn_record.setText("Start Recording")
             
             if self.recorder.session_dir:
-                folder = self.recorder.get_session_folder_name()
-                self.chat.log_event(f"Recording saved in folder «{folder}»")
+                self.chat.log_event(f"Recording saved")
 
         else:
             self.recorder.start_recording()
