@@ -10,6 +10,7 @@ from utils.path_utils import add_parent_to_syspath
 add_parent_to_syspath(1) 
 
 from emg.emg_peak_analyzer import EMGPeakAnalyzer
+from emg.emg_peak_classifier import EMGPeakClassifier
 
 
 
@@ -85,8 +86,25 @@ class EMGRecorder:
             self.parent.chat.log_event("Recording stopped")
 
             if self.filename:
-                analyzer = EMGPeakAnalyzer(csv_path=self.filename)
-                analyzer.run(show_plots=False, save_results=True)
+                # Use the peak classifier instead of basic analyzer
+                analyzer = EMGPeakClassifier(csv_path=self.filename)
+                results = analyzer.run(show_plots=False, save_results=True, classify_peaks=True)
+                
+                # Log classification results if available
+                if results.get('classifications'):
+                    num_classifications = len(results['classifications'])
+                    self.parent.chat.log_event(f"Peak analysis completed: {results['num_peaks']} peaks detected, {num_classifications} classified")
+                    
+                    # Show classification summary
+                    class_counts = {}
+                    for result in results['classifications']:
+                        cls = result['predicted_class']
+                        class_counts[cls] = class_counts.get(cls, 0) + 1
+                    
+                    summary = ", ".join([f"{cls}% MVC: {count}" for cls, count in sorted(class_counts.items())])
+                    self.parent.chat.log_event(f"Classification summary: {summary}")
+                else:
+                    self.parent.chat.log_event(f"Peak analysis completed: {results['num_peaks']} peaks detected (no classification available)")
 
         except Exception as e:
             print(f"[Recorder] Failed to stop recording: {e}")
