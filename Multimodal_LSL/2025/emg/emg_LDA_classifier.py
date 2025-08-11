@@ -268,33 +268,6 @@ def main():
     model_path = Path(__file__).parent / "lda_model.pkl"
     classifier.save_model(model_path)
 
-    # Example: Predict on some sample data
-    print("\n" + "=" * 60)
-    print("Example Predictions")
-    print("=" * 60)
-
-    # Sample peak amplitudes (you would replace these with your actual data)
-    sample_amplitudes = np.array([0.5, 1.2, 2.1, 0.8, 1.8])
-
-    print(f"Sample peak amplitudes: {sample_amplitudes}")
-
-    # Predict classes
-    predictions = classifier.predict(sample_amplitudes)
-    print(f"Predicted classes: {predictions}")
-
-    # Predict probabilities
-    probabilities = classifier.predict_proba(sample_amplitudes)
-    print(f"Class probabilities:")
-    for i, (amp, pred, prob) in enumerate(zip(sample_amplitudes, predictions, probabilities)):
-        print(f"  Sample {i+1}: Amplitude={amp:.2f}, Class={pred}, Probs={prob}")
-
-    print("\n" + "=" * 60)
-    print("Usage:")
-    print("1. Train: classifier = EMGLDAClassifier(); classifier.train()")
-    print("2. Predict: predictions = classifier.predict(peak_amplitudes)")
-    print("3. Save: classifier.save_model('model.pkl')")
-    print("4. Load: classifier = EMGLDAClassifier('model.pkl')")
-    print("=" * 60)
 
 if __name__ == "__main__":
     main()
