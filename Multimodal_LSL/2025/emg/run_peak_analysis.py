@@ -179,8 +179,8 @@ def run_batch_analysis():
     
     # Run batch analysis
     batch_analyzer = BatchPeakAnalyzer(dataset_path)
-    batch_analyzer.load_dataset()
-    batch_analyzer.run_batch_analysis()
+    batch_analyzer.load_data()
+    batch_analyzer.run()
 
 def main():
     print("=" * 50)

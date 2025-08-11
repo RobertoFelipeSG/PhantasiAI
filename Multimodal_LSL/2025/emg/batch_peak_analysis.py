@@ -21,6 +21,8 @@ import os
 from pathlib import Path
 from datetime import datetime
 import warnings
+import subprocess
+import sys
 warnings.filterwarnings('ignore')
 
 # Import the fixed peak analyzer
@@ -285,6 +287,80 @@ class BatchPeakAnalyzer:
         
         return detailed_df
     
+    def run_lda_classification(self):
+        """Run LDA classification on the peak analysis results."""
+        try:
+            print("=" * 60)
+            print("Running LDA Classification")
+            print("=" * 60)
+            
+            # Import the LDA classifier
+            from emg_LDA_classifier import EMGLDAClassifier
+            
+            # Path to the peak analysis results
+            peak_results_file = self.output_dir / "peak_analysis_results.csv"
+            
+            if not peak_results_file.exists():
+                print(f"Peak analysis results not found: {peak_results_file}")
+                return
+            
+            print(f"Loading peak analysis results: {peak_results_file}")
+            
+            # Initialize and train the LDA classifier
+            classifier = EMGLDAClassifier()
+            results = classifier.train(data_path=str(peak_results_file))
+            
+            print(f"LDA training completed!")
+            print(f"Test Accuracy: {results['test_accuracy']:.4f}")
+            print(f"CV Test Accuracy: {results['cv_test_accuracy']:.4f}")
+            
+            # Load the peak analysis results for classification
+            df = pd.read_csv(peak_results_file)
+            peak_amplitudes = df['fwEMG 3'].values
+            
+            # Classify all peak amplitudes
+            classifications = classifier.predict(peak_amplitudes)
+            probabilities = classifier.predict_proba(peak_amplitudes)
+            
+            # Create results DataFrame
+            results_df = df.copy()
+            results_df['Predicted_MVC'] = classifications
+            
+            # Add probability columns
+            class_names = classifier.label_encoder.classes_
+            for i, class_name in enumerate(class_names):
+                results_df[f'Prob_{class_name}'] = probabilities[:, i]
+            
+            # Save LDA results
+            lda_results_file = self.output_dir / "lda_classification_results.csv"
+            results_df.to_csv(lda_results_file, index=False)
+            
+            # Save the trained model
+            model_file = self.output_dir / "lda_model.pkl"
+            classifier.save_model(str(model_file))
+            
+            print(f"LDA results saved to: {lda_results_file}")
+            print(f"Trained model saved to: {model_file}")
+            
+            # Display summary
+            print(f"\nLDA Classification Summary:")
+            print(f"   Total samples: {len(results_df)}")
+            print(f"   Predicted classes: {sorted(np.unique(classifications))}")
+            
+            # Show some examples
+            print(f"\nSample classifications:")
+            for i in range(min(5, len(results_df))):
+                row = results_df.iloc[i]
+                print(f"   Sample {i+1}: Subject={row['Subject']}, MVC={row['MVC']}, "
+                      f"Peak={row['fwEMG 3']:.3f}, Predicted={row['Predicted_MVC']}")
+            
+            print("=" * 60)
+            print("LDA Classification completed successfully!")
+            
+        except Exception as e:
+            print(f"Error running LDA classification: {e}")
+            print("Continuing without LDA classification...")
+    
     def run(self):
         """Run the complete batch analysis."""
         print("=" * 60)
@@ -327,6 +403,10 @@ class BatchPeakAnalyzer:
         
         print(f"\nResults saved to: {self.output_dir}")
         print("=" * 60)
+        
+        # Run LDA classification after peak analysis
+        print("\nRunning LDA Classification...")
+        self.run_lda_classification()
         
         return {
             'summary_df': summary_df,
