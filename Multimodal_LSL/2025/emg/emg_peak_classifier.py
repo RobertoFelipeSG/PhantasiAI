@@ -79,6 +79,101 @@ class EMGPeakClassifier(EMGPeakAnalyzer):
             self.classifier = None
             return False
     
+    def extract_peak_features(self, peak_times, peak_amplitudes):
+        """
+        Extract enhanced features for each peak including frequency features.
+        Uses the same approach as the batch analysis for consistency.
+        
+        Parameters:
+        -----------
+        peak_times : array-like
+            Times of detected peaks
+        peak_amplitudes : array-like
+            Amplitudes of detected peaks
+            
+        Returns:
+        --------
+        array : Feature matrix with shape (n_peaks, n_features)
+        """
+        if len(peak_times) == 0:
+            return np.array([])
+        
+        # Get EMG signal
+        data, times = self.raw_filtered[:, :]
+        emg_signal = data.squeeze()
+        
+        # Extract minimum peak amplitude (same for all peaks in this trial)
+        min_peak_amplitude = np.min(peak_amplitudes) if len(peak_amplitudes) > 0 else np.nan
+        
+        # Extract frequency features from segments around peaks
+        mean_freqs = []
+        median_freqs = []
+        
+        try:
+            # Import scipy for frequency analysis
+            from scipy import signal
+            
+            # Create segments centered around each peak
+            seg_len = int(2 * self.sampling_rate)  # 2 second segments
+            
+            for peak_time in peak_times:
+                # Convert time to sample index
+                peak_idx = int(peak_time * self.sampling_rate)
+                
+                # Extract segment around peak
+                start_idx = max(0, peak_idx - seg_len // 2)
+                end_idx = min(len(emg_signal), peak_idx + seg_len // 2)
+                segment = emg_signal[start_idx:end_idx]
+                
+                if len(segment) > 0:
+                    try:
+                        # Calculate frequency features using SciPy
+                        # Use power spectral density analysis
+                        f, Pxx = signal.welch(segment, self.sampling_rate)
+                        
+                        # Calculate mean frequency (frequency weighted by power)
+                        mean_freq = np.sum(f * Pxx) / np.sum(Pxx) if np.sum(Pxx) > 0 else np.nan
+                        
+                        # Calculate median frequency (frequency where cumulative power is 50%)
+                        cumsum_power = np.cumsum(Pxx)
+                        if cumsum_power[-1] > 0:
+                            median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
+                            median_freq = f[median_idx]
+                        else:
+                            median_freq = np.nan
+                        
+                        mean_freqs.append(mean_freq)
+                        median_freqs.append(median_freq)
+                    except Exception as e:
+                        print(f"Warning: Error calculating frequency features: {e}")
+                        mean_freqs.append(np.nan)
+                        median_freqs.append(np.nan)
+                else:
+                    mean_freqs.append(np.nan)
+                    median_freqs.append(np.nan)
+                    
+        except ImportError:
+            print("Warning: SciPy not available. Using NaN for frequency features.")
+            mean_freqs = [np.nan] * len(peak_times)
+            median_freqs = [np.nan] * len(peak_times)
+        
+        # Calculate average frequency features across all segments (same for all peaks)
+        mean_frequency = np.nanmean(mean_freqs) if mean_freqs else np.nan
+        median_frequency = np.nanmean(median_freqs) if median_freqs else np.nan
+        
+        # Create feature vectors for each peak (all peaks get the same trial-level features)
+        features = []
+        for peak_amplitude in peak_amplitudes:
+            feature_vector = [
+                peak_amplitude,  # Peak amplitude (different for each peak)
+                min_peak_amplitude,  # Min peak amplitude (same for all peaks)
+                mean_frequency,  # Mean frequency (same for all peaks)
+                median_frequency  # Median frequency (same for all peaks)
+            ]
+            features.append(feature_vector)
+        
+        return np.array(features)
+
     def classify_peaks(self):
         """
         Classify detected peaks using the LDA model.
@@ -100,18 +195,24 @@ class EMGPeakClassifier(EMGPeakAnalyzer):
         peak_amplitudes = data.squeeze()[self.peaks]
         peak_times = times[self.peaks]
         
+        # Extract features for classification
+        features = self.extract_peak_features(peak_times, peak_amplitudes)
+        
         # Classify peaks
         try:
-            predictions = self.classifier.predict(peak_amplitudes)
-            probabilities = self.classifier.predict_proba(peak_amplitudes)
+            predictions = self.classifier.predict(features)
+            probabilities = self.classifier.predict_proba(features)
             
             # Create classification results
             self.classification_results = []
-            for i, (time, amplitude, pred, prob) in enumerate(zip(peak_times, peak_amplitudes, predictions, probabilities)):
+            for i, (time, amplitude, pred, prob, feature_vec) in enumerate(zip(peak_times, peak_amplitudes, predictions, probabilities, features)):
                 result = {
                     'peak_id': i + 1,
                     'timestamp': time,
                     'amplitude': amplitude,
+                    'min_amplitude': feature_vec[1] if len(feature_vec) > 1 else np.nan,
+                    'mean_frequency': feature_vec[2] if len(feature_vec) > 2 else np.nan,
+                    'median_frequency': feature_vec[3] if len(feature_vec) > 3 else np.nan,
                     'predicted_class': pred,
                     'probabilities': prob,
                     'confidence': max(prob),
@@ -141,6 +242,9 @@ class EMGPeakClassifier(EMGPeakAnalyzer):
                 'peak_id': result['peak_id'],
                 'timestamp': result['timestamp'],
                 'amplitude': result['amplitude'],
+                'min_amplitude': result['min_amplitude'],
+                'mean_frequency': result['mean_frequency'],
+                'median_frequency': result['median_frequency'],
                 'predicted_class': result['predicted_class'],
                 'confidence': result['confidence']
             }

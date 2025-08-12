@@ -1,17 +1,23 @@
 
 #!/usr/bin/env python3
 """
-Fixed Batch Peak Analysis for Combined EMG Dataset
-=================================================
+Batch Peak Analysis for Combined EMG Dataset
+====================================================
 
-This script processes the combined_emg_dorsiflex.csv dataset using the corrected
-EMGPeakAnalyzerFixed to properly detect peaks in each trial.
+This script processes the combined_emg_dorsiflex.csv dataset using 
+EMGPeakAnalyzerFixed (version compatible with database structure)
+to properly detect peaks in each trial and extract enhanced features.
 
 The script will:
 1. Load the combined dataset
 2. Extract individual trials (Subject, MVC, Trial combinations)
 3. Run peak detection on each trial using the fixed analyzer
-4. Save results in the correct format
+4. Extract features including:
+   - Maximum peak amplitude 
+   - Minimum peak amplitude
+   - Mean frequency 
+   - Median frequency
+5. Save results in the correct format
 """
 
 import pandas as pd
@@ -27,6 +33,24 @@ warnings.filterwarnings('ignore')
 
 # Import the fixed peak analyzer
 from emg_peak_analyzer_fixed import EMGPeakAnalyzerFixed
+
+# Import PySiology for frequency features
+try:
+    from pysiology.electromyography import getPSD, getMNF, getMDF
+    PYSIOLOGY_AVAILABLE = True
+except ImportError:
+    print("Warning: PySiology not available. Frequency features will be skipped.")
+    PYSIOLOGY_AVAILABLE = False
+
+# Import scipy for frequency analysis
+try:
+    from scipy import signal
+    SCIPY_AVAILABLE = True
+except ImportError:
+    print("Warning: SciPy not available. Frequency features will be skipped.")
+    SCIPY_AVAILABLE = False
+
+
 
 class BatchPeakAnalyzer:
     def __init__(self, dataset_path, sampling_rate=220, height_percentile=98, min_distance=3):
@@ -155,6 +179,12 @@ class BatchPeakAnalyzer:
             
             results = analyzer.run(show_plots=False, save_results=False)
             
+            # Extract enhanced features
+            enhanced_features = self.extract_enhanced_features(
+                trial_data, 
+                results['peak_times'], 
+                results['peak_amplitudes']
+            )
 
             # Clean up temporary file
             os.unlink(temp_csv_path)
@@ -169,7 +199,10 @@ class BatchPeakAnalyzer:
                 'highest_peak_time': results['highest_peak_time'],
                 'highest_peak_amplitude': results['highest_peak_amplitude'],
                 'signal_duration': results['signal_duration'],
-                'trial_data': trial_data  # Keep original trial data for verification
+                'trial_data': trial_data,  # Keep original trial data for verification
+                'min_peak_amplitude': enhanced_features['min_peak_amplitude'],
+                'mean_frequency': enhanced_features['mean_frequency'],
+                'median_frequency': enhanced_features['median_frequency']
             }
             
         except Exception as e:
@@ -191,13 +224,17 @@ class BatchPeakAnalyzer:
                 highest_peak_time = result['highest_peak_time']
                 highest_peak_amplitude = result['highest_peak_amplitude']
                 
-                # Convert back to absolute time (add the original trial start time)
+                # The peak_time is in the trial's relative coordinate system (0-11s)
+                # We need to convert it back to the original absolute time
                 original_start_time = result['trial_data'].attrs['original_start_time']
                 absolute_peak_time = original_start_time + highest_peak_time
                 
                 summary_data.append({
                     'Time': absolute_peak_time,
                     'fwEMG 3': highest_peak_amplitude,
+                    'Min_Peak_Amplitude': result['min_peak_amplitude'],
+                    'Mean_Frequency': result['mean_frequency'],
+                    'Median_Frequency': result['median_frequency'],
                     'Subject': result['Subject'],
                     'MVC': result['MVC'],
                     'Trial': result['Trial']
@@ -215,6 +252,9 @@ class BatchPeakAnalyzer:
                 summary_data.append({
                     'Time': absolute_max_time,
                     'fwEMG 3': max_amplitude,
+                    'Min_Peak_Amplitude': result['min_peak_amplitude'],
+                    'Mean_Frequency': result['mean_frequency'],
+                    'Median_Frequency': result['median_frequency'],
                     'Subject': result['Subject'],
                     'MVC': result['MVC'],
                     'Trial': result['Trial']
@@ -287,6 +327,87 @@ class BatchPeakAnalyzer:
         
         return detailed_df
     
+    def extract_enhanced_features(self, trial_data, peak_times, peak_amplitudes):
+        """
+        Extract enhanced features from EMG signal segments around peaks.
+        
+        Parameters:
+        -----------
+        trial_data : pd.DataFrame
+            Trial data containing EMG signal
+        peak_times : list
+            Times of detected peaks
+        peak_amplitudes : list
+            Amplitudes of detected peaks
+            
+        Returns:
+        --------
+        dict : Dictionary containing extracted features
+        """
+        if len(peak_times) == 0:
+            return {
+                'min_peak_amplitude': np.nan,
+                'mean_frequency': np.nan,
+                'median_frequency': np.nan
+            }
+        
+        # Get EMG signal
+        emg_signal = trial_data['fwEMG 3'].values
+        
+        # Extract minimum peak amplitude
+        min_peak_amplitude = np.min(peak_amplitudes) if len(peak_amplitudes) > 0 else np.nan
+        
+        # Extract frequency features from segments around peaks
+        mean_freqs = []
+        median_freqs = []
+        
+        if SCIPY_AVAILABLE:
+            # Create segments centered around each peak
+            seg_len = int(2 * self.sampling_rate)  # 2 second segments
+            
+            for peak_time in peak_times:
+                # Convert time to sample index
+                peak_idx = int(peak_time * self.sampling_rate)
+                
+                # Extract segment around peak
+                start_idx = max(0, peak_idx - seg_len // 2)
+                end_idx = min(len(emg_signal), peak_idx + seg_len // 2)
+                segment = emg_signal[start_idx:end_idx]
+                
+                if len(segment) > 0:
+                    try:
+                        # Calculate frequency features using SciPy
+                        # Use power spectral density analysis
+                        f, Pxx = signal.welch(segment, self.sampling_rate)
+                        
+                        # Calculate mean frequency (frequency weighted by power)
+                        mean_freq = np.sum(f * Pxx) / np.sum(Pxx) if np.sum(Pxx) > 0 else np.nan
+                        
+                        # Calculate median frequency (frequency where cumulative power is 50%)
+                        cumsum_power = np.cumsum(Pxx)
+                        if cumsum_power[-1] > 0:
+                            median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
+                            median_freq = f[median_idx]
+                        else:
+                            median_freq = np.nan
+                        
+                        mean_freqs.append(mean_freq)
+                        median_freqs.append(median_freq)
+                    except Exception as e:
+                        print(f"Warning: Error calculating frequency features: {e}")
+                        mean_freqs.append(np.nan)
+                        median_freqs.append(np.nan)
+        
+        # Calculate average frequency features across all segments
+        mean_frequency = np.nanmean(mean_freqs) if mean_freqs else np.nan
+        median_frequency = np.nanmean(median_freqs) if median_freqs else np.nan
+        
+        return {
+            'min_peak_amplitude': min_peak_amplitude,
+            'mean_frequency': mean_frequency,
+            'median_frequency': median_frequency
+        }
+    
     def run_lda_classification(self):
         """Run LDA classification on the peak analysis results."""
         try:
@@ -316,11 +437,24 @@ class BatchPeakAnalyzer:
             
             # Load the peak analysis results for classification
             df = pd.read_csv(peak_results_file)
-            peak_amplitudes = df['fwEMG 3'].values
             
-            # Classify all peak amplitudes
-            classifications = classifier.predict(peak_amplitudes)
-            probabilities = classifier.predict_proba(peak_amplitudes)
+            # Create feature vectors using all 4 features
+            feature_vectors = []
+            for _, row in df.iterrows():
+                feature_vector = [
+                    row['fwEMG 3'],  # Peak amplitude
+                    row['Min_Peak_Amplitude'],  # Min peak amplitude
+                    row['Mean_Frequency'],  # Mean frequency
+                    row['Median_Frequency']  # Median frequency
+                ]
+                feature_vectors.append(feature_vector)
+            
+            feature_vectors = np.array(feature_vectors)
+            print(f"Created feature vectors with shape: {feature_vectors.shape}")
+            
+            # Classify using all features
+            classifications = classifier.predict(feature_vectors)
+            probabilities = classifier.predict_proba(feature_vectors)
             
             # Create results DataFrame
             results_df = df.copy()

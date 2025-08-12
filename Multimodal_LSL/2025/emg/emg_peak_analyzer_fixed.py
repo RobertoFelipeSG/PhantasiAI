@@ -104,7 +104,10 @@ class EMGPeakAnalyzerFixed:
         """Detect peaks in the filtered EMG signal."""
         start_idx = 0
         stop_idx = self.raw_filtered.n_times
-        data, self.times = self.raw_filtered[:, start_idx:stop_idx]
+        data, mne_times = self.raw_filtered[:, start_idx:stop_idx]
+        
+        # Use the original time vector from the CSV file, not MNE's internal time
+        self.times = self.time_vector
         
         # Remove DC offset
         data_centered = data.squeeze() - data.squeeze().mean()
