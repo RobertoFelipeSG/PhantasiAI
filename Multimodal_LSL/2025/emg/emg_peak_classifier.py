@@ -18,19 +18,19 @@ warnings.filterwarnings('ignore')
 try:
     import neurokit2 as nk
     NEUROKIT2_AVAILABLE = True
-    print("✓ NeuroKit2 available for frequency analysis")
+    print("NeuroKit2 available for frequency analysis")
 except ImportError:
     NEUROKIT2_AVAILABLE = False
-    print("✗ NeuroKit2 not available. Please install with: pip install neurokit2")
+    print("NeuroKit2 not available. Please install with: pip install neurokit2")
 
 # Check if SciPy is available for fallback
 try:
     from scipy import signal
     SCIPY_AVAILABLE = True
-    print("✓ SciPy available for fallback frequency analysis")
+    print("SciPy available for fallback frequency analysis")
 except ImportError:
     SCIPY_AVAILABLE = False
-    print("✗ SciPy not available. Please install with: pip install scipy")
+    print("SciPy not available. Please install with: pip install scipy")
 
 from .emg_peak_analyzer import EMGPeakAnalyzer
 from .emg_LDA_classifier import EMGLDAClassifier
@@ -43,7 +43,7 @@ class EMGPeakClassifier(EMGPeakAnalyzer):
     using a pre-trained LDA model.
     """
     
-    def __init__(self, csv_path, model_path=None, sampling_rate=10000, 
+    def __init__(self, csv_path, model_path=None, sampling_rate=220, 
                  height_percentile=98, min_distance=3):
         """
         Initialize the EMG peak classifier.
@@ -129,7 +129,7 @@ class EMGPeakClassifier(EMGPeakAnalyzer):
         median_freqs = []
         
         # Use 20ms window centered around each peak
-        window_duration = 0.020  # 20 milliseconds
+        window_duration = 3  # 3 seconds
         seg_len = int(window_duration * self.sampling_rate)  # Convert to samples
         
         print(f"Using {window_duration*1000:.0f}ms window ({seg_len} samples) centered around peaks at {self.sampling_rate}Hz")
