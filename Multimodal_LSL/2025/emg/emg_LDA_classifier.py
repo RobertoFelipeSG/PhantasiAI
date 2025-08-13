@@ -97,16 +97,25 @@ class EMGLDAClassifier:
         if nan_count > 0:
             print(f"Found {nan_count} NaN values in features")
             
-            # Strategy 1: Try to remove samples with NaN values
-            valid_mask = ~np.isnan(X).any(axis=1)
-            if valid_mask.sum() > 0:
-                print(f"Removing {len(X) - valid_mask.sum()} samples with NaN values...")
-                X = X[valid_mask]
-                y = y[valid_mask]
-            else:
-                # Strategy 2: If all samples have NaN, replace with 0
-                print("All samples have NaN values. Replacing with 0...")
-                X = np.nan_to_num(X, nan=0.0)
+            # Strategy 1: Replace NaN values with reasonable defaults based on feature type
+            print("Replacing NaN values with reasonable defaults...")
+            for i, feature_name in enumerate(self.feature_names):
+                if 'amplitude' in feature_name.lower():
+                    # For amplitude features, use median of non-NaN values or 0
+                    non_nan_values = X[~np.isnan(X[:, i]), i]
+                    default_value = np.median(non_nan_values) if len(non_nan_values) > 0 else 0.0
+                    X[np.isnan(X[:, i]), i] = default_value
+                elif 'frequency' in feature_name.lower():
+                    # For frequency features, use typical EMG frequency values
+                    if 'mean' in feature_name.lower():
+                        X[np.isnan(X[:, i]), i] = 50.0  # Default mean frequency
+                    elif 'median' in feature_name.lower():
+                        X[np.isnan(X[:, i]), i] = 45.0  # Default median frequency
+                    else:
+                        X[np.isnan(X[:, i]), i] = 50.0  # Default frequency
+                else:
+                    # For other features, use 0
+                    X[np.isnan(X[:, i]), i] = 0.0
                 
                 # Ensure X has the correct shape after NaN replacement
                 if X.shape[1] != len(self.feature_names):
@@ -130,6 +139,51 @@ class EMGLDAClassifier:
         y_encoded = self.label_encoder.fit_transform(y)
 
         return X, y_encoded
+
+    def _preprocess_prediction_data(self, X):
+        """Preprocess prediction data with the same NaN handling as training data."""
+        # Check for NaN values in features
+        nan_count = np.isnan(X).sum()
+        if nan_count > 0:
+            print(f"Found {nan_count} NaN values in prediction data")
+            
+            # Strategy: Replace NaN values with reasonable defaults based on feature type
+            print("Replacing NaN values with reasonable defaults...")
+            for i, feature_name in enumerate(self.feature_names):
+                if 'amplitude' in feature_name.lower():
+                    # For amplitude features, use 0.0 as default
+                    X[np.isnan(X[:, i]), i] = 0.0
+                elif 'frequency' in feature_name.lower():
+                    # For frequency features, use typical EMG frequency values
+                    if 'mean' in feature_name.lower():
+                        X[np.isnan(X[:, i]), i] = 50.0  # Default mean frequency
+                    elif 'median' in feature_name.lower():
+                        X[np.isnan(X[:, i]), i] = 45.0  # Default median frequency
+                    else:
+                        X[np.isnan(X[:, i]), i] = 50.0  # Default frequency
+                else:
+                    # For other features, use 0
+                    X[np.isnan(X[:, i]), i] = 0.0
+                
+                # Ensure X has the correct shape after NaN replacement
+                if X.shape[1] != len(self.feature_names):
+                    print(f"Warning: Feature matrix shape {X.shape} doesn't match expected features {len(self.feature_names)}")
+                    # Pad or truncate to match expected features
+                    if X.shape[1] < len(self.feature_names):
+                        # Pad with zeros
+                        padding = np.zeros((X.shape[0], len(self.feature_names) - X.shape[1]))
+                        X = np.hstack([X, padding])
+                    else:
+                        # Truncate
+                        X = X[:, :len(self.feature_names)]
+
+        # Check for infinite values
+        inf_count = np.isinf(X).sum()
+        if inf_count > 0:
+            print(f"Replacing {inf_count} infinite values...")
+            X = np.nan_to_num(X, nan=0.0, posinf=1e6, neginf=-1e6)
+
+        return X
 
     def train(self, data_path=None, test_size=0.2, random_state=42):
         """Train the LDA model using the same approach as the classification file."""
@@ -224,8 +278,11 @@ class EMGLDAClassifier:
         if X.shape[1] != len(self.feature_names):
             raise ValueError(f"Input has {X.shape[1]} features, but model expects {len(self.feature_names)} features: {self.feature_names}")
 
+        # Handle NaN values in prediction data
+        X_processed = self._preprocess_prediction_data(X)
+
         # Scale features
-        X_scaled = self.scaler.transform(X)
+        X_scaled = self.scaler.transform(X_processed)
 
         # Predict
         predictions = self.model.predict(X_scaled)
@@ -251,8 +308,11 @@ class EMGLDAClassifier:
         if X.shape[1] != len(self.feature_names):
             raise ValueError(f"Input has {X.shape[1]} features, but model expects {len(self.feature_names)} features: {self.feature_names}")
 
+        # Handle NaN values in prediction data
+        X_processed = self._preprocess_prediction_data(X)
+
         # Scale features
-        X_scaled = self.scaler.transform(X)
+        X_scaled = self.scaler.transform(X_processed)
 
         # Predict probabilities
         probabilities = self.model.predict_proba(X_scaled)

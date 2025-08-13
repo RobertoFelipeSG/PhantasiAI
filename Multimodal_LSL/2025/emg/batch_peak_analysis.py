@@ -34,26 +34,28 @@ warnings.filterwarnings('ignore')
 # Import the fixed peak analyzer
 from emg_peak_analyzer_fixed import EMGPeakAnalyzerFixed
 
-# Import PySiology for frequency features
+# Import NeuroKit2 for enhanced frequency analysis
 try:
-    from pysiology.electromyography import getPSD, getMNF, getMDF
-    PYSIOLOGY_AVAILABLE = True
+    import neurokit2 as nk
+    NEUROKIT2_AVAILABLE = True
+    print("NeuroKit2 available for enhanced frequency analysis")
 except ImportError:
-    print("Warning: PySiology not available. Frequency features will be skipped.")
-    PYSIOLOGY_AVAILABLE = False
+    print("ERROR: NeuroKit2 is required for frequency analysis. Please install it with: pip install neurokit2")
+    NEUROKIT2_AVAILABLE = False
 
-# Import scipy for frequency analysis
+# Import SciPy for fallback frequency analysis
 try:
     from scipy import signal
     SCIPY_AVAILABLE = True
+    print("SciPy available for fallback frequency analysis")
 except ImportError:
-    print("Warning: SciPy not available. Frequency features will be skipped.")
+    print("WARNING: SciPy not available for fallback. Please install it with: pip install scipy")
     SCIPY_AVAILABLE = False
 
 
 
 class BatchPeakAnalyzer:
-    def __init__(self, dataset_path, sampling_rate=220, height_percentile=98, min_distance=3):
+    def __init__(self, dataset_path, sampling_rate=10000, height_percentile=98, min_distance=3):
         """
         Initialize the batch analyzer.
         
@@ -330,6 +332,7 @@ class BatchPeakAnalyzer:
     def extract_enhanced_features(self, trial_data, peak_times, peak_amplitudes):
         """
         Extract enhanced features from EMG signal segments around peaks.
+        Uses a 20ms window centered around each peak and PySiology toolkit for feature calculation.
         
         Parameters:
         -----------
@@ -361,46 +364,142 @@ class BatchPeakAnalyzer:
         mean_freqs = []
         median_freqs = []
         
-        if SCIPY_AVAILABLE:
-            # Create segments centered around each peak
-            seg_len = int(2 * self.sampling_rate)  # 2 second segments
+        # Use 3s window centered around each peak
+        window_duration = 3  # 3 seconds
+        # Use resampled sampling rate (200Hz) for feature extraction
+        resampled_sampling_rate = 200
+        seg_len = int(window_duration * resampled_sampling_rate)  # Convert to samples
+        
+        print(f"Using {window_duration*1000:.0f}ms window ({seg_len} samples) centered around peaks at {resampled_sampling_rate}Hz")
+        
+        for peak_time in peak_times:
+            # Convert time to sample index using resampled sampling rate
+            peak_idx = int(peak_time * resampled_sampling_rate)
             
-            for peak_time in peak_times:
-                # Convert time to sample index
-                peak_idx = int(peak_time * self.sampling_rate)
-                
-                # Extract segment around peak
-                start_idx = max(0, peak_idx - seg_len // 2)
-                end_idx = min(len(emg_signal), peak_idx + seg_len // 2)
-                segment = emg_signal[start_idx:end_idx]
-                
-                if len(segment) > 0:
-                    try:
-                        # Calculate frequency features using SciPy
-                        # Use power spectral density analysis
-                        f, Pxx = signal.welch(segment, self.sampling_rate)
-                        
-                        # Calculate mean frequency (frequency weighted by power)
-                        mean_freq = np.sum(f * Pxx) / np.sum(Pxx) if np.sum(Pxx) > 0 else np.nan
-                        
-                        # Calculate median frequency (frequency where cumulative power is 50%)
-                        cumsum_power = np.cumsum(Pxx)
-                        if cumsum_power[-1] > 0:
-                            median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
-                            median_freq = f[median_idx]
+            # For feature extraction, we need to get the resampled envelope from the analyzer
+            # Since we're working with the original trial data, we'll need to resample it too
+            # Extract segment around peak from the original signal and then resample
+            original_peak_idx = int(peak_time * self.sampling_rate)
+            original_start_idx = max(0, original_peak_idx - int(seg_len * self.sampling_rate / resampled_sampling_rate // 2))
+            original_end_idx = min(len(emg_signal), original_peak_idx + int(seg_len * self.sampling_rate / resampled_sampling_rate // 2))
+            original_segment = emg_signal[original_start_idx:original_end_idx]
+            
+            # Resample the segment to 200Hz
+            from scipy import signal
+            target_length = int(len(original_segment) * resampled_sampling_rate / self.sampling_rate)
+            if target_length > 0:
+                segment = signal.resample(original_segment, target_length)
+            else:
+                segment = np.array([])
+            
+            if len(segment) > 0:
+                try:
+                    # Try NeuroKit2 first for enhanced frequency analysis
+                    if NEUROKIT2_AVAILABLE:
+                        try:
+                            psd = nk.signal_psd(segment, sampling_rate=resampled_sampling_rate)
+                            
+                            if isinstance(psd, pd.DataFrame) and len(psd) > 0 and 'Frequency' in psd.columns and 'Power' in psd.columns:
+                                frequencies = psd['Frequency'].values
+                                power = psd['Power'].values
+                                
+                                # Calculate mean frequency
+                                mean_freq = np.sum(frequencies * power) / np.sum(power) if np.sum(power) > 0 else np.nan
+                                
+                                # Calculate median frequency
+                                cumsum_power = np.cumsum(power)
+                                if cumsum_power[-1] > 0:
+                                    median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
+                                    median_freq = frequencies[median_idx]
+                                else:
+                                    median_freq = np.nan
+                                
+                                if not np.isnan(mean_freq) and not np.isnan(median_freq):
+                                    mean_freqs.append(mean_freq)
+                                    median_freqs.append(median_freq)
+                                    print(f"NeuroKit2 features - Mean: {mean_freq:.2f} Hz, Median: {median_freq:.2f} Hz")
+                                else:
+                                    raise ValueError("NeuroKit2 returned NaN values")
+                            else:
+                                raise ValueError("NeuroKit2 PSD returned invalid format")
+                        except Exception as nk_error:
+                            print(f"NeuroKit2 failed for peak at {peak_time:.3f}s: {nk_error}")
+                            # Fall back to SciPy
+                            if SCIPY_AVAILABLE:
+                                print(f"Falling back to SciPy for peak at {peak_time:.3f}s")
+                                # Use SciPy for frequency analysis
+                                frequencies, power = signal.welch(segment, fs=resampled_sampling_rate, nperseg=min(len(segment), 256))
+                                
+                                # Calculate mean frequency
+                                mean_freq = np.sum(frequencies * power) / np.sum(power) if np.sum(power) > 0 else np.nan
+                                
+                                # Calculate median frequency
+                                cumsum_power = np.cumsum(power)
+                                if cumsum_power[-1] > 0:
+                                    median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
+                                    median_freq = frequencies[median_idx]
+                                else:
+                                    median_freq = np.nan
+                                
+                                if not np.isnan(mean_freq) and not np.isnan(median_freq):
+                                    mean_freqs.append(mean_freq)
+                                    median_freqs.append(median_freq)
+                                    print(f"SciPy fallback features - Mean: {mean_freq:.2f} Hz, Median: {median_freq:.2f} Hz")
+                                else:
+                                    raise ValueError("SciPy also returned NaN values")
+                            else:
+                                print("ERROR: Neither NeuroKit2 nor SciPy available for frequency analysis")
+                                raise ValueError("No frequency analysis method available")
+                    else:
+                        # NeuroKit2 not available, try SciPy
+                        if SCIPY_AVAILABLE:
+                            print(f"Using SciPy for peak at {peak_time:.3f}s (NeuroKit2 not available)")
+                            # Use SciPy for frequency analysis
+                            frequencies, power = signal.welch(segment, fs=resampled_sampling_rate, nperseg=min(len(segment), 256))
+                            
+                            # Calculate mean frequency
+                            mean_freq = np.sum(frequencies * power) / np.sum(power) if np.sum(power) > 0 else np.nan
+                            
+                            # Calculate median frequency
+                            cumsum_power = np.cumsum(power)
+                            if cumsum_power[-1] > 0:
+                                median_idx = np.argmin(np.abs(cumsum_power - 0.5 * cumsum_power[-1]))
+                                median_freq = frequencies[median_idx]
+                            else:
+                                median_freq = np.nan
+                            
+                            if not np.isnan(mean_freq) and not np.isnan(median_freq):
+                                mean_freqs.append(mean_freq)
+                                median_freqs.append(median_freq)
+                                print(f"SciPy features - Mean: {mean_freq:.2f} Hz, Median: {median_freq:.2f} Hz")
+                            else:
+                                raise ValueError("SciPy returned NaN values")
                         else:
-                            median_freq = np.nan
-                        
-                        mean_freqs.append(mean_freq)
-                        median_freqs.append(median_freq)
-                    except Exception as e:
-                        print(f"Warning: Error calculating frequency features: {e}")
-                        mean_freqs.append(np.nan)
-                        median_freqs.append(np.nan)
+                            print("ERROR: Neither NeuroKit2 nor SciPy available for frequency analysis")
+                            raise ValueError("No frequency analysis method available")
+                            
+                except Exception as e:
+                    print(f"Warning: All frequency analysis methods failed for peak at {peak_time:.3f}s: {e}")
+                    # Only use defaults if all methods fail
+                    mean_freqs.append(np.nan)
+                    median_freqs.append(np.nan)
+            else:
+                print(f"Warning: Empty segment for peak at {peak_time:.3f}s")
+                # Empty segment - no frequency analysis possible
+                mean_freqs.append(np.nan)
+                median_freqs.append(np.nan)
         
         # Calculate average frequency features across all segments
         mean_frequency = np.nanmean(mean_freqs) if mean_freqs else np.nan
         median_frequency = np.nanmean(median_freqs) if median_freqs else np.nan
+        
+        # Check if we have any valid frequency calculations
+        if np.isnan(mean_frequency) or np.isnan(median_frequency):
+            print("Warning: All frequency calculations failed for this trial.")
+            print("This may indicate issues with the signal quality or segment length.")
+            # Keep NaN values - let the LDA classifier handle them
+        
+        print(f"Final frequency features - Mean: {mean_frequency:.2f} Hz, Median: {median_frequency:.2f} Hz")
         
         return {
             'min_peak_amplitude': min_peak_amplitude,

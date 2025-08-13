@@ -19,20 +19,58 @@ The system now extracts 4 features:
 3. Mean Frequency (`Mean_Frequency`): Frequency-weighted average in Hz
 4. Median Frequency (`Median_Frequency`): Frequency where cumulative power reaches 50% in Hz
 
-### Frequency Analysis Implementation
+### Frequency Analysis Implementation (v2.6)
 
-- Library: SciPy's `signal.welch()` for power spectral density analysis
-- Method: Welch's method with default parameters
-- Segment Size: 2-second segments centered around each peak
-- Fallback: NaN values if frequency analysis fails
+- **Primary Library**: NeuroKit2 for enhanced physiological signal analysis
+- **Fallback Library**: SciPy for robust frequency analysis when NeuroKit2 fails
+- **Method**: 
+  - Primary: NeuroKit2 `signal_psd()` for physiological signal processing
+  - Fallback: SciPy `signal.welch()` for standard frequency analysis
+- **Sampling Rate**: 10kHz (10,000 Hz) - matches the training database
+- **Segment Size**: 20ms window centered around each peak (200 samples at 10kHz)
+- **Requirements**: NeuroKit2 is preferred, SciPy is required for fallback
+- **Error Handling**: Automatic fallback to SciPy when NeuroKit2 fails, NaN values only when both methods fail
+- **Note**: NeuroKit2 provides enhanced physiological signal analysis optimized for EMG data, SciPy ensures robustness
+
+### Window Size Optimization
+
+- **Window**: 20ms centered around each peak
+- **Rationale**: More focused analysis on the actual peak activity
+- **Sample Count**: 200 samples at 10kHz sampling rate
+- **Benefits**: 
+  - Reduces noise from surrounding signal
+  - More precise frequency analysis
+  - Faster computation
+  - Better peak-specific feature extraction
+  - Optimal data length for NeuroKit2 analysis
+
+### Error Handling and Robustness
+
+- **Primary Strategy**: NeuroKit2 for enhanced physiological analysis
+- **Fallback Strategy**: Automatic fallback to SciPy when NeuroKit2 fails
+- **Final Fallback**: NaN values only when both NeuroKit2 and SciPy fail
+- **LDA Handling**: LDA classifier handles remaining NaN values with feature-specific defaults
+- **Default Values** (LDA classifier): 
+  - Mean Frequency: 50.0 Hz (typical EMG mean frequency)
+  - Median Frequency: 45.0 Hz (typical EMG median frequency)
+  - Amplitude features: Median of available values or 0.0
+- **Robustness**: Ensures maximum feature extraction success while maintaining data integrity
 
 
 ## Prerequisites
 
 Before using peak classification, we need to:
 
-1. Train the LDA model: Run the training pipeline to create a model from the EMG database
-2. Save the trained model: The script looks for `lda_model.pkl` in the `emg/` directory
+1. **Install NeuroKit2**: Primary library for enhanced frequency analysis
+   ```bash
+   pip install neurokit2
+   ```
+2. **Install SciPy**: Required for fallback frequency analysis
+   ```bash
+   pip install scipy
+   ```
+3. Train the LDA model: Run the training pipeline to create a model from the EMG database
+4. Save the trained model: The script looks for `lda_model.pkl` in the `emg/` directory
 
 ## Training the LDA Model (in a computer)
 

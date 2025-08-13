@@ -11,18 +11,23 @@ Usage:
 2. Then run: python3 run_lda_after_peak_analysis.py
 """
 
+import sys
+import os
 import pandas as pd
 import numpy as np
 from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
 
+# Add the parent directory to the path to find the modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # Import the LDA classifier
 from emg_LDA_classifier import EMGLDAClassifier
 
 def find_latest_peak_results():
     """Find the most recent peak_analysis_results.csv file."""
-    dataset_dir = Path(__file__).parent.parent / "dataset"
+    dataset_dir = Path(__file__).parent.parent.parent / "dataset"
     
     if not dataset_dir.exists():
         raise FileNotFoundError(f"Dataset directory not found: {dataset_dir}")
@@ -78,13 +83,23 @@ def run_lda_classification():
     print("Classifying Peak Analysis Results")
     print("=" * 60)
     
-    # Extract peak amplitudes from the results
-    peak_amplitudes = df['fwEMG 3'].values
-    print(f"Classifying {len(peak_amplitudes)} peak amplitudes...")
+    # Create feature vectors using all 4 features
+    feature_vectors = []
+    for _, row in df.iterrows():
+        feature_vector = [
+            row['fwEMG 3'],  # Peak amplitude
+            row['Min_Peak_Amplitude'],  # Min peak amplitude
+            row['Mean_Frequency'],  # Mean frequency
+            row['Median_Frequency']  # Median frequency
+        ]
+        feature_vectors.append(feature_vector)
     
-    # Classify all peak amplitudes
-    classifications = classifier.predict(peak_amplitudes)
-    probabilities = classifier.predict_proba(peak_amplitudes)
+    feature_vectors = np.array(feature_vectors)
+    print(f"Classifying {len(feature_vectors)} feature vectors with shape: {feature_vectors.shape}")
+    
+    # Classify using all features
+    classifications = classifier.predict(feature_vectors)
+    probabilities = classifier.predict_proba(feature_vectors)
     
     # Create results DataFrame
     results_df = df.copy()
@@ -105,7 +120,9 @@ def run_lda_classification():
     for i in range(min(10, len(results_df))):
         row = results_df.iloc[i]
         print(f"  Sample {i+1}: Subject={row['Subject']}, MVC={row['MVC']}, "
-              f"Peak={row['fwEMG 3']:.3f}, Predicted={row['Predicted_MVC']}")
+              f"Peak={row['fwEMG 3']:.3f}, Min={row['Min_Peak_Amplitude']:.3f}, "
+              f"MeanFreq={row['Mean_Frequency']:.1f}Hz, MedianFreq={row['Median_Frequency']:.1f}Hz, "
+              f"Predicted={row['Predicted_MVC']}")
     
     # Save results
     output_file = peak_results_file.parent / "lda_classification_results.csv"
