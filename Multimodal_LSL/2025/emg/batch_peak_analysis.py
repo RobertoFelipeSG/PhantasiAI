@@ -97,12 +97,15 @@ class BatchPeakAnalyzer:
         print(f"Trials: {trials}")
         
         # Verify expected structure
-        expected_subjects = [f"S0{i}" for i in range(1, 8)]
+        expected_subjects = ['S01', 'S02', 'S03', 'S04', 'S05', 'S07']  # Updated for new dataset
         expected_mvcs = [10, 25, 50]
         expected_trials = [1, 2, 3]
         
-        if subjects != expected_subjects:
-            print(f"Warning: Unexpected subjects. Expected: {expected_subjects}, Got: {subjects}")
+        # Extract base subject names (remove channel info)
+        base_subjects = sorted(list(set([s.split('_')[0] for s in subjects if '_' in s])))
+        
+        if base_subjects != expected_subjects:
+            print(f"Warning: Unexpected subjects. Expected: {expected_subjects}, Got: {base_subjects}")
         
         if mvcs != expected_mvcs:
             print(f"Warning: Unexpected MVC levels. Expected: {expected_mvcs}, Got: {mvcs}")
@@ -126,8 +129,11 @@ class BatchPeakAnalyzer:
     def extract_trial_data(self, subject, mvc, trial):
         """Extract data for a specific trial."""
 
+        # For the new dataset, we need to use CH1 for each subject
+        subject_ch1 = f"{subject}_CH1"
+        
         trial_data = self.df[
-            (self.df['Subject'] == subject) & 
+            (self.df['Subject'] == subject_ch1) & 
             (self.df['MVC'] == mvc) & 
             (self.df['Trial'] == trial)
         ].copy()
@@ -233,7 +239,7 @@ class BatchPeakAnalyzer:
                 
                 summary_data.append({
                     'Time': absolute_peak_time,
-                    'fwEMG 3': highest_peak_amplitude,
+                    'EMG': highest_peak_amplitude,
                     'Min_Peak_Amplitude': result['min_peak_amplitude'],
                     'Mean_Frequency': result['mean_frequency'],
                     'Median_Frequency': result['median_frequency'],
@@ -244,16 +250,16 @@ class BatchPeakAnalyzer:
             else:
                 # No peaks detected - use the maximum value from the trial
                 trial_data = result['trial_data']
-                max_idx = trial_data['fwEMG 3'].idxmax()
+                max_idx = trial_data['EMG'].idxmax()
                 # Convert back to absolute time
                 original_start_time = trial_data.attrs['original_start_time']
                 relative_max_time = trial_data.loc[max_idx, 'Time']
                 absolute_max_time = original_start_time + relative_max_time
-                max_amplitude = trial_data.loc[max_idx, 'fwEMG 3']
+                max_amplitude = trial_data.loc[max_idx, 'EMG']
                 
                 summary_data.append({
                     'Time': absolute_max_time,
-                    'fwEMG 3': max_amplitude,
+                    'EMG': max_amplitude,
                     'Min_Peak_Amplitude': result['min_peak_amplitude'],
                     'Mean_Frequency': result['mean_frequency'],
                     'Median_Frequency': result['median_frequency'],
@@ -293,7 +299,7 @@ class BatchPeakAnalyzer:
                         
                         detailed_data.append({
                             'Time': absolute_peak_time,
-                            'fwEMG 3': peak_amplitude,
+                            'EMG': peak_amplitude,
                             'Subject': subject,
                             'MVC': mvc,
                             'Trial': trial,
@@ -303,16 +309,16 @@ class BatchPeakAnalyzer:
                 else:
                     # No peaks detected - use the maximum value
                     trial_data = result['trial_data']
-                    max_idx = trial_data['fwEMG 3'].idxmax()
+                    max_idx = trial_data['EMG'].idxmax()
                     # Convert back to absolute time
                     original_start_time = trial_data.attrs['original_start_time']
                     relative_max_time = trial_data.loc[max_idx, 'Time']
                     absolute_max_time = original_start_time + relative_max_time
-                    max_amplitude = trial_data.loc[max_idx, 'fwEMG 3']
+                    max_amplitude = trial_data.loc[max_idx, 'EMG']
                     
                     detailed_data.append({
                         'Time': absolute_max_time,
-                        'fwEMG 3': max_amplitude,
+                        'EMG': max_amplitude,
                         'Subject': subject,
                         'MVC': mvc,
                         'Trial': trial,
@@ -355,7 +361,7 @@ class BatchPeakAnalyzer:
             }
         
         # Get EMG signal
-        emg_signal = trial_data['fwEMG 3'].values
+        emg_signal = trial_data['EMG'].values
         
         # Extract minimum peak amplitude
         min_peak_amplitude = np.min(peak_amplitudes) if len(peak_amplitudes) > 0 else np.nan
@@ -541,7 +547,7 @@ class BatchPeakAnalyzer:
             feature_vectors = []
             for _, row in df.iterrows():
                 feature_vector = [
-                    row['fwEMG 3'],  # Peak amplitude
+                    row['EMG'],  # Peak amplitude
                     row['Min_Peak_Amplitude'],  # Min peak amplitude
                     row['Mean_Frequency'],  # Mean frequency
                     row['Median_Frequency']  # Median frequency
@@ -585,7 +591,7 @@ class BatchPeakAnalyzer:
             for i in range(min(5, len(results_df))):
                 row = results_df.iloc[i]
                 print(f"   Sample {i+1}: Subject={row['Subject']}, MVC={row['MVC']}, "
-                      f"Peak={row['fwEMG 3']:.3f}, Predicted={row['Predicted_MVC']}")
+                      f"Peak={row['EMG']:.3f}, Predicted={row['Predicted_MVC']}")
             
             print("=" * 60)
             print("LDA Classification completed successfully!")
@@ -606,15 +612,18 @@ class BatchPeakAnalyzer:
         # Create output directory
         self.create_output_directory()
         
-        # Get all unique combinations
-        combinations = self.df.groupby(['Subject', 'MVC', 'Trial']).size().reset_index()
-        print(f"\nFound {len(combinations)} unique trial combinations")
+        # Get all unique combinations for CH1 only
+        ch1_data = self.df[self.df['Subject'].str.endswith('_CH1')]
+        combinations = ch1_data.groupby(['Subject', 'MVC', 'Trial']).size().reset_index()
+        print(f"\nFound {len(combinations)} unique trial combinations (CH1 only)")
         
         # Analyze each trial
         all_results = []
         
         for _, row in combinations.iterrows():
-            subject, mvc, trial = row['Subject'], row['MVC'], row['Trial']
+            subject_full, mvc, trial = row['Subject'], row['MVC'], row['Trial']
+            # Extract base subject name (remove _CH1)
+            subject = subject_full.split('_')[0]
             result = self.analyze_trial(subject, mvc, trial)
             all_results.append(result)
         
@@ -651,7 +660,7 @@ class BatchPeakAnalyzer:
 def main():
     """Main function to run the batch analysis."""
     # Path to the combined dataset
-    dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex.csv"
+    dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex_master.csv"
     
     if not dataset_path.exists():
         print(f"Error: Dataset not found at {dataset_path}")

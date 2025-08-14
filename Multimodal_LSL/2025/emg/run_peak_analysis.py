@@ -150,7 +150,7 @@ def run_single_file_analysis():
     model_path = None
     possible_model_paths = [
         Path(__file__).parent / "lda_model.pkl",
-        Path(__file__).parent.parent / "dataset" / "batch_peak_analysis_20250813_115014" / "lda_model.pkl"
+        Path(__file__).parent.parent / "dataset" / "batch_peak_analysis_20250814_105200" / "lda_model.pkl"
     ]
     
     for path in possible_model_paths:
@@ -191,7 +191,7 @@ def run_single_file_analysis():
 def run_batch_analysis():
     """Run batch analysis on the combined dataset."""
     # Check if default dataset exists
-    default_dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex.csv"
+    default_dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex_master.csv"
     
     if default_dataset_path.exists():
         print(f"Found default dataset: {default_dataset_path}")

@@ -57,7 +57,12 @@ class EMGPeakAnalyzerFixed:
         print(f"Available columns: {self.df_emg.columns.tolist()}")
         
         # Handle different possible column names for EMG data
-        if 'fwEMG 3' in self.df_emg.columns:
+        if 'EMG' in self.df_emg.columns:
+            # New master dataset format
+            emg_signal = self.df_emg['EMG'].dropna().values
+            time_vector = self.df_emg['Time'].iloc[:len(emg_signal)].values
+            print(f"Using 'EMG' column for EMG data")
+        elif 'fwEMG 3' in self.df_emg.columns:
             # Combined dataset format
             emg_signal = self.df_emg['fwEMG 3'].dropna().values
             time_vector = self.df_emg['Time'].iloc[:len(emg_signal)].values

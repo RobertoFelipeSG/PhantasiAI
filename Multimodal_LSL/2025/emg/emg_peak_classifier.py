@@ -32,8 +32,8 @@ except ImportError:
     SCIPY_AVAILABLE = False
     print("SciPy not available. Please install with: pip install scipy")
 
-from .emg_peak_analyzer import EMGPeakAnalyzer
-from .emg_LDA_classifier import EMGLDAClassifier
+from emg_peak_analyzer import EMGPeakAnalyzer
+from emg_LDA_classifier import EMGLDAClassifier
 
 class EMGPeakClassifier(EMGPeakAnalyzer):
     """

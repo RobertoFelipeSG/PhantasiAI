@@ -8,7 +8,7 @@ as the classification file. It outputs classification arrays for new data.
 
 The peak_analysis_results.csv file contains:
 - Time: Timestamp of the highest peak in each trial
-- fwEMG 3: Amplitude of the highest peak
+- EMG: Amplitude of the highest peak
 - Subject: Subject identifier (S01-S07)
 - MVC: MVC percentage (10, 25, 50)
 - Trial: Trial number (1, 2, 3)
@@ -72,7 +72,7 @@ class EMGLDAClassifier:
         for (subject, mvc, trial), group in df.groupby(['Subject', 'MVC', 'Trial']):
             if len(group) > 0:
                 # Extract enhanced features
-                peak_amplitude = group['fwEMG 3'].max()  # Maximum peak amplitude
+                peak_amplitude = group['EMG'].max()  # Maximum peak amplitude
                 min_peak_amplitude = group['Min_Peak_Amplitude'].iloc[0]  # Minimum peak amplitude
                 mean_frequency = group['Mean_Frequency'].iloc[0]  # Mean frequency
                 median_frequency = group['Median_Frequency'].iloc[0]  # Median frequency

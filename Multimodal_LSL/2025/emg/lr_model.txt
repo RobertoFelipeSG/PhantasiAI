@@ -1,0 +1,23 @@
+Logistic Regression Model Summary
+========================================
+
+Model Type: Logistic Regression
+Features: ['Peak_Amplitude', 'Min_Peak_Amplitude', 'Mean_Frequency', 'Median_Frequency']
+Classes: [np.int64(10), np.int64(25), np.int64(50)]
+
+Cross-validation Results:
+  Train Accuracy: 0.6684
+  Test Accuracy:  0.6250
+  Train F1:       0.6535
+  Test F1:        0.6060
+
+Final Test Results:
+  Test Accuracy: 0.3636
+  Test F1:       0.3152
+  Training Time: 0.00s
+
+Feature Importance:
+  Peak_Amplitude: 1.1854
+  Min_Peak_Amplitude: 1.0643
+  Mean_Frequency: 0.1976
+  Median_Frequency: 0.1094
