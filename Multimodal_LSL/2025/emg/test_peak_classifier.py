@@ -261,29 +261,32 @@ def test_peak_classifier():
             return False
 
 def test_model_loading():
-    """Test loading the LDA model."""
+    """Test loading the Logistic Regression model."""
     print("\n" + "=" * 60)
     print("Testing Model Loading")
     print("=" * 60)
     
     # Check if model file exists
-    model_path = Path(__file__).parent / "lda_model.pkl"
+    model_path = Path(__file__).parent / "lr_model.pkl"
     if not model_path.exists():
         print(f"Model file not found: {model_path}")
-        print("Please train the LDA model first:")
-        print("1. python run_peak_analysis.py")
-        print("2. python run_lda_after_peak_analysis.py")
+        print("Please train the Logistic Regression model first:")
+        print("python train_lr_model.py")
         return False
     
     print(f"Model file found: {model_path}")
     
     # Try to load the model
     try:
-        from emg.emg_LDA_classifier import EMGLDAClassifier
-        classifier = EMGLDAClassifier()
-        classifier.load_model(model_path)
+        import pickle
+        with open(model_path, 'rb') as f:
+            model_package = pickle.load(f)
+        
         print("Model loaded successfully")
-        print(f"Available classes: {classifier.label_encoder.classes_}")
+        print(f"Model type: {model_package['model_type']}")
+        print(f"Version: {model_package['version']}")
+        print(f"Available classes: {list(model_package['label_encoder'].classes_)}")
+        print(f"Feature names: {model_package['feature_names']}")
         return True
     except Exception as e:
         print(f"Error loading model: {e}")
@@ -331,19 +334,23 @@ def test_standalone_classifier():
             print(f"Error testing standalone classifier: {e}")
             return False
 
-def debug_lda_classifier():
-    """Debug the LDA classifier with test amplitudes."""
+def debug_lr_classifier():
+    """Debug the Logistic Regression classifier with test amplitudes."""
     print("\n" + "=" * 60)
-    print("Debugging LDA Classifier")
+    print("Debugging Logistic Regression Classifier")
     print("=" * 60)
     
     try:
-        from emg.emg_LDA_classifier import EMGLDAClassifier
+        import pickle
         
         # Load the model
-        model_path = Path(__file__).parent / "lda_model.pkl"
-        classifier = EMGLDAClassifier()
-        classifier.load_model(model_path)
+        model_path = Path(__file__).parent / "lr_model.pkl"
+        with open(model_path, 'rb') as f:
+            model_package = pickle.load(f)
+        
+        model = model_package['model']
+        scaler = model_package['scaler']
+        label_encoder = model_package['label_encoder']
         
         # Test amplitudes for each MVC level (expanded range)
         test_amplitudes = {
@@ -361,12 +368,18 @@ def debug_lda_classifier():
                 # Create feature vector with all 4 features
                 X = np.array([[amp, amp * 0.8, 50.0, 45.0]])  # [amp, min_amp, mean_freq, median_freq]
                 
+                # Scale features
+                X_scaled = scaler.transform(X)
+                
                 # Get prediction and probabilities
-                prediction = classifier.predict(X)[0]
-                probabilities = classifier.predict_proba(X)[0]
+                prediction = model.predict(X_scaled)[0]
+                probabilities = model.predict_proba(X_scaled)[0]
                 confidence = max(probabilities)
                 
-                print(f"  Amplitude {amp:.3f} → Predicted: {prediction}% MVC, "
+                # Convert back to original labels
+                predicted_class = label_encoder.inverse_transform([prediction])[0]
+                
+                print(f"  Amplitude {amp:.3f} → Predicted: {predicted_class}% MVC, "
                       f"Confidence: {confidence:.3f}")
                 print(f"    Probabilities: 10%={probabilities[0]:.3f}, "
                       f"25%={probabilities[1]:.3f}, 50%={probabilities[2]:.3f}")
@@ -384,12 +397,16 @@ def test_edge_cases():
     print("=" * 60)
     
     try:
-        from emg.emg_LDA_classifier import EMGLDAClassifier
+        import pickle
         
         # Load the model
-        model_path = Path(__file__).parent / "lda_model.pkl"
-        classifier = EMGLDAClassifier()
-        classifier.load_model(model_path)
+        model_path = Path(__file__).parent / "lr_model.pkl"
+        with open(model_path, 'rb') as f:
+            model_package = pickle.load(f)
+        
+        model = model_package['model']
+        scaler = model_package['scaler']
+        label_encoder = model_package['label_encoder']
         
         # Test edge cases
         edge_cases = [
@@ -419,12 +436,18 @@ def test_edge_cases():
             X = np.array([[amplitude, amplitude * 0.8, 50.0, 45.0]])  # [amp, min_amp, mean_freq, median_freq]
             
             try:
+                # Scale features
+                X_scaled = scaler.transform(X)
+                
                 # Get prediction and probabilities
-                prediction = classifier.predict(X)[0]
-                probabilities = classifier.predict_proba(X)[0]
+                prediction = model.predict(X_scaled)[0]
+                probabilities = model.predict_proba(X_scaled)[0]
                 confidence = max(probabilities)
                 
-                print(f"  {description} ({amplitude:.3f}): Predicted {prediction}% MVC, "
+                # Convert back to original labels
+                predicted_class = label_encoder.inverse_transform([prediction])[0]
+                
+                print(f"  {description} ({amplitude:.3f}): Predicted {predicted_class}% MVC, "
                       f"Confidence {confidence:.3f}")
                 print(f"    Probabilities: 10%={probabilities[0]:.3f}, "
                       f"25%={probabilities[1]:.3f}, 50%={probabilities[2]:.3f}")
@@ -445,12 +468,16 @@ def test_noise_robustness():
     print("=" * 60)
     
     try:
-        from emg.emg_LDA_classifier import EMGLDAClassifier
+        import pickle
         
         # Load the model
-        model_path = Path(__file__).parent / "lda_model.pkl"
-        classifier = EMGLDAClassifier()
-        classifier.load_model(model_path)
+        model_path = Path(__file__).parent / "lr_model.pkl"
+        with open(model_path, 'rb') as f:
+            model_package = pickle.load(f)
+        
+        model = model_package['model']
+        scaler = model_package['scaler']
+        label_encoder = model_package['label_encoder']
         
         # Base amplitude to test
         base_amplitude = 0.25  # 25% MVC level
@@ -470,13 +497,19 @@ def test_noise_robustness():
             X = np.array([[noisy_amplitude, noisy_amplitude * 0.8, 50.0, 45.0]])
             
             try:
+                # Scale features
+                X_scaled = scaler.transform(X)
+                
                 # Get prediction and probabilities
-                prediction = classifier.predict(X)[0]
-                probabilities = classifier.predict_proba(X)[0]
+                prediction = model.predict(X_scaled)[0]
+                probabilities = model.predict_proba(X_scaled)[0]
                 confidence = max(probabilities)
                 
+                # Convert back to original labels
+                predicted_class = label_encoder.inverse_transform([prediction])[0]
+                
                 print(f"  Noise level {noise_level:.3f}: Amplitude {noisy_amplitude:.3f} → "
-                      f"Predicted {prediction}% MVC, Confidence {confidence:.3f}")
+                      f"Predicted {predicted_class}% MVC, Confidence {confidence:.3f}")
                 
             except Exception as e:
                 print(f"  Noise level {noise_level:.3f}: Error - {e}")
@@ -495,8 +528,8 @@ if __name__ == "__main__":
         print("\nModel loading test failed. Please ensure you have a trained LDA model.")
         sys.exit(1)
     
-    # Debug the LDA classifier
-    debug_lda_classifier()
+    # Debug the Logistic Regression classifier
+    debug_lr_classifier()
     
     # Test edge cases
     test_edge_cases()

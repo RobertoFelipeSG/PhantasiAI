@@ -92,20 +92,33 @@ class BatchPeakAnalyzer:
         mvcs = sorted(self.df['MVC'].unique())
         trials = sorted(self.df['Trial'].unique())
         
-        print(f"Subjects: {subjects}")
+        print(f"Unique subjects: {subjects}")
         print(f"MVC levels: {mvcs}")
         print(f"Trials: {trials}")
         
         # Verify expected structure
-        expected_subjects = ['S01', 'S02', 'S03', 'S04', 'S05', 'S07']  # Updated for new dataset
+        expected_base_subjects = ['S01', 'S02', 'S03', 'S04', 'S05', 'S07']
         expected_mvcs = [10, 25, 50]
         expected_trials = [1, 2, 3]
         
         # Extract base subject names (remove channel info)
         base_subjects = sorted(list(set([s.split('_')[0] for s in subjects if '_' in s])))
+        print(f"Base subjects (without channels): {base_subjects}")
         
-        if base_subjects != expected_subjects:
-            print(f"Warning: Unexpected subjects. Expected: {expected_subjects}, Got: {base_subjects}")
+        # Check if we have multiple channels per subject
+        channels_per_subject = {}
+        for subject in subjects:
+            if '_' in subject:
+                base_subject = subject.split('_')[0]
+                channel = subject.split('_')[1]
+                if base_subject not in channels_per_subject:
+                    channels_per_subject[base_subject] = []
+                channels_per_subject[base_subject].append(channel)
+        
+        print(f"Channels per subject: {channels_per_subject}")
+        
+        if base_subjects != expected_base_subjects:
+            print(f"Warning: Unexpected base subjects. Expected: {expected_base_subjects}, Got: {base_subjects}")
         
         if mvcs != expected_mvcs:
             print(f"Warning: Unexpected MVC levels. Expected: {expected_mvcs}, Got: {mvcs}")
@@ -129,11 +142,9 @@ class BatchPeakAnalyzer:
     def extract_trial_data(self, subject, mvc, trial):
         """Extract data for a specific trial."""
 
-        # For the new dataset, we need to use CH1 for each subject
-        subject_ch1 = f"{subject}_CH1"
-        
+        # Use the full subject name (including channel) as provided
         trial_data = self.df[
-            (self.df['Subject'] == subject_ch1) & 
+            (self.df['Subject'] == subject) & 
             (self.df['MVC'] == mvc) & 
             (self.df['Trial'] == trial)
         ].copy()
@@ -612,19 +623,25 @@ class BatchPeakAnalyzer:
         # Create output directory
         self.create_output_directory()
         
-        # Get all unique combinations for CH1 only
-        ch1_data = self.df[self.df['Subject'].str.endswith('_CH1')]
-        combinations = ch1_data.groupby(['Subject', 'MVC', 'Trial']).size().reset_index()
-        print(f"\nFound {len(combinations)} unique trial combinations (CH1 only)")
+        # Get all unique combinations for ALL channels
+        combinations = self.df.groupby(['Subject', 'MVC', 'Trial']).size().reset_index()
+        print(f"\nFound {len(combinations)} unique trial combinations (ALL channels)")
         
         # Analyze each trial
         all_results = []
         
         for _, row in combinations.iterrows():
             subject_full, mvc, trial = row['Subject'], row['MVC'], row['Trial']
-            # Extract base subject name (remove _CH1)
-            subject = subject_full.split('_')[0]
-            result = self.analyze_trial(subject, mvc, trial)
+            # Extract base subject name and channel
+            if '_' in subject_full:
+                subject = subject_full.split('_')[0]
+                channel = subject_full.split('_')[1]
+            else:
+                subject = subject_full
+                channel = 'CH1'  # Default for backward compatibility
+            
+            print(f"Processing {subject_full} (Subject: {subject}, Channel: {channel})")
+            result = self.analyze_trial(subject_full, mvc, trial)  # Pass full subject name
             all_results.append(result)
         
         # Save results
@@ -669,7 +686,7 @@ def main():
     # Create and run the batch analyzer
     analyzer = BatchPeakAnalyzer(
         dataset_path=dataset_path,
-        sampling_rate=220,
+        sampling_rate=10000,
         height_percentile=95,  # Slightly lower threshold for better detection
         min_distance=2  # Minimum 2 seconds between peaks
     )
