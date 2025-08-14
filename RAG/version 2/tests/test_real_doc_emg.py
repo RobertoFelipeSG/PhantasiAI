@@ -46,7 +46,7 @@ def test_emg_doc_ingested(
     stats_before = rag_service.vector_store_service.get_collection_stats()
 
     # ingest the EMG article
-    rag_service.setup_vector_db(file_path=TEST_EMG_FILE)
+    rag_service.setup_vector_db(TEST_EMG_FILE)
     stats_after = rag_service.vector_store_service.get_collection_stats()
 
     assert stats_before["total_documents"] == 0  # tests if VDB was cleared

@@ -43,7 +43,7 @@ def test_add_new_document_to_vector_db(vector_store_service, rag_service):
     initial_stats = vector_store_service.get_collection_stats()
     initial_count = initial_stats["total_documents"]
 
-    rag_service.setup_vector_db(file_path=TEST_FILE_PATH)
+    rag_service.setup_vector_db(TEST_FILE_PATH)
 
     updated_stats = vector_store_service.get_collection_stats()
     updated_count = updated_stats["total_documents"]
