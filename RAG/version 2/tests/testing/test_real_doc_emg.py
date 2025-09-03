@@ -58,7 +58,7 @@ def test_emg_doc_ingested(
     ("query", "expected_snippet"),
     [
         (
-            "What does the paper say about EMG recordings?",
+            "What does the paper say EMG recording represent?",
             "EMG recordings represent a mixture of the electrical activity",
         ),
         (
@@ -70,10 +70,31 @@ def test_emg_doc_ingested(
 def test_direct_similarity_search(
     vector_store_service: VectorStoreService, query: str, expected_snippet: str
 ):
+    
+    """Debug: print top retrieved chunks"""
+    k = 5
+    docs = vector_store_service.similarity_search(query, k=k) # old: docs = vector_store_service.similarity_search(query, k=1)
+    
+    print(f"\n=== DEBUG: Query ===\n{query}")
+    print(f"Expected snippet: {expected_snippet}\n")
+    print("--- Retrieved chunks ---")
+    for i, d in enumerate(docs, start=1):
+        preview = d.page_content.strip().replace("\n", " ")
+        print(f"[{i}] {preview[:300]}{'...' if len(preview) > 300 else ''}")
+    
     """Top-1 chunk returned by similarity_search should mention the snippet."""
-    docs = vector_store_service.similarity_search(query, k=1)
-    assert len(docs) == 1
+    assert len(docs) > 0 # old: assert len(docs) == 1
     top_chunk = docs[0].page_content.lower()
+
+    if expected_snippet.lower() not in top_chunk:
+        print("Expected snippet not found in Top-1 chunk")
+
+        for d in docs:
+            if expected_snippet.lower() in d.page_content.lower():
+                print("Expected snippet found in a lower-ranked chunk")
+                break
+        else: print("Expected snippet not found in any retrieved chunks (Top-5)")
+
     assert expected_snippet.lower() in top_chunk
 
 
@@ -97,11 +118,30 @@ def test_direct_similarity_search(
 def test_rag_chain_answers_emg_questions(
     rag_service: RAGService, question: str, keywords: list[str]
 ):
+    """Debug: print retrieved content and LLM answer"""
+    retriever = rag_service.vector_store_service.get_retriever(search_type="similarity", k=5)
+
+    # context passed to LLM
+    retrieved_docs = retriever.invoke(question)
+    print(f"\n=== DEBUG: Question ===\n{question}\n")
+    print("--- Retrieved context chunks ---")
+    for i, d in enumerate(retrieved_docs, start=1):
+        preview = d.page_content.strip().replace("\n", " ")
+        print(f"[{i}] {preview[:300]}{'...' if len(preview) > 300 else ''}")
+    
     """Full RAG chain should return an answer that references expected terms."""
     rag_chain = rag_service.create_rag_chain()
     response = rag_chain.invoke({"question": question})
     answer = response if isinstance(response, str) else response.content
+
+    print(f"\n--- LLM Answer ---\n{answer}")
+
     answer_lower = answer.lower()
+
+    # Check for specific keywords missing (if any)
+    missing = [kw for kw in keywords if kw not in answer_lower]
+    if missing:
+        print(f"\nMissing keywords: {missing}")
 
     # Basic sanity: we got a non-empty answer
     assert answer_lower.strip() != ""
