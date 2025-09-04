@@ -1,4 +1,6 @@
 # %%
+import re
+
 from pathlib import Path
 import json
 from typing import List
@@ -48,9 +50,10 @@ chain = (
 )
 # %%
 # (optional) sanity-print the chunks the retriever fed to the LLM
-print("\n--- Retrieved chunks ---")
+''' print("\n--- Retrieved chunks ---")
 for d in retriever.invoke(full_prompt):
     print("•", d.page_content[:120].replace("\n", " "), "…")
+'''
 
 # fire the LLM
 raw_text = chain.invoke({"question": full_prompt})
@@ -61,7 +64,11 @@ print(raw_text)
 
 # %%
 try:
-    data = json.loads(raw_text)
+    # remove markdown code fences
+    clean_text = re.sub(r"```(?:json)?\s*", "", raw_text)
+    clean_text = re.sub(r"```", "", clean_text)
+
+    data = json.loads(clean_text)
     if not isinstance(data, list):
         # tolerate the model returning a single object
         data = [data]

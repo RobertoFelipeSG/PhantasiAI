@@ -1,3 +1,5 @@
+import os
+import torch
 from pydantic_settings import BaseSettings
 from typing import Optional, Literal
 
@@ -12,26 +14,27 @@ class Settings(BaseSettings):
     DB_DIR: str = "db"
 
     # Model Settings
-    EMBEDDING_MODEL: Literal[
-        "mxbai-embed-large",
-        "rjmalagon/gte-qwen2-1.5b-instruct-embed-f16",
-        "jasper_en_vision_language_v1",
-        "Losspost/stella_en_1.5b_v5",
-        "nvidia/NV-Embed-v2",
-        "rjmalagon/gte-qwen2-7b-instruct:f16",
-        "sentence-transformers/all-MiniLM-L6-v2"
-    ] = "sentence-transformers/all-MiniLM-L6-v2"
-    EMBEDDING_PROVIDER: str = "auto"
-    EMBEDDING_DEVICE: Optional[str] = None
-    EMBEDDING_BATCH_SIZE: int = 64
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_PROVIDER: str = "huggingface"
+    EMBEDDING_DEVICE: str = "cpu"
+    EMBEDDING_BATCH_SIZE: int = 32
 
-    LLM_MODEL: str = "llama3:8b"
+    LLM_MODEL: Literal[
+        "google/medgemma-4b-it",
+        "google/medgemma-4b-pt",
+        "google/medgemma-27b-it",
+        "google/medgemma-27b-text-it"
+    ] = "google/medgemma-4b-it"
+    LLM_PROVIDER: str = "huggingface"
+    LLM_DEVICE: Literal["cuda", "cpu"] = "cuda" if torch.cuda.is_available() else "cpu"
+    # LLM_TORCH_DTYPE: str = "bfloat16"
+    # LLM_API_KEY: Optional[str] = os.getenv("LLM_API_KEY")  # Google API key
 
     # Vector Store Settings
     COLLECTION_NAME: str = "documents"
-    CHUNK_SIZE: int = 1000
+    CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 50
-    TOP_K: int = 5
+    TOP_K: int = 1000
     CHROMA_DISTANCE_METRIC: str = "cosine"
 
     # Logging

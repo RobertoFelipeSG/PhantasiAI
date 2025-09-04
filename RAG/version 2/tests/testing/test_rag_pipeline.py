@@ -32,7 +32,7 @@ def test_init_vector_db(rag_service):
     assert vector_store.vector_store is not None, "Vector store should be initialized."
     assert stats is not None, "Collection stats should not be None."
     assert os.path.exists(stats["db_path"]), "Vector DB directory does not exist"
-    assert "all-MiniLM-L6-v2" in stats["embedding_function"], "Embedding model mismatch"
+    assert "all-MiniLM-L6-v2" in stats["embedding_function"], "Embedding model mismatch" # currently failing (using gte-qwen2-1.5b)
     assert stats["total_documents"] >= 0, "Total documents should be non-negative."
 
 
@@ -43,7 +43,7 @@ def test_add_new_document_to_vector_db(vector_store_service, rag_service):
     initial_stats = vector_store_service.get_collection_stats()
     initial_count = initial_stats["total_documents"]
 
-    rag_service.setup_vector_db(file_path=TEST_FILE_PATH)
+    rag_service.setup_vector_db(TEST_FILE_PATH)
 
     updated_stats = vector_store_service.get_collection_stats()
     updated_count = updated_stats["total_documents"]
@@ -161,5 +161,5 @@ def test_rag_pipeline_end_to_end(rag_service):
     assert isinstance(response, str)
     assert len(response) > 0
     # assert "james" in response.lower() or "parsons" in response.lower()
-    assert "18779876403" in response.replace("-", "")
+    assert "18779876403" in response.replace("-", "") # currently failing, could be related to model, chunking, or retrieval recall
     print(f"Response: {response}")

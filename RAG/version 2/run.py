@@ -1,4 +1,5 @@
-from app.main import RAGApplication
+from main import RAGApplication
+import traceback
 
 
 def main():
@@ -7,7 +8,8 @@ def main():
         app.initialize_database()
         app.run_interactive()
     except Exception as e:
-        print(f"Error: {e}")
+        # print(f"Error: {e}")
+        traceback.print_exc()
         exit(1)
 
 

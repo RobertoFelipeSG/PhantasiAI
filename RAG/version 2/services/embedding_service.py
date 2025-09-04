@@ -13,7 +13,7 @@ MODEL_PROVIDER_MAP = {
     "rjmalagon/gte-qwen2-1.5b-instruct-embed-f16": "ollama",
     "jasper_en_vision_language_v1": "ollama",
     "Losspost/stella_en_1.5b_v5": "ollama",
-    "all-MiniLM-L6-v2": "sentence_transformers",
+    "sentence-transformers/all-MiniLM-L6-v2": "sentence_transformers",
     "nvidia/NV-Embed-v2": "sentence_transformers",
     "rjmalagon/gte-qwen2-7b-instruct:f16": "ollama"
 }
