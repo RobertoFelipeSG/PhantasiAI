@@ -11,10 +11,14 @@ import logging
 from typing import Union
 from pathlib import Path
 
+import time
+
 logger = logging.getLogger(__name__)
 
 
 class RAGService:
+    print("DEBUG: Initializing RAG")
+
     def __init__(self, search_type: str = "similarity"):
         self.embedding_service = EmbeddingService()
         self.llm_service = LLMService()
@@ -28,44 +32,59 @@ class RAGService:
 
     def setup_vector_db(self, file_paths: Union[str, list[str]]) -> None:
         """Initialize and populate vector database."""
+        # batch_size = settings.EMBEDDING_BATCH_SIZE
+
         if isinstance(file_paths, str):
             file_paths = [file_paths]
 
-        all_split_docs = []
         for file_path in file_paths:
             try:
                 # Create database directory if it doesn't exist
                 os.makedirs(settings.DB_DIR, exist_ok=True)
 
-                # Load and split documents
+                # 1: Load and split documents
+                print("DEBUG: Loading / splitting documents")
                 loader = TextLoader(file_path, encoding="utf-8")
                 documents = loader.load()
                 for d in documents:
                     d.metadata["source"] = Path(file_path).name
                     d.metadata["doc_id"] = Path(file_path).name
                 
-                # propagate metadata while splitting
+                # Propagate metadata while splitting
+                print("DEBUG: Propagating metadata while splitting")
                 split = self.text_splitter.split_documents(documents)
+                total_chunks = len(split)
+                print(f"DEBUG: {total_chunks} chunks found in {file_path}")
+
+                # Attach metadata with chunk IDs
                 for idx, chunk in enumerate(split):
-                    chunk.metadata["chunk_id"] = idx
-                all_split_docs.extend(split)
+                    chunk.metadata.update({
+                        "chunk_id": idx,
+                        "source": Path(file_path).name,
+                        "doc_id": Path(file_path).name
+                    })
 
-
-                # Add to vector store
-                self.vector_store_service.add_documents(all_split_docs)
+                # 2: Embed + insert documents
+                print(f"DEBUG: Inserting+embedding all chunks")
+                start = time.time()
+                
+                self.vector_store_service.vector_store.add_documents(split)
+                print(f"DEBUG: Embedding + Inserting batch into vector store took {time.time()-start:.2f}s")
 
                 # Log stats
                 stats = self.vector_store_service.get_collection_stats()
                 logger.info(
                     f"Vector store initialized with {stats['total_documents']} documents"
                 )
+                print("DEBUG: Vectore DB initialized")
 
             except Exception as e:
-                logger.error(f"Error setting up vector database: {e}")
+                logger.error(f"Error creating vector database for {file_path}: {e}")
                 raise
 
     def create_rag_chain(self):
         """Create the RAG chain for retrieval and response generation."""
+
         try:
             retriever = self.vector_store_service.get_retriever(
                 search_type="similarity", k=settings.TOP_K
@@ -83,7 +102,7 @@ class RAGService:
                     blocks.append(f"### SOURCE: {src}\n" + "\n".join(pages))
 
                 return "\n\n".join(blocks)
-
+            
             chain = (
                 {"context": retriever | format_docs, "question": RunnablePassthrough()}
                 | self.llm_service.get_prompt()

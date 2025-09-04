@@ -18,19 +18,20 @@ class Settings(BaseSettings):
         "jasper_en_vision_language_v1",
         "Losspost/stella_en_1.5b_v5",
         "nvidia/NV-Embed-v2",
-        "rjmalagon/gte-qwen2-7b-instruct:f16"
-    ] = "rjmalagon/gte-qwen2-1.5b-instruct-embed-f16"
+        "rjmalagon/gte-qwen2-7b-instruct:f16",
+        "sentence-transformers/all-MiniLM-L6-v2"
+    ] = "sentence-transformers/all-MiniLM-L6-v2"
     EMBEDDING_PROVIDER: str = "auto"
     EMBEDDING_DEVICE: Optional[str] = None
-    EMBEDDING_BATCH_SIZE: int = 32
+    EMBEDDING_BATCH_SIZE: int = 64
 
     LLM_MODEL: str = "llama3:8b"
 
     # Vector Store Settings
     COLLECTION_NAME: str = "documents"
-    CHUNK_SIZE: int = 500
+    CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 50
-    TOP_K: int = 1000
+    TOP_K: int = 5
     CHROMA_DISTANCE_METRIC: str = "cosine"
 
     # Logging
