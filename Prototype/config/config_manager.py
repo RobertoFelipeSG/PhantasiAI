@@ -7,7 +7,8 @@ CONFIG_PATH = CONFIG_DIR / "phantasiai_config.json"
 
 DEFAULT_CONFIG = {
     "view_mode": "chat",         # chat or graph
-    "arduino_port": "/dev/ttyUSB0"       # default Arduino port
+    "arduino_port": "/dev/ttyUSB0", # default Arduino port
+    "ganglion_port": "/dev/ttyUSB0"    # default ganglion port MAC  
 }
 
 def load_config():

@@ -168,7 +168,7 @@ class RealTimeRecorder:
             self.event_times.append(timestamp)
             self.last_event_time = timestamp
             #print(f"[Recorder] Event marked with timestamp {timestamp:.3f}s, total events: {len(self.event_times)}")
-            self.parent.chat.log_event(f"Automatic marker event at {timestamp:.3f}s")
+            #self.parent.chat.log_event(f"Automatic marker event at {timestamp:.3f}s")
         except Exception as e:
             print(f"[Recorder] Failed to mark event: {e}")
             

@@ -63,8 +63,7 @@ if __name__ == "__main__":
 
     # Configuration du client MQTT
     broker_address = "localhost"
-    mqtt_client = mqtt.Client("FileWatcher_Client")
-    #mqtt_client = mqtt.Client(CallbackAPIVersion.VERSION1, "Filewatcher_Client")
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, "FileWatcher_Client")
     mqtt_client.on_connect = on_connect
 
     # Connexion au broker MQTT

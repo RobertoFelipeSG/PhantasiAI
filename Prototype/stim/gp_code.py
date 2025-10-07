@@ -5,7 +5,7 @@ import pandas as pd
 import warnings
 import paho.mqtt.client as mqtt  # Importation du client MQTT
 from botorch.models import SingleTaskGP
-from botorch.fit import fit_gpytorch_mll
+from botorch.fit import fit_gpytorch_model
 from botorch.acquisition import ExpectedImprovement, NoisyExpectedImprovement, UpperConfidenceBound
 from botorch.utils.transforms import normalize, standardize
 from gpytorch.mlls import ExactMarginalLogLikelihood
@@ -131,7 +131,7 @@ def run_bayesian_optimization(resp_nd, resp_1d, parameter_names, X_test_norm, X_
             else:
                 gp = SingleTaskGP(x_train_norm, y_train_std)
             mll = ExactMarginalLogLikelihood(gp.likelihood, gp)
-            fit_gpytorch_mll(mll)
+            fit_gpytorch_model(mll)
 
         best_idx = torch.argmax(P_test[s, :, -1])
         best_params_idx = P_test[s, best_idx, :-1].numpy().astype(int)
@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     # Configuration du client MQTT
     broker_address = "localhost"
-    client = mqtt.Client("GPBO_Client")
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, "GPBO_Client")
     client.connect(broker_address, 1883, 60)
     client.loop_start()
 

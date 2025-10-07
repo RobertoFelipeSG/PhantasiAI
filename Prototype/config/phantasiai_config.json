@@ -1,5 +1,5 @@
 {
-    "view_mode": "graph",
+    "view_mode": "chat",
     "arduino_port": "/dev/ttyUSB0",
     "ganglion_port": "/dev/ttyACM0"
 }
