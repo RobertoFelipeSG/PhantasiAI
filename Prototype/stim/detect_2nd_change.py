@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     # Configuration du client MQTT
     broker_address = "localhost"
-    mqtt_client = mqtt.Client("SQWatcher_Client")
+    mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, "SQWatcher_Client")
     mqtt_client.on_connect = on_connect
 
     # Connexion au broker MQTT

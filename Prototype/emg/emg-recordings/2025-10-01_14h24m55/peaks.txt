@@ -1,0 +1,36 @@
+EMG File: emg/emg-recordings/2025-10-01_14h24m55/tmpbbk2jw8m.csv
+Output File: peaks.txt
+Number of events: 12
+Number of event windows: 11
+Number of peaks detected: 11
+Height percentile: 95
+Min distance: 2 seconds
+Sampling rate: 200 Hz
+Signal duration: 60.00 seconds
+
+Event details:
+Event 1: Time=74.290s
+Event 2: Time=79.290s
+Event 3: Time=84.290s
+Event 4: Time=89.290s
+Event 5: Time=94.290s
+Event 6: Time=99.290s
+Event 7: Time=104.290s
+Event 8: Time=109.290s
+Event 9: Time=114.290s
+Event 10: Time=119.290s
+Event 11: Time=124.290s
+Event 12: Time=129.295s
+
+Peak details (highest peak per event window):
+Peak 1: Time=74.300s, Amplitude=4111.1315µV
+Peak 2: Time=84.235s, Amplitude=23445.6275µV
+Peak 3: Time=85.555s, Amplitude=17252.9317µV
+Peak 4: Time=93.180s, Amplitude=22381.5440µV
+Peak 5: Time=98.090s, Amplitude=14495.0228µV
+Peak 6: Time=100.540s, Amplitude=9301.5992µV
+Peak 7: Time=105.445s, Amplitude=8797.8517µV
+Peak 8: Time=109.525s, Amplitude=9203.1680µV
+Peak 9: Time=117.705s, Amplitude=18399.5306µV
+Peak 10: Time=123.450s, Amplitude=15883.1825µV
+Peak 11: Time=127.495s, Amplitude=19656.3816µV

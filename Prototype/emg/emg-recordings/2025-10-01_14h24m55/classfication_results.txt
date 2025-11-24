@@ -1,0 +1,37 @@
+
+--- Classification Results ---
+Model used: XGBoost Classifier
+Available classes: [np.int64(10), np.int64(25), np.int64(50)]
+Classified peaks: 10
+Class distribution: {np.int64(10): 10}
+
+Peak Details:
+  Peak 1: 7.085s - 10% MVC (Amplitude: -1136.6µV, Confidence: 0.970)
+  Peak 2: 12.635s - 10% MVC (Amplitude: 5668.0µV, Confidence: 0.912)
+  Peak 3: 19.995s - 10% MVC (Amplitude: 11526.7µV, Confidence: 0.912)
+  Peak 4: 20.010s - 10% MVC (Amplitude: 2439.9µV, Confidence: 0.912)
+  Peak 5: 25.110s - 10% MVC (Amplitude: -430.4µV, Confidence: 0.970)
+  Peak 6: 34.740s - 10% MVC (Amplitude: -2064.9µV, Confidence: 0.970)
+  Peak 7: 35.565s - 10% MVC (Amplitude: -3523.0µV, Confidence: 0.970)
+  Peak 8: 42.135s - 10% MVC (Amplitude: 6426.9µV, Confidence: 0.912)
+  Peak 9: 48.125s - 10% MVC (Amplitude: -5156.9µV, Confidence: 0.970)
+  Peak 10: 52.795s - 10% MVC (Amplitude: -6661.2µV, Confidence: 0.970)
+
+--- Classification Results ---
+Model used: XGBoost Classifier
+Available classes: [np.int64(10), np.int64(25), np.int64(50)]
+Classified peaks: 11
+Class distribution: {np.int64(10): 11}
+
+Peak Details:
+  Peak 1: 0.020s - 10% MVC (Amplitude: -1100.7µV, Confidence: 0.909)
+  Peak 2: 9.955s - 10% MVC (Amplitude: -6157.7µV, Confidence: 0.909)
+  Peak 3: 11.275s - 10% MVC (Amplitude: 10845.1µV, Confidence: 0.726)
+  Peak 4: 18.900s - 10% MVC (Amplitude: 6080.6µV, Confidence: 0.726)
+  Peak 5: 23.810s - 10% MVC (Amplitude: -5398.6µV, Confidence: 0.909)
+  Peak 6: 26.260s - 10% MVC (Amplitude: -1650.2µV, Confidence: 0.909)
+  Peak 7: 31.165s - 10% MVC (Amplitude: 924.0µV, Confidence: 0.726)
+  Peak 8: 35.245s - 10% MVC (Amplitude: 2917.2µV, Confidence: 0.726)
+  Peak 9: 43.425s - 10% MVC (Amplitude: 5709.0µV, Confidence: 0.726)
+  Peak 10: 49.170s - 10% MVC (Amplitude: -5065.2µV, Confidence: 0.909)
+  Peak 11: 53.215s - 10% MVC (Amplitude: 6476.4µV, Confidence: 0.726)

@@ -1,0 +1,18 @@
+
+--- Classification Results ---
+Model used: XGBoost Classifier
+Available classes: [np.int64(10), np.int64(25), np.int64(50)]
+Classified peaks: 10
+Class distribution: {np.int64(10): 10}
+
+Peak Details:
+  Peak 1: 7.100s - 10% MVC (Amplitude: 8.9µV, Confidence: 0.887)
+  Peak 2: 12.425s - 10% MVC (Amplitude: 0.4µV, Confidence: 0.885)
+  Peak 3: 17.460s - 10% MVC (Amplitude: 112.7µV, Confidence: 0.870)
+  Peak 4: 21.115s - 10% MVC (Amplitude: 31.7µV, Confidence: 0.870)
+  Peak 5: 27.645s - 10% MVC (Amplitude: 6.5µV, Confidence: 0.855)
+  Peak 6: 30.305s - 10% MVC (Amplitude: 9.8µV, Confidence: 0.887)
+  Peak 7: 37.505s - 10% MVC (Amplitude: 3.0µV, Confidence: 0.845)
+  Peak 8: 40.190s - 10% MVC (Amplitude: 2.7µV, Confidence: 0.847)
+  Peak 9: 47.090s - 10% MVC (Amplitude: -23.2µV, Confidence: 0.772)
+  Peak 10: 52.300s - 10% MVC (Amplitude: 9.6µV, Confidence: 0.887)

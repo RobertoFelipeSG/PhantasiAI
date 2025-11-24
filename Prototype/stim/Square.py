@@ -1,4 +1,13 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    # Use mock GPIO for non-Raspberry Pi systems
+    import sys
+    import os
+    sys.path.append(os.path.dirname(__file__))
+    from mock_gpio import MockGPIO as GPIO
+    print("[Square.py] Using mock GPIO (not running on Raspberry Pi)")
+
 from time import sleep
 import numpy as np
 import os
@@ -25,7 +34,7 @@ if __name__ == "__main__":
     
     # Configuration du client MQTT
     broker_address = "localhost"
-    client = mqtt.Client("Square_Client")
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, "Square_Client")
     client.connect(broker_address, 1883, 60)
     client.loop_start()
     

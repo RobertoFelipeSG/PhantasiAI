@@ -1,6 +1,8 @@
 import os
 import sys
 import subprocess
+import threading
+import queue
 import numpy as np
 from PyQt5 import QtWidgets, QtGui, QtCore
 
@@ -36,7 +38,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # ganglion port configuration
         cfg_ganglion_port = (self.config.get("ganglion_port") or "").strip()
-        probed_ports = "/dev/ttyACM0" #[p for p in ("/dev/ttyUSB0", "/dev/ttyACM0") if os.path.exists(p)]
+        probed_ports = [p for p in ("/dev/ttyUSB0", "/dev/ttyACM0") if os.path.exists(p)]
         self.ganglion_port = cfg_ganglion_port or (probed_ports[0] if probed_ports else "/dev/ttyACM0")
         
         # sensor type selection
@@ -49,6 +51,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_data_source = data_type
         self.selected_channels = []
         self.data_received = False
+        
+        # Background processes for AI and STIM
+        self.ai_process = None
+        self.stim_process = None
+        self.ai_output_queue = queue.Queue()
+        self.stim_output_queue = queue.Queue()
+        self.output_timer = QtCore.QTimer()
+        self.output_timer.timeout.connect(self.process_background_output)
 
         # Automatic analysis settings
         self.auto_analysis_enabled = False
@@ -507,6 +517,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.auto_analysis_countdown_label.setText("AI analysis: OFF")
                 self.auto_analysis_countdown_label.setStyleSheet("QLabel { color: blue; font-weight: bold; font-size: 15pt; }")
             
+            # Stop background processes
+            self.stop_background_processes()
+            self.output_timer.stop()
+            self.chat.log_event("Background AI and STIM processes stopped")
+            
             self.recorder.stop_recording()
             self.btn_record.setText("START")
             
@@ -533,48 +548,33 @@ class MainWindow(QtWidgets.QMainWindow):
             self.graph.automatic_marker_added.connect(self.handle_automatic_marker)
             
 
-            # Automatic scripts to run in new terminals
-            # Find current base directory and  thus find the results from the session
+            # Start background processes for AI and STIM
             base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
             script_path = os.path.join(base_dir, "stim", "detect_change.py")
             script_path_II = os.path.join(base_dir, "stim", "detect_2nd_change.py")
-            #print(base_dir)
-            #print(script_path)
-            VENV_PATH = "/home/phantasiai/Prototype/prot/bin/activate"
-
-            # Target script to be executed in terminals
-            command_seq = (
-            f"source {VENV_PATH} &&"
-            f"echo 'Virtual enviroment actvated' &&"
-            f"python3 {script_path};"
-            f"exec bash"
-            )
             
-            command_seq_II = (
-            f"source {VENV_PATH} &&"
-            f"echo 'Virtual enviroment actvated' &&"
-            f"python3 {script_path_II};"
-            f"exec bash"
-            )
+            # Start AI process in background
+            self.chat.log_event(f"Starting AI process: {script_path}")
+            self.ai_process = self.start_background_process(script_path, "AI", self.ai_output_queue)
+            if self.ai_process:
+                self.chat.log_event("AI Stimulation Optimization started in background")
+                print("AI process started in background")
+            else:
+                self.chat.log_event("Failed to start AI process")
+                print("Failed to start AI process")
             
-            # The '-e' flag tells lxterminal to execute the command that follows.
-            command = f'lxterminal -e "bash -c \\"{command_seq}\\""'
-            command_II = f'lxterminal -e "bash -c \\"{command_seq_II}\\""'
-
-
-            try:
-                # Launch the new terminal process without blocking the main script
-                subprocess.Popen(command, shell=True)
-                print(f"Launched AI in a new LXTerminal window.")
-                self.chat.log_event("Acquiring data to execute AI Stimulation Optimization")
-                
-                subprocess.Popen(command_II, shell=True)
-                print(f"Launched STIM in a new LXTerminal window.")
-                self.chat.log_event("Sending AI Stimulation")             
-
-            except FileNotFoundError:
-                print("❌ 'lxterminal' not found.")
-                print("Please ensure you're running a version of Raspberry Pi OS with a desktop.")
+            # Start STIM process in background
+            self.chat.log_event(f"Starting STIM process: {script_path_II}")
+            self.stim_process = self.start_background_process(script_path_II, "STIM", self.stim_output_queue)
+            if self.stim_process:
+                self.chat.log_event("AI Stimulation started in background")
+                print("STIM process started in background")
+            else:
+                self.chat.log_event("Failed to start STIM process")
+                print("Failed to start STIM process")
+            
+            # Start output processing timer
+            self.output_timer.start(100)  # Check for output every 100ms
             
             
 
@@ -811,12 +811,126 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.auto_analysis_enabled:
             self.stop_auto_analysis_timer()
         
+        # Stop background processes
+        self.stop_background_processes()
+        self.output_timer.stop()
+        
         if hasattr(self, 'graph') and self.graph.thread.isRunning():
             self.graph.thread.stop()
         if hasattr(self, 'live'):
             self.live.close()
         self.recorder.close()
         super().closeEvent(event)
+
+    def start_background_process(self, script_path, process_name, output_queue):
+        """Start a background process and capture its output."""
+        def read_output(process, queue, name):
+            """Read output from process and put it in queue."""
+            try:
+                for line in iter(process.stdout.readline, ''):
+                    if line:
+                        line = line.strip()
+                        if line:
+                            queue.put(f"[{name}] {line}")
+                            print(f"[{name}] {line}")  # Also print to main terminal
+                process.stdout.close()
+            except Exception as e:
+                queue.put(f"[{name}] Error reading output: {e}")
+                print(f"[{name}] Error reading output: {e}")
+        
+        try:
+            # Try to find and use the current Python environment
+            # First, try to use the same Python interpreter that's running this script
+            python_executable = sys.executable
+            
+            # If we're in a virtual environment, use it directly
+            if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
+                # We're in a virtual environment, use the current Python
+                command = f'"{python_executable}" "{script_path}"'
+            else:
+                # Not in a virtual environment, try to find a common venv path
+                base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+                possible_venv_paths = [
+                    os.path.join(base_dir, "venv", "bin", "activate"),
+                    os.path.join(base_dir, "env", "bin", "activate"),
+                    os.path.join(base_dir, ".venv", "bin", "activate"),
+                    "/home/phantasiai/Prototype/prot/bin/activate"  # Keep original as fallback
+                ]
+                
+                venv_path = None
+                for path in possible_venv_paths:
+                    if os.path.exists(path):
+                        venv_path = path
+                        break
+                
+                if venv_path:
+                    command = f'source "{venv_path}" && python3 "{script_path}"'
+                    output_queue.put(f"[{process_name}] Using virtual environment: {venv_path}")
+                else:
+                    # No virtual environment found, use system Python
+                    command = f'python3 "{script_path}"'
+                    output_queue.put(f"[{process_name}] Using system Python")
+            
+            output_queue.put(f"[{process_name}] Executing command: {command}")
+            
+            process = subprocess.Popen(
+                command,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                bufsize=1,
+                universal_newlines=True
+            )
+            
+            # Start thread to read output
+            output_thread = threading.Thread(
+                target=read_output,
+                args=(process, output_queue, process_name),
+                daemon=True
+            )
+            output_thread.start()
+            
+            return process
+        except Exception as e:
+            output_queue.put(f"[{process_name}] Failed to start: {e}")
+            print(f"[{process_name}] Failed to start: {e}")
+            return None
+
+    def stop_background_processes(self):
+        """Stop all background processes."""
+        if self.ai_process:
+            try:
+                self.ai_process.terminate()
+                self.ai_process.wait(timeout=5)
+            except:
+                self.ai_process.kill()
+            self.ai_process = None
+            
+        if self.stim_process:
+            try:
+                self.stim_process.terminate()
+                self.stim_process.wait(timeout=5)
+            except:
+                self.stim_process.kill()
+            self.stim_process = None
+
+    def process_background_output(self):
+        """Process output from background processes and display in chat."""
+        # Process AI output
+        while not self.ai_output_queue.empty():
+            try:
+                message = self.ai_output_queue.get_nowait()
+                self.chat.log_event(message)
+            except queue.Empty:
+                break
+                
+        # Process STIM output
+        while not self.stim_output_queue.empty():
+            try:
+                message = self.stim_output_queue.get_nowait()
+                self.chat.log_event(message)
+            except queue.Empty:
+                break
 
     def _update_controls(self):
         """
