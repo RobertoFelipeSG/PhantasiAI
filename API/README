@@ -1,0 +1,45 @@
+This is a testing file for an API server to stream EMG data on an OpenBCI Ganglion
+
+On the web server, click Start EMG to begin streaming real-time data
+Data will appear in the terminal on the host server
+
+To use: 
+- run uvicorn main:app --host 0.0.0.0 --port 8000 in terminal
+- type in your web browser: <IPv4 address>:8000
+
+Note: This code is adapted for Linux OS/RaspberryPi, in order to use on Windows:
+- winget install --interactive usbipd-win (install usbipd tool; in PowerShell as Admin)
+- usbipd wsl list (look for OpenBCI dongle -> get BUSID)
+- usbipd wsl attach --busid <your-bus-id> (attach dongle to WSL)
+- ls /dev/tty* (check if device is visible on Ubuntu (WSL) terminal)
+    - the name will either be /dev/ttyACM0 or /dev/ttyUSB0
+- sudo adduser $USER dialout (give permission to access serial port (reopen Ubuntu terminal))
+
+Overall Architecture:
+[ OpenBCI Ganglion ]
+       |
+       v
+[ Python Server (main.py) ]  <-- Catches the raw data
+       |
+       +-----------------------------+
+       |                             |
+  (Path 1: Visualization)       (Path 2: Data Processing)
+       |                             |                 |
+  [ WebSockets ]                 [ LSL Outlet ]   [ CSV Files ]
+       |                             |                 |
+       v                             v                 v
+  [ Browser ]                  [ Local Network ] 
+(You see live EMG data)              
+                              
+
+Data Threads:
+    1. Main asynchronous thread (FastAPI/Uvicorn)
+        - central engine of app, controlled by asyncio Event Loop
+        - non-blocking: handles many network requests
+        - related functions: manager.connect(), broadcast(), get_running_loop(), gather()
+    2. EMG worker thread 
+        - handles hardware interaction and data processing
+        - blocking: waits for hardware data
+        - emg_thread is the actual thread, stop_event is the event flag
+        - related functions: 
+            - asyncio.run_coroutine_threadsafe(coroutine, loop): how thread 2 communicated with thread 1 (queues the broadcast coroutine onto the Event Loop's schedule)
