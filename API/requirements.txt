@@ -1,0 +1,12 @@
+brainflow
+jinja2
+fastapi
+mne
+neurokit2
+pandas
+pydantic
+pylsl
+scipy
+uvicorn[standard]
+websockets
+xgboost

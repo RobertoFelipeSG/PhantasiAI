@@ -4,6 +4,7 @@
 <head>
     <title>PhantasiAI Device</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; }
         h2 { margin-top: 20px; margin-bottom: 5px; }
@@ -33,15 +34,24 @@
 
     <!-- Controls -->
     <div>
+        <!-- Config Controls -->
         <label>Serial Port:</label>
         <input type="text" id="port" value="COM4">
-        <button onclick="startStream()">Start EMG Stream</button>
-        <button onclick="stopStream()">Stop EMG Stream</button>
-        <span id="status">Status: Disconnected</span>
+        <span id="websocketStatus">WS Status: Disconnected</span>
     </div>
-    <div class="controls-bar">
+    <div class="controls-bar"> <!-- Pause Controls -->
         <strong>Master Control:</strong>
         <button onclick="togglePauseGraph()" id="pauseGraphBtn">Pause Graphs</button>
+    </div>
+    <div class="controls-bar"> <!-- Stream + Record Controls -->
+        <strong>Streaming Control:</strong>
+        
+        <label for="intervalInput" style="margin-left: 10px;">Marker Interval (s):</label>
+        <input type="number" id="intervalInput" min="1" max="5" step="0.5" value="1" style="width: 60px;">
+        
+        <button onclick="handleStreamingClick()" id="streamBtn">Start EMG Stream + Recording</button>
+        <span id="streamingStatus">Idle</span>
+        <span id="markerCountdownDisplay" style="margin-left: 15px; font-weight: bold; color: #666;"></span>
     </div>
 
     <hr>
@@ -84,39 +94,137 @@
         let ws = null;
         let emgGraph = null;
         let accelGraph = null;
+        let annotations = [];
+        let pendingEmgData = []; // EMG Data Buffer
+        let pendingAccelData = []; // Accel Data Buffer
 
         // Graph configuration
-        const MAX_DATA_POINTS = 500; // Limit data for scrolling graph + data performance
+        const MAX_DATA_POINTS = 1000; // Limit data for scrolling graph (10s * 200Hz)
+        const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
         const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
         
         // State management
         let isGraphPaused = false; // tracks whether the graphs are paused or not
-        const emgState = { 
-            zoomRange: null, // stores manual min/max for Y axis
-            isZoomed: false // tracks manual zoom
-        }
-        const accelState = { 
-            zoomRange: null, // stores manual min/max for Y axis
-            isZoomed: false // tracks manual zoom
-        }
-        
-        // Data Buffers
-        const emgTimestamps = [];
-        const emgValues = [];
-        const accelTimestamps = [];
-        const accelX = [];
-        const accelY = [];
-        const accelZ = [];
+        let isStreaming = false;
+        let lastMarkerInterval = 0;
+        let markerCountdown = 0; // gets countdown value synchronized with backend
 
-         // -- Initialize Graphs -- //
+        document.addEventListener('DOMContentLoaded', () => {
+            initGraphs();
+            setStreamingState(false, 'Idle');
+        });
+
+        // ----- Initialize frontend connection to server via WebSocket ----- //
+        function connectWebSocket() {
+            if (ws) return;
+
+            // Connect to server via WebSocket + update server connection status
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const wsUrl = `${protocol}://${window.location.host}/ws`;
+            
+            console.log("Attempting to connect to:", wsUrl);
+            try {
+                ws = new WebSocket(wsUrl);
+
+                ws.onopen = () => {
+                    document.getElementById('websocketStatus').innerText = "WS Status: Connected";
+                }
+
+                ws.onmessage = (event) => {
+                    // Update buffers with most recent EMG + Accel data
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'emg_data') {
+                        data.value.forEach((val, i) => {
+                            pendingEmgData.push({ x: data.timestamp[i], y: val });
+                        });
+
+                        document.getElementById('emgValue').innerText = data.value[data.value.length-1].toFixed(2);
+                    } 
+                    else if (data.type === 'accel_data') {
+                        data.value[0].forEach((_, i) => {
+                            pendingAccelData.push({ x: data.timestamp[i],
+                                                    y_x: data.value[0][i],
+                                                    y_y: data.value[1][i],
+                                                    y_z: data.value[2][i] });
+                        });
+
+                        valuesMatrix = data.value;
+                        const len = valuesMatrix[0].length;
+                        if (len > 0) {
+                            document.getElementById('valX').innerText = valuesMatrix[0][len-1].toFixed(2);
+                            document.getElementById('valY').innerText = valuesMatrix[1][len-1].toFixed(2);
+                            document.getElementById('valZ').innerText = valuesMatrix[2][len-1].toFixed(2);
+                        }
+                    }
+                    
+                    // Add most recent event markers (vertical lines)
+                    else if (data.type === 'event_times') {
+                        data.timestamps.forEach(event_time => {
+                        updateEventDisplay(event_time);
+                        });
+                    }
+                    
+                    // Update next marker countdown
+                    else if (data.type === 'marker_countdown') {
+                        updateMarkerDisplay(data.time_remaining);
+                    }
+                }
+
+                ws.onclose = () => {
+                    document.getElementById('websocketStatus').innerText = "WS Status: Disconnected";
+                    ws = null;
+                };
+
+                ws.onerror = (error) => {
+                    console.error("WebSocket Error:", error);
+                    document.getElementById('websocketStatus').innerText = "WS Status: Connection Error";
+                }
+            } catch (e) {
+                console.error("Failed to create WebSocket:", e);
+                document.getElementById('websocketStatus').innerText = "WS Status: Setup Error";
+            }
+        }
+
+        // ----- Initialize Graphs ----- //
+        function getCommonChartOptions(yLabel) {
+            return {
+                animation: false,
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: true },
+                    annotation: { annotations: [] } // event marker lines
+                },
+                parsing: false, // disable automatic parsing 
+                normalized: true, // data is already sorted 
+                scales: { 
+                    x: { 
+                        type: 'linear',
+                        min: undefined,
+                        max: undefined,
+                        title: { display: true, text: 'Time (s)' },
+                        id: 'x', // reference for annotations 
+                        ticks: { display: true, color: 'black', maxRotation: 0, minRotation: 0, autoSkip: true, maxTicksLimit: 10,
+                                callback: function(value) {
+                                    const numericValue = parseFloat(this.getLabelForValue(value));
+                                    return Number.isFinite(numericValue) ? numericValue.toFixed(1) : this.getLabelForValue(value); }
+                                }, 
+                        grid: { display: true, lineWidth: 0.5 }
+                    }, 
+                    y: { 
+                        title: { display: true, text: yLabel },
+                        grid: { display: true, lineWidth: 0.5 }
+                    }}
+            }
+        };
+        
         function initGraphs() {
             
             // 1: EMG Graph
             const ctxEmg = document.getElementById('emgGraph').getContext('2d');
             emgGraph = new Chart(ctxEmg, {
                 type: 'line',
-                data: {
-                    labels: [], 
+                data: { 
                     datasets: [{
                         label: 'Channel 1 (EMG Signal)',
                         data: [], 
@@ -134,8 +242,7 @@
             const ctxAccel = document.getElementById('accelGraph').getContext('2d');
             accelGraph = new Chart(ctxAccel, {
                 type: 'line',
-                data: {
-                    labels: [], 
+                data: { 
                     datasets: [
                         { label: 'X', data: [], borderColor: 'red', borderWidth: 1.5, pointRadius: 0 },
                         { label: 'Y', data: [], borderColor: 'green', borderWidth: 1.5, pointRadius: 0 },
@@ -144,141 +251,107 @@
                 },
                 options: getCommonChartOptions('G-Force') 
             });
+
         }
 
-        // Helper function for graph style options
-        function getCommonChartOptions(yLabel) {
-            return {
-                animation: false,
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: true } },
-                scales: { 
-                    x: { 
-                        title: { display: true, text: 'Time (s)' },
-                        ticks: { display: true, color: 'black', maxRotation: 0, minRotation: 0, autoSkip: true, maxTicksLimit: 10,
-                                callback: function(value) {
-                                    const numericValue = parseFloat(this.getLabelForValue(value));
-                                    return Number.isFinite(numericValue) ? numericValue.toFixed(1) : this.getLabelForValue(value); }}, 
-                        grid: { display: true, lineWidth: 0.5 }
-                    }, 
-                    y: { 
-                        title: { display: true, text: yLabel },
-                        grid: { display: true, lineWidth: 0.5 }
-                    }}
+        // ----- Graph Display Logic (using render loops) ----- //
+        function startRenderLoop() {
+            requestAnimationFrame(renderLoop);
+        }
+
+        function renderLoop() {
+            if (!isGraphPaused) {
+                batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
+                batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
             }
-        };
+            requestAnimationFrame(renderLoop); // Continue looping
+        }
 
-        document.addEventListener('DOMContentLoaded', initGraphs);
+        function batchUpdateGraph(chart, buffer, type) {
+            if (!chart || buffer.length === 0) return;
 
-        // -- Initialize frontend connection to server via WebSocket -- //
-        function connectWebSocket() {
-            if (ws) return;
+            // 1: Push all pending data to Chart dataset
+            if (type === 'emg') {
+                chart.data.datasets[0].data.push(...buffer);
+            } 
+            else if (type == 'accel') {
+                buffer.forEach(pt => {
+                    chart.data.datasets[0].data.push({ x: pt.x, y: pt.y_x });
+                    chart.data.datasets[1].data.push({ x: pt.x, y: pt.y_y });
+                    chart.data.datasets[2].data.push({ x: pt.x, y: pt.y_z });
+                });
+            }
 
-            // Connect to server via WebSocket + update server connection status
-            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-            const wsUrl = `${protocol}://${window.location.host}/ws`;
+            buffer.length = 0 // 2: Clear buffer
+
+            // 3: Prune graph (along x-axis) 
+            const currentLength = chart.data.datasets[0].data.length;
+            if (currentLength > MAX_DATA_POINTS) {
+                const removeCount = currentLength - MAX_DATA_POINTS;
+                chart.data.datasets.forEach(dataset => {
+                    dataset.data.splice(0, removeCount);
+                });
+            }
+
+            // 4: Update x-axis (time) window 
+            const lastPoint = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
+            if (lastPoint) {
+                const latestTime = lastPoint.x;
+                
+                // Manually set the view window for smooth scrolling effect
+                chart.options.scales.x.min = latestTime - WINDOW_SIZE;
+                chart.options.scales.x.max = latestTime;
+            }
+
+            // 5: Marker interval filtering
+            chart.options.plugins.annotation.annotations = annotations.filter(a => 
+                a.value >= chart.options.scales.x.min && 
+                a.value <= chart.options.scales.x.max
+            );
+
+            chart.update('none'); // 6: Render
+        }
+
+        // ----- Event Marker Logic ----- //
+        function updateEventDisplay(timestamp) {
+            if (isGraphPaused) return;
             
-            console.log("Attempting to connect to:", wsUrl);
-            try {
-                ws = new WebSocket(wsUrl);
-
-                ws.onopen = () => {
-                    document.getElementById('status').innerText = "Status: Connected";
+            timestamp = Number(timestamp);
+            
+            const annotationConfig = {
+            type: 'line',
+            mode: 'vertical',
+            scaleID: 'x',
+            value: timestamp,
+            borderColor: 'red',
+            borderWidth: 1,
+            label: {
+                content: 'EVENT',
+                enabled: true,
+                position: 'top',
+                backgroundColor: 'rgba(255, 0, 0, 0.7)',
+                color: 'white'
                 }
+            };
 
-                // Update webpage with most recent EMG + Accel data
-                ws.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    if (data.type === 'raw_data') {
-                        updateDisplayEMG(data.value, data.timestamp);
-                    } 
-                    else if (data.type === 'accel_data') {
-                        updateDisplayAccel(data.value, data.timestamp);
-                    }
-                }
-
-                ws.onclose = () => {
-                    document.getElementById('status').innerText = "Status: Disconnected";
-                    ws = null;
-                };
-
-                ws.onerror = (error) => {
-                    console.error("WebSocket Error:", error);
-                    document.getElementById('status').innerText = "Status: Connection Error";
-                }
-            } catch (e) {
-                console.error("Failed to create WebSocket:", e);
-                document.getElementById('status').innerText = "Status: Setup Error";
-            }
+            annotations.push(annotationConfig); // update annotations
         }
         
-        // -- Display Logic -- //
-        /*  1. pushes everything into data buffers, 
-            2. trims the arrays to the MAX_DATA_POINTS limit, and then,
-            3. if the graph is not paused, updates the chart 
-            4. updates live value*/
-        
-        // EMG Display
-        function updateDisplayEMG(valuesArray, timestampsArray) {
-            emgTimestamps.push(...timestampsArray);
-            emgValues.push(...valuesArray);
-
-            const removeCount = emgTimestamps.length - MAX_DATA_POINTS;
-            if (removeCount > 0) {
-                emgTimestamps.splice(0, removeCount);
-                emgValues.splice(0, removeCount);
+        function updateMarkerDisplay(timeRemaining) {
+            const display = document.getElementById('markerCountdownDisplay');
+            if (!display) return;
+            
+            // Detect when marker begins (time remaining goes near 0)
+            if (timeRemaining < 0.5 && markerCountdown >= 0.5) { // small threshold (0.1s) for reliability
+                display.style.color = 'red'; // visual flash for marker
+                setTimeout(() => display.style.color = 'blue', 200);
             }
 
-            if (!isGraphPaused) { redrawEMGGraph(); }
-
-            if(valuesArray.length > 0) {
-                document.getElementById('emgValue').innerText = valuesArray[valuesArray.length - 1].toFixed(2);
-            }
-        }
-        function redrawEMGGraph() { // Enforce manual settings and update chart 
-            if (!emgGraph) return;
-            emgGraph.data.labels = emgTimestamps.slice();
-            emgGraph.data.datasets[0].data = emgValues.slice();
-            applyEMGYAxisRange(); 
-            emgGraph.update('none');
-        }
-
-        // Accel Display
-        function updateDisplayAccel(valuesMatrix, timestampsArray) {
-            accelTimestamps.push(...timestampsArray);
-            accelX.push(...valuesMatrix[0]);
-            accelY.push(...valuesMatrix[1]);
-            accelZ.push(...valuesMatrix[2]);
-
-            const removeCount = accelTimestamps.length - MAX_DATA_POINTS;
-            if (removeCount > 0) {
-                accelTimestamps.splice(0, removeCount);
-                accelX.splice(0, removeCount);
-                accelY.splice(0, removeCount);
-                accelZ.splice(0, removeCount);
-            }
-
-            if (!isGraphPaused) { redrawAccelGraph(); }
-
-            const len = valuesMatrix[0].length;
-            if (len > 0) {
-                document.getElementById('valX').innerText = valuesMatrix[0][len-1].toFixed(2);
-                document.getElementById('valY').innerText = valuesMatrix[1][len-1].toFixed(2);
-                document.getElementById('valZ').innerText = valuesMatrix[2][len-1].toFixed(2);
-            }
-        }
-        function redrawAccelGraph() {
-            if (!accelGraph) return;
-            accelGraph.data.labels = accelTimestamps.slice();
-            accelGraph.data.datasets[0].data = accelX.slice();
-            accelGraph.data.datasets[1].data = accelY.slice();
-            accelGraph.data.datasets[2].data = accelZ.slice();
-            applyAccelYAxisRange(); 
-            accelGraph.update('none');
+            markerCountdown = timeRemaining;
+            display.innerText = `NEXT MARKER: ${timeRemaining.toFixed(2)}s`;
         }
         
-        // -- Control Functions -- //
+        // ----- Graph Control Functions ----- //
         // Pause control for BOTH graphs (synchronized)
         function togglePauseGraph() {
             isGraphPaused = !isGraphPaused;
@@ -290,124 +363,204 @@
                 redrawAccelGraph();
             }
         }
-        
-        // EMG zoom controls
-        function applyEMGYAxisRange() {
-            if (!emgGraph) return;
-            if (emgState.zoomRange) {
-                emgGraph.options.scales.y.min = emgState.zoomRange.min;
-                emgGraph.options.scales.y.max = emgState.zoomRange.max;
-            } else {
-                delete emgGraph.options.scales.y.min;
-                delete emgGraph.options.scales.y.max;
-            }
-        }
-        function adjustEMGYAxis(scale) {
-            adjustYAxis(scale, emgGraph, emgState, emgValues); 
-        }
-        function zoomEMGIn() { adjustEMGYAxis(1 / Y_ZOOM_FACTOR); }
-        function zoomEMGOut() { adjustEMGYAxis(Y_ZOOM_FACTOR); }
-        function resetEMGZoom() { resetYAxis(emgGraph, emgState); }
 
-        // Accelerometer zoom controls
-        function applyAccelYAxisRange() {
-            if (!accelGraph) return;
-            if (accelState.zoomRange) {
-                accelGraph.options.scales.y.min = accelState.zoomRange.min;
-                accelGraph.options.scales.y.max = accelState.zoomRange.max;
-            } else {
-                delete accelGraph.options.scales.y.min;
-                delete accelGraph.options.scales.y.max;
-            }
-        }
+        // Zoom control functions
+        // 1: Calculate min/max of graphs current data
+        function getGraphRangeY(graph) {
+            let min = Infinity;
+            let max = -Infinity;
+            let hasData = false;
 
-        function adjustAccelYAxis(scale) {
-            // Note: uses accelX data to calculate the range for all three (X, Y, Z) for simplification 
-            adjustYAxis(scale, accelGraph, accelState, accelX);
-        }
+            // Loop through all datasets (handles Accel X, Y, Z simultaneously)
+            graph.data.datasets.forEach(dataset => {
+                dataset.data.forEach(point => {
+                    // Handle data whether it is a raw number (EMG) or an object {x, y} (Accel)
+                    const val = (typeof point === 'object' && point !== null) ? point.y : point;
+                    
+                    if (val < min) min = val;
+                    if (val > max) max = val;
+                    hasData = true;
+                });
+            });
 
-        function zoomAccelIn() { adjustAccelYAxis(1 / Y_ZOOM_FACTOR); }
-        function zoomAccelOut() { adjustAccelYAxis(Y_ZOOM_FACTOR); }
-        function resetAccelZoom() { resetYAxis(accelGraph, accelState); }
-
-        // -- Zoom Helper Functions -- //
-        function calculateDataRange(dataArray) {
-            // Calculates the current min/max of a specific data array
-            if (!dataArray || dataArray.length === 0) return null;
-            let min = Infinity, max = -Infinity;
-            for (const value of dataArray) {
-                if (value < min) min = value;
-                if (value > max) max = value;
-            }
-            if (!isFinite(min) || !isFinite(max)) return null;
+            if (!hasData || min === Infinity || max === -Infinity) return null;
+            
+            // Add a tiny buffer if flatline
             if (min === max) {
-                const padding = Math.abs(min) || 1;
-                min -= padding * 0.1; max += padding * 0.1;
+                min -= 1;
+                max += 1;
             }
             return { min, max };
         }
+        
+        // 2: Zoom in/out Function
+        function applyZoom(graph, factor) {
+            if (!graph) return;
 
-        function adjustYAxis(scale, graph, stateObj, dataArray) {
-            // Adjusts Y-axis
-            if (!stateObj.zoomRange) {
-                stateObj.zoomRange = calculateDataRange(dataArray);
-                if (!stateObj.zoomRange) return;
+            // Get current scale limits
+            let currentMin = graph.options.scales.y.min;
+            let currentMax = graph.options.scales.y.max;
+
+            // If manual zoom isn't set yet, calculate it from the data
+            if (currentMin === undefined || currentMax === undefined) {
+                const limits = getGraphRangeY(graph);
+                if (!limits) return; // No data to zoom on
+                currentMin = limits.min;
+                currentMax = limits.max;
             }
-            const center = (stateObj.zoomRange.min + stateObj.zoomRange.max) / 2;
-            let halfRange = (stateObj.zoomRange.max - stateObj.zoomRange.min) / 2;
-            if (halfRange === 0) halfRange = Math.abs(center) || 1;
-            
-            halfRange *= scale;
-            stateObj.zoomRange = { min: center - halfRange, max: center + halfRange };
-            stateObj.isZoomed = true;
 
-            // Apply the change specific to this graph
-            graph.options.scales.y.min = stateObj.zoomRange.min;
-            graph.options.scales.y.max = stateObj.zoomRange.max;
-            graph.update('none'); 
+            // Calculate center and span
+            const center = (currentMin + currentMax) / 2;
+            const span = (currentMax - currentMin);
+            
+            // Apply Zoom Factor (newSpan = oldSpan * factor)
+            // Factor < 1 zooms IN (smaller span), Factor > 1 zooms OUT (larger span)
+            const newHalfSpan = (span * factor) / 2;
+
+            graph.options.scales.y.min = center - newHalfSpan;
+            graph.options.scales.y.max = center + newHalfSpan;
+            
+            graph.update('none');
         }
 
-        // Reset the Y-axis
-        function resetYAxis(graph, stateObj) {
-            stateObj.zoomRange = null;
-            stateObj.isZoomed = false;
+        // 3: Reset function
+        function resetZoom(graph) {
+            if (!graph) return;
+            // deleting min/max returns Chart.js to "Auto-Scale" mode
             delete graph.options.scales.y.min;
             delete graph.options.scales.y.max;
             graph.update('none');
         }
+        
+        // EMG zoom controls
+        function zoomEMGIn() { applyZoom(emgGraph, 1 / Y_ZOOM_FACTOR); }
+        function zoomEMGOut() { applyZoom(emgGraph, Y_ZOOM_FACTOR); }
+        function resetEMGZoom() { resetZoom(emgGraph); }
 
-        async function startStream() {
-            const port = document.getElementById('port').value;
+        // Accelerometer zoom controls
+        function zoomAccelIn() { applyZoom(accelGraph, 1 / Y_ZOOM_FACTOR); }
+        function zoomAccelOut() { applyZoom(accelGraph, Y_ZOOM_FACTOR); }
+        function resetAccelZoom() { resetZoom(accelGraph); }
+        
+        // ----- Streaming Control Helper ----- //
+        function setStreamingState(active, statusMessage, color="333") {
+            isStreaming = active;
+            const button = document.getElementById('streamBtn');
+            const input = document.getElementById('intervalInput');
+            const status = document.getElementById('streamingStatus');
+
+            if (button) {
+                button.innerText = active ? 'Stop Stream + Recording' : 'Start Stream + Recording';
+                button.disabled = false;
+            }
+            
+            // Lock input while active
+            if (input) input.disabled = active;
+
+            if (status) {
+                status.innerText = statusMessage;
+                status.style.color = color;
+            }
+        }
+        
+        // ----- MAIN STREAMING LOGIC ----- //
+        async function handleStreamingClick() {
+            // Case 1: Stop streaming + recording
+            if (isStreaming) {
+                await stopStream();
+                return
+            }
+
+            // Case 2: Start streaming + recording
+            const intervalInput = document.getElementById('intervalInput');
+            const intervalValue = parseFloat(intervalInput.value);
+            if (isNaN(intervalValue) || intervalValue < 1 || intervalValue > 5) {
+                alert("Please enter a valid interval (1-5 seconds).");
+                return;
+            }
+
+            // Lock controls before async loop starts and start main countdown
+            document.getElementById('streamBtn').disabled = true;
+            document.getElementById('intervalInput').disabled = true;
+
+            const status = document.getElementById('streamingStatus');
+            status.style.color = '#e65100'; // Orange for warning
+
+            for (let i = 3; i > 0; i--) {
+                status.innerText = `Starting in ${i}...`;
+                
+                // Wait 1 second
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            status.innerText = "Initializing...";
+            
+            // Send interval and start stream + recording
+            await startStream(intervalValue);
+        }
+
+        async function startStream(intervalSeconds) {
             connectWebSocket();
             
             // Reset ALL Buffers and States
-            emgTimestamps.length = 0; emgValues.length = 0;
-            accelTimestamps.length = 0; accelX.length = 0; accelY.length = 0; accelZ.length = 0;
+            pendingEmgData.length = 0;
+            pendingAccelData.length = 0;
             isGraphPaused = false;
             resetEMGZoom();
             resetAccelZoom();
             document.getElementById('pauseGraphBtn').innerText = 'Pause Graphs';
+            document.getElementById('streamBtn').disabled = false; // Enable stream + recording
             
-            // Clear graphs and EMG log 
+            // Clear graphs and event marker displays
+            annotations.length = 0; 
             [emgGraph, accelGraph].forEach(graph => {
-                if(graph) {
-                    graph.data.labels = [];
+                if(graph && graph.options.plugins && graph.options.plugins.annotation) {
                     graph.data.datasets.forEach(d => d.data = []);
+                    graph.options.plugins.annotation.annotations = [];
                     graph.update('none');
                 }
             });
 
-            try { // Wait 1 second for WebSocket to connect first 
+            startRenderLoop();
+
+            try { 
+                // Wait 1 second for WebSocket to connect first 
                 await new Promise(resolve => setTimeout(resolve, 100)); 
-                await fetch(`/activate?serial_port=${port}`);
-            } catch (e) { console.error(e); }
+                
+                // note: marker countdown automatically starts when backend sends first marker_countdown data point
+                await fetch(`/start_stream?interval_marker=${intervalSeconds}`, { method: 'POST' });
+                setStreamingState(true, `EMG Stream + Recording Active`, 'green');
+            
+            } catch (error) { 
+                console.error(error);
+                setStreamingState(false, 'Error Starting', 'red');
+                alert("Error: " + error.message);
+            }
         }
 
         async function stopStream() {
             try {
-                await fetch('/stop');
-            } catch (e) { console.error(e); }
+                // Lock button briefly
+                document.getElementById('streamBtn').disabled = true; 
+                document.getElementById('streamingStatus').innerText = "Stopping...";
+                
+                await fetch('/stop_stream', { method: 'POST' });
+                
+                // Clear the synchronized marker countdown display
+                const display = document.getElementById('markerCountdownDisplay');
+                if (display) {
+                    display.innerText = "";
+                    display.style.color = 'blue';
+                }
+            markerCountdown = 0; // Reset state
+            setStreamingState(false, 'Idle', '#333');
+            } catch (e) {
+                console.error(e);
+                alert("Error stopping");
+                setStreamingState(true, 'Error Stopping', 'red'); // Revert if failed
+            }
         }
+    
     </script>
 
 </body>

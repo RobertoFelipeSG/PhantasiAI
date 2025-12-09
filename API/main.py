@@ -37,11 +37,12 @@ async def websocket_endpoint(websocket: WebSocket):
         manager.disconnect(websocket)
         logging.info("WebSocket disconnected.")
 
-@app.get("/activate")
-async def activate(serial_port: str = "COM4"):
+@app.post("/start_stream")
+async def start_stream(interval_marker: str):
     '''
     Initializes Ganglion
-    Starts background EMG thread
+    Starts background EMG thread 
+    Start CSV recording of EMG data
     '''
     global ganglion_instance
     
@@ -55,13 +56,14 @@ async def activate(serial_port: str = "COM4"):
         current_loop = asyncio.get_event_loop()
     
     # Create and run EMG execution thread (runs concurrently with FastAPI server)
-    ganglion_instance = GanglionData(serial_port)
+    ganglion_instance = GanglionData(interval_marker)
     ganglion_instance.start(current_loop)
     return {"status": "success", "message": "EMG streaming started"}
 
-@app.get("/stop")
-async def stop():
+@app.post("/stop_stream")
+async def stop_stream():
     '''
+    Stops CSV recording
     Stops background thread
     '''
     global ganglion_instance

@@ -1,11 +1,10 @@
 This is a testing file for an API server to stream EMG data on an OpenBCI Ganglion
 
-On the web server, click Start EMG to begin streaming real-time data
-Data will appear in the terminal on the host server
-
 To use: 
-- run uvicorn main:app --host 0.0.0.0 --port 8000 in terminal
+- install requirements: pip install ir requirements.txt
+- in your terminal run: python main.py 
 - type in your web browser: <IPv4 address>:8000
+    - OR for local connections: http://127.0.0.1:8000/
 
 Note: This code is adapted for Linux OS/RaspberryPi, in order to use on Windows:
 - winget install --interactive usbipd-win (install usbipd tool; in PowerShell as Admin)
@@ -21,25 +20,19 @@ Overall Architecture:
        v
 [ Python Server (main.py) ]  <-- Catches the raw data
        |
-       +-----------------------------+
-       |                             |
-  (Path 1: Visualization)       (Path 2: Data Processing)
-       |                             |                 |
-  [ WebSockets ]                 [ LSL Outlet ]   [ CSV Files ]
-       |                             |                 |
-       v                             v                 v
-  [ Browser ]                  [ Local Network ] 
+       +-------------------------------------------+
+       |                                           |
+  [ Path 1: Visualization (index.html)]      (Path 2: Data Processing)
+       |                                        |                 |
+  [ WebSockets ]                         [ LSL Outlet ]   [ CSV Files ]
+       |                                        |                 |
+       v                                        v                 v
+  [ Browser ]                                    [ Local Network ] 
 (You see live EMG data)              
-                              
+
+Data Processing Architecture:
+                     
 
 Data Threads:
-    1. Main asynchronous thread (FastAPI/Uvicorn)
-        - central engine of app, controlled by asyncio Event Loop
-        - non-blocking: handles many network requests
-        - related functions: manager.connect(), broadcast(), get_running_loop(), gather()
-    2. EMG worker thread 
-        - handles hardware interaction and data processing
-        - blocking: waits for hardware data
-        - emg_thread is the actual thread, stop_event is the event flag
-        - related functions: 
-            - asyncio.run_coroutine_threadsafe(coroutine, loop): how thread 2 communicated with thread 1 (queues the broadcast coroutine onto the Event Loop's schedule)
+    1. Main asynchronous thread (FastAPI/Uvicorn): central engine of app instance, controlled by asyncio Event Loop (non-blocking)
+    2. EMG worker thread: handles hardware interaction and data processing, thread=ganglion_instance._emg_thread (blocking)

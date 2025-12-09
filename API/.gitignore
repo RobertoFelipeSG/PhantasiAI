@@ -1,4 +1,9 @@
 # Ignore virtual environment folders
+venv_basic_emg/
+env_basic_emg/
+.venv_basic_emg/
+.env_basic_emg/
+
 venv/
 env/
 .venv/
@@ -18,7 +23,5 @@ Thumbs.db
 *.log
 *.tmp
 
-# Ignore compiled or build folders
-build/
-dist/
-*.egg-info/
+# Ignore EMG CSV files
+emg-recordings/
