@@ -18,7 +18,7 @@ from emg_peak_classifier import PeakClassifier
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, num_emg_channels=1, num_accel_channels=3, marker_interval=5):
+    def __init__(self, num_emg_channels=4, num_accel_channels=3):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
@@ -30,38 +30,42 @@ class RealTimeRecorder:
         
         self._sample_rate = 200
         self._buffer_seconds = 120
-        self._buffer_len = self._sample_rate * self._buffer_seconds
+        self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session=24000 (~15 trials MAX per session)         
         self._buffer = deque(maxlen=self._buffer_len)
         self._buffer_header = None
 
-        self.emg_channel_count = num_emg_channels # auto: 1 channel
+        self.emg_channel_count = num_emg_channels # auto: all 4
         self.accel_channel_count = num_accel_channels # auto: all 3
         
-        self.marker_interval = marker_interval
-        self.next_event_time = 0.0 # track the time since recording start for when the next marker is due
+        self.marker_interval = 6.0 # event every 6 seconds
+        self.next_event_time = self.marker_interval // 2 # first marker occurs at 3 seconds
+        self.min_time = 0.0 # minimum timestamp pointer for analysis DataFrame
+        
         self.event_times_buffer = [] # buffer to store event times for frontend push
         self._event_times = [] # store event times for entire session 
         
-        logging.info(f"[Recorder] initialized with a {marker_interval} second marker for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels")
+        logging.info(f"[Recorder] initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels")
 
     def _mark_event(self, timestamp):
         event_flag = 0
-        if self.marker_interval > 0.0 and timestamp >= self.next_event_time:
+        if timestamp >= self.next_event_time:
             event_flag = 1
             self._event_times.append(timestamp)
             self.event_times_buffer.append(timestamp)
             
-            # Advance the marker time past the current timestamp
-            while timestamp >= self.next_event_time:
-                self.next_event_time += float(self.marker_interval)
+            # Advance the marker time
+            self.next_event_time += float(self.marker_interval)
             logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
         
         return event_flag
         
     def record_data_point(self, timestamp, emg_values, accel_values):
-        '''Records single row of EMG and Accel data in csv file'''
+        '''
+        Records single row of EMG and Accel data in csv file
+        Returns if event occured
+        '''
         if not self.recording or not self.csv_writer:
-            return
+            return False
 
         try:
             # Ensure emg_values and accel_values are a list of floats
@@ -98,16 +102,17 @@ class RealTimeRecorder:
                 self.csv_file.flush()
             self._index += 1
 
+            return bool(event_flag)            
+
         except Exception as e:
             logging.warning(f"[Recorder] Failed to record data point: {e}")
+            return False
 
-    def create_analysis_file(self, analysis_time=60): 
+    def create_analysis_file(self, max_time, trial): 
         """
-        Create a 60 second analysis file and saves file as CSV 
+        Create an analysis file with X number of trials and saves file as CSV 
         Return: DataFrame (df of analysis data) 
         """
-        # TO-DO: there is a bug here where the last data point of one minute analysis gets added to the consecutive minute analysis
-        # This is causing there to be an extra event detected 
 
         if not self.recording or not self._buffer: return None
 
@@ -116,16 +121,15 @@ class RealTimeRecorder:
             df['timestamp'] = df['timestamp'].astype(float)
 
             # Calculate analysis window and get data
-            latest_time = df['timestamp'].max()
-            cutoff_time = latest_time - analysis_time # max - 60s = 1 minute analysis window
-            analysis_data = df[df['timestamp'] > cutoff_time]
-            # NOTE: first 2 data points get excluded in this process (where t=0.0)
+            analysis_data = df[(df['timestamp'] > self.min_time) & (df['timestamp'] < max_time)]
+
+            self.min_time = self._event_times[trial - 1] # Advance minimum timestamp pointer
 
             if analysis_data.empty:
                 return None
 
             # Save df as csv
-            filename = f"{int(latest_time)}.csv"
+            filename = f"{max_time:.1f}.csv"
             output_path = os.path.join(self.analyses_dir, filename)
             analysis_data.to_csv(output_path, index=False)
 
@@ -169,13 +173,6 @@ class RealTimeRecorder:
 
             self.recording = True
 
-            # Initialize first marker time
-            interval_float = float(self.marker_interval)
-            if interval_float > 0.0:
-                self.next_event_time = interval_float
-            else:
-                self.next_event_time = float('inf')
-
             logging.info(f"[Recorder] Recording started: {self.filename}")
         except Exception as e:
             logging.error(f"[Recorder] Failed to start recording: {e}")
@@ -201,7 +198,7 @@ class RealTimeRecorder:
 ganglion_instance = None
 
 class GanglionData:
-    def __init__(self, interval_marker=5, mac_address=None, channel_list=None, sample_rate=200, buffer_seconds=2):
+    def __init__(self, num_trials=10, mac_address=None, channel_list=None, sample_rate=200, buffer_seconds=2):
         '''Initialize Ganglion board system'''
         
         self.serial_port = "COM4"
@@ -211,6 +208,18 @@ class GanglionData:
         self._buffer_seconds = buffer_seconds
         self._buffer_len = sample_rate * buffer_seconds
         self._num_points = 20 # number of data points processed at once
+
+        self._stop_event = threading.Event() # create threading flag for EMG stream
+        self._emg_thread = None
+        self._session_start_time = None
+        
+        self._num_trials = int(num_trials) # trials per session
+        self.next_trial_block = int(num_trials)
+        self._total_events = 0
+        self.marker_broadcast_counter = 0
+        
+        self._outlets = {} # LSL StreamOutlets for each channel
+        self._accel_outlet = None # LSL StreamOutlets for accel channel
 
         self.board_shim = None
         self.board_id = BoardIds.GANGLION_BOARD.value
@@ -224,29 +233,10 @@ class GanglionData:
         self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
         self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
 
-        self._outlets = {} # LSL StreamOutlets for each channel
-        self._accel_outlet = None # LSL StreamOutlets for accel channel
-        
-        self._stop_event = threading.Event() # create threading flag for EMG stream
-        self._emg_thread = None
-        self._session_start_time = None
-        
-        self.analysis_interval = 10.0 # seconds
-        self.next_analysis_time = 10.0 # first analysis time window is 0-59.9
-        self.recorder = RealTimeRecorder(
-            num_emg_channels=len(self.emg_channels),
-            num_accel_channels=len(self.accel_channels),
-            marker_interval=float(interval_marker))
-        self.feature_extractor = FeatureExtractor(
-            sampling_rate=200, 
-            height_percentile=98, 
-            min_distance=3.0)
-        self.peak_classifier = PeakClassifier(
-            model_path="./models/xgboost_model.pkl"
-        )
-        
-        self.marker_broadcast_counter = 0
-    
+        self.recorder = RealTimeRecorder(num_emg_channels=len(self.emg_channels), num_accel_channels=len(self.accel_channels))
+        self.feature_extractor = FeatureExtractor(sampling_rate=200, height_percentile=98, min_distance=3.0)
+        self.peak_classifier = PeakClassifier(model_path="./models/xgboost_model.pkl")
+            
     def _process_data(self, loop):
         # Read and remove current data chunk
         data = self.board_shim.get_board_data() 
@@ -267,13 +257,19 @@ class GanglionData:
             curr_accel_ch = data[self.accel_channels, i]
             curr_timestamp = relative_timestamps[i]
 
-            self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
+            has_event = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
             
-            # Perform 60 second analysis
-            if self.analysis_interval > 0.0 and  curr_timestamp >= self.next_analysis_time:
-                analysis_df = self.recorder.create_analysis_file(self.analysis_interval)
+            if has_event: 
+                self._total_events += 1
+                logging.info(f"Recorded {self._total_events} events")            
+            
+            # Perform analysis on selected trials
+            curr_trials = self._total_events - 1
+            if curr_trials == self.next_trial_block:
+                logging.info(f"Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
+                analysis_df = self.recorder.create_analysis_file(curr_timestamp, curr_trials)
                 
-                # Signal processing of minute analysis file
+                # Signal processing of analysis file
                 if analysis_df is None:
                     logging.error("Skipping feature extraction because analysis_df is None.")
                 else:
@@ -286,9 +282,9 @@ class GanglionData:
                     classification_results = self.peak_classifier.run(
                         features_df=features_df, output_path=class_filepath)
 
-                # Advance to next analysis window
-                while curr_timestamp >= self.next_analysis_time:
-                    self.next_analysis_time += float(self.analysis_interval)
+                # Advance to next trial block
+                while curr_trials == self.next_trial_block:
+                    self.next_trial_block += self._num_trials
             
         # Broadcast event markers
         if self.recorder.event_times_buffer: 

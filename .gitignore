@@ -18,6 +18,3 @@ Thumbs.db
 # Ignore logs and temporary files
 *.log
 *.tmp
-
-# Ignore EMG CSV files
-emg-recordings/

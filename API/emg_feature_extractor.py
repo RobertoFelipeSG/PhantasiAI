@@ -23,7 +23,7 @@ class FeatureExtractor:
     - Optional tangential acceleration calculation from accelerometer data
     """
     
-    def __init__(self, sampling_rate=200, height_percentile=98.0, min_distance=3.0, lowpass_cutoff=80.0, window_duration=1.0):
+    def __init__(self, sampling_rate=200, height_percentile=98.0, min_distance=3.0, lowpass_cutoff=80.0, window_duration=6.0):
         self.sampling_rate = sampling_rate
         self.height_percentile = height_percentile
         self.min_distance = min_distance # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
@@ -72,33 +72,46 @@ class FeatureExtractor:
         
         return data_centered, envelope
     
-    def detect_peaks(self, envelope: np.ndarray, event_column: np.ndarray
+    def detect_peaks(self, envelope: np.ndarray, event_column: np.ndarray, timestamps: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Event-based peak detection: find highest peak in each trial between events.
         """
+        
+        # Get indices of all events
         event_indices = np.where(event_column == 1)[0]
         peak_indices = []
-        peak_amplitudes = []
-        
-        # Find highest peak in each trial between consecutive events
-        for i in range(len(event_indices) - 1):
-            start_idx = event_indices[i]
-            end_idx = event_indices[i + 1]
-            trial = envelope[start_idx:end_idx]
+        peak_amplitudes = [] 
+
+        # Iterate through each event to define the window
+        for event_idx in event_indices:
             
-            if len(trial) > 0:
-                # Find peak in this trial
+            event_time = timestamps[event_idx]
+            start_time = event_time - (self.window_duration // 2)
+            end_time = event_time + (self.window_duration // 2)
+            
+            # Find the nearest indices for the window boundaries
+            start_idx = np.searchsorted(timestamps, start_time, side='left')
+            end_idx = np.searchsorted(timestamps, end_time, side='right')
+            
+            # Ensure the slice is within the bounds of the envelope array
+            start_idx = max(0, start_idx)
+            end_idx = min(len(envelope), end_idx)
+            
+            trial_data = envelope[start_idx:end_idx]
+            
+            # Find peak in this trial
+            if len(trial_data) > 0:
+                local_peaks, _ = find_peaks(trial_data, height=np.percentile(trial_data, self.height_percentile), distance=int(self.min_distance * self.sampling_rate))
                 # To-do: Figure out why we are doing this extra check of 3 second window (which would give 2 local peaks for each trial)
-                local_peaks, _ = find_peaks(trial, height=np.percentile(trial, self.height_percentile), distance=int(self.min_distance * self.sampling_rate))
                 
-                if len(local_peaks) > 0: # Get the highest peak in this trial
-                    local_peak_amplitudes = trial[local_peaks]
-                    highest_local_peak_idx = local_peaks[np.argmax(local_peak_amplitudes)]
-                    global_peak_idx = start_idx + highest_local_peak_idx
-                    
-                    peak_indices.append(global_peak_idx)
-                    peak_amplitudes.append(envelope[global_peak_idx])
+            if len(local_peaks) > 0: # Get the highest peak in this trial
+                local_peak_amplitudes = trial_data[local_peaks]
+                highest_local_peak_idx = local_peaks[np.argmax(local_peak_amplitudes)]
+                global_peak_idx = start_idx + highest_local_peak_idx
+                
+                peak_indices.append(global_peak_idx)
+                peak_amplitudes.append(envelope[global_peak_idx])
         
         return np.array(peak_indices), np.array(peak_amplitudes)
     
@@ -208,7 +221,7 @@ class FeatureExtractor:
         filtered_signal, envelope = self.preprocess_signal(emg_signal)
         
         # Detect peaks using event-based detection
-        peak_indices, peak_amplitudes = self.detect_peaks(envelope, event_column)
+        peak_indices, peak_amplitudes = self.detect_peaks(envelope, event_column, timestamps)        
         
         # Extract features for each peak
         peak_features = self.extract_features(filtered_signal, peak_indices, peak_amplitudes, timestamps)

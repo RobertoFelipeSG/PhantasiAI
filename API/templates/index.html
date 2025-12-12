@@ -46,8 +46,8 @@
     <div class="controls-bar"> <!-- Stream + Record Controls -->
         <strong>Streaming Control:</strong>
         
-        <label for="intervalInput" style="margin-left: 10px;">Marker Interval (s):</label>
-        <input type="number" id="intervalInput" min="1" max="5" step="0.5" value="1" style="width: 60px;">
+        <label for="trialInput" style="margin-left: 10px;">Trials per Session:</label>
+        <input type="number" id="trialInput" min="1" max="15" step="1" value="1" style="width: 60px;">
         
         <button onclick="handleStreamingClick()" id="streamBtn">Start EMG Stream + Recording</button>
         <span id="streamingStatus">Idle</span>
@@ -446,7 +446,7 @@
         function setStreamingState(active, statusMessage, color="333") {
             isStreaming = active;
             const button = document.getElementById('streamBtn');
-            const input = document.getElementById('intervalInput');
+            const input = document.getElementById('trialInput');
             const status = document.getElementById('streamingStatus');
 
             if (button) {
@@ -472,16 +472,14 @@
             }
 
             // Case 2: Start streaming + recording
-            const intervalInput = document.getElementById('intervalInput');
-            const intervalValue = parseFloat(intervalInput.value);
-            if (isNaN(intervalValue) || intervalValue < 1 || intervalValue > 5) {
-                alert("Please enter a valid interval (1-5 seconds).");
-                return;
-            }
+            const trialInput = document.getElementById('trialInput');
+            const numTrials = parseFloat(trialInput.value);
+            if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
+                alert("Please enter a valid number of trials (1-15)");
 
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
-            document.getElementById('intervalInput').disabled = true;
+            document.getElementById('trialInput').disabled = true;
 
             const status = document.getElementById('streamingStatus');
             status.style.color = '#e65100'; // Orange for warning
@@ -495,11 +493,11 @@
             
             status.innerText = "Initializing...";
             
-            // Send interval and start stream + recording
-            await startStream(intervalValue);
+            // Send number of trials per session and start stream + recording
+            await startStream(numTrials);
         }
 
-        async function startStream(intervalSeconds) {
+        async function startStream(numTrials)  {
             connectWebSocket();
             
             // Reset ALL Buffers and States
@@ -528,8 +526,7 @@
                 await new Promise(resolve => setTimeout(resolve, 100)); 
                 
                 // note: marker countdown automatically starts when backend sends first marker_countdown data point
-                await fetch(`/start_stream?interval_marker=${intervalSeconds}`, { method: 'POST' });
-                setStreamingState(true, `EMG Stream + Recording Active`, 'green');
+                await fetch(`/start_stream?num_trials=${numTrials}`, { method: 'POST' });
             
             } catch (error) { 
                 console.error(error);
