@@ -21,3 +21,4 @@ Thumbs.db
 
 # Ignore EMG CSV files
 emg-recordings/
+synthetic-emg-recordings/

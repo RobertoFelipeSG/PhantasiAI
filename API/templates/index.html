@@ -35,8 +35,11 @@
     <!-- Controls -->
     <div>
         <!-- Config Controls -->
-        <label>Serial Port:</label>
-        <input type="text" id="port" value="COM4">
+        <label for="board-id">Board ID:</label>
+        <select id="boardID">
+            <option value="Ganglion" selected>Ganglion</option>
+            <option value="Synthetic">Synthetic</option>
+        </select>
         <span id="websocketStatus">WS Status: Disconnected</span>
     </div>
     <div class="controls-bar"> <!-- Pause Controls -->
@@ -99,7 +102,7 @@
         let pendingAccelData = []; // Accel Data Buffer
 
         // Graph configuration
-        const MAX_DATA_POINTS = 1000; // Limit data for scrolling graph (10s * 200Hz)
+        const MAX_DATA_POINTS = 1000; // Limit data for scrolling graph (5s * 200Hz)
         const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
         const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
         
@@ -472,10 +475,15 @@
             }
 
             // Case 2: Start streaming + recording
+            const boardID = document.getElementById('boardID');
+            let useSyntheticData = false
+            if (boardID.value === "Synthetic") { useSyntheticData = true } 
+            
             const trialInput = document.getElementById('trialInput');
             const numTrials = parseFloat(trialInput.value);
             if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
                 alert("Please enter a valid number of trials (1-15)");
+            }
 
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
@@ -494,10 +502,10 @@
             status.innerText = "Initializing...";
             
             // Send number of trials per session and start stream + recording
-            await startStream(numTrials);
+            await startStream(numTrials, useSyntheticData);
         }
 
-        async function startStream(numTrials)  {
+        async function startStream(numTrials, useSyntheticData)  {
             connectWebSocket();
             
             // Reset ALL Buffers and States
@@ -526,7 +534,8 @@
                 await new Promise(resolve => setTimeout(resolve, 100)); 
                 
                 // note: marker countdown automatically starts when backend sends first marker_countdown data point
-                await fetch(`/start_stream?num_trials=${numTrials}`, { method: 'POST' });
+                await fetch(`/start_stream?num_trials=${numTrials}&synthetic=${useSyntheticData}`, { method: 'POST' });
+                setStreamingState(true, `EMG Stream + Recording Active`, 'green');
             
             } catch (error) { 
                 console.error(error);
