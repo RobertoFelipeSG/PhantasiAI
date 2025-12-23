@@ -5,15 +5,34 @@
     <title>PhantasiAI Device</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+
     <style>
         body { font-family: Arial, sans-serif; }
         h2 { margin-top: 20px; margin-bottom: 5px; }
-        .graph-container {
-            width: 90%;
-            height: 500px;
-            margin: 20px auto;
-            border: 1px solid #ddd;
+
+        .top-section-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 10px;
         }
+
+        .controls-left {
+            flex: 1;        
+        }
+
+        .terminal-right {
+            flex: 1; 
+            background-color: #f5f5f5;          
+            padding: 10px;
+            border-radius: 5px;
+            height: 150px;            
+            overflow-y: auto;         
+            font-size: 12px;
+            border: 2px solid #333;
+        }
+        
         .controls-bar {
             margin: 10px 0;
             padding: 10px;
@@ -26,73 +45,162 @@
             padding: 5px 10px;
             cursor: pointer;
         }
+
+        .log-entry {
+            margin-bottom: 4px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .graph-container {
+            width: 90%;
+            height: 500px;
+            margin: 20px auto;
+            border: 1px solid #ddd;
+        }
+
+        .guide-text {
+            font-size: 80px;      
+            font-weight: 900;     
+            margin: 40px 0;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            color: #3498db;
+        }
+
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 17px;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
     </style>
+    
 </head>
 
 <body>
     <h1>Welcome to PhantasiAI</h1>
 
-    <!-- Controls -->
-    <div>
-        <!-- Config Controls -->
-        <label for="board-id">Board ID:</label>
-        <select id="boardID">
-            <option value="Ganglion" selected>Ganglion</option>
-            <option value="Synthetic">Synthetic</option>
-        </select>
-        <span id="websocketStatus">WS Status: Disconnected</span>
-    </div>
-    <div class="controls-bar"> <!-- Pause Controls -->
-        <strong>Master Control:</strong>
-        <button onclick="togglePauseGraph()" id="pauseGraphBtn">Pause Graphs</button>
-    </div>
-    <div class="controls-bar"> <!-- Stream + Record Controls -->
-        <strong>Streaming Control:</strong>
+    <div class="top-section-wrapper">
         
-        <label for="trialInput" style="margin-left: 10px;">Trials per Session:</label>
-        <input type="number" id="trialInput" min="1" max="15" step="1" value="1" style="width: 60px;">
-        
-        <button onclick="handleStreamingClick()" id="streamBtn">Start EMG Stream + Recording</button>
-        <span id="streamingStatus">Idle</span>
-        <span id="markerCountdownDisplay" style="margin-left: 15px; font-weight: bold; color: #666;"></span>
+        <!-- Controls -->
+        <div class="controls-left">
+            <div>
+                <label for="board-id">Board ID:</label>
+                <select id="boardID">
+                    <option value="Ganglion" selected>Ganglion</option>
+                    <option value="Synthetic">Synthetic</option>
+                </select>
+                <span id="websocketStatus">WS Status: Disconnected</span>
+            </div>
+
+            <div class="controls-bar">
+                <strong>Streaming Control:</strong>
+                <label for="trialInput" style="margin-left: 10px;">Trials:</label>
+                <input type="number" id="trialInput" min="1" max="15" step="1" value="1" style="width: 50px;">
+                <button onclick="handleStreamingClick()" id="streamBtn">Start Stream</button>
+                <span id="streamingStatus">Idle</span>
+                <span id="markerCountdownDisplay" style="margin-left: 15px; font-weight: bold; color: #666;"></span>
+            </div>
+        </div>
+
+        <!-- Chat  -->
+        <div class="terminal-right" id="chatTerminal">
+            <div class="log-entry">[System] Terminal initialized. Waiting for data...</div>
+        </div>
     </div>
 
     <hr>
 
-    <!-- EMG Value + Graph Display -->
-    <div>
-        <h2>EMG Signal: <span id="emgValue">--</span> µV</h2>
-        <div class="controls-bar">
-            <strong>EMG Zoom Y-Axis: </strong>
-            <button onclick="zoomEMGIn()">+</button>
-            <button onclick="zoomEMGOut()">-</button>
-            <button onclick="resetEMGZoom()">Reset</button>
-        </div>
-    </div>
-    <div class="graph-container">
-        <canvas id="emgGraph"></canvas>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'Graphs')" id="defaultOpen">Graphs</button>
+        <button class="tablinks" onclick="openTab(event, 'Instructions')">Instructions</button>
     </div>
 
-    <!-- Accel Values + Graph Display -->
-    <div>
-        <h2>Accelerometer Signals:</h2>
-        <div>
-            X: <span id="valX" style="color:red">--</span> | 
-            Y: <span id="valY" style="color:green">--</span> | 
-            Z: <span id="valZ" style="color:blue">--</span>
+    <div id="Graphs" class="tabcontent">
+    
+        <div class="controls-bar"> <!-- Pause Controls -->
+            <strong>Graph Control:</strong>
+            <button onclick="togglePauseGraph()" id="pauseGraphBtn">Pause Graphs</button>
         </div>
-        <div class="controls-bar">
-            <strong>Accel Zoom Y-Axis: </strong>
-            <button onclick="zoomAccelIn()">+</button>
-            <button onclick="zoomAccelOut()">-</button>
-            <button onclick="resetAccelZoom()">Reset</button>
+        
+    
+        <!-- EMG Value + Graph Display -->
+        <div>
+            <h2>EMG Signal: <span id="emgValue">--</span> µV</h2>
+            <div class="controls-bar">
+                <strong>EMG Zoom Y-Axis: </strong>
+                <button onclick="zoomEMGIn()">+</button>
+                <button onclick="zoomEMGOut()">-</button>
+                <button onclick="resetEMGZoom()">Reset</button>
+            </div>
+        </div>
+        <div class="graph-container">
+            <canvas id="emgGraph"></canvas>
+        </div>
+    
+        <!-- Accel Values + Graph Display -->
+        <div>
+            <h2>Accelerometer Signals:</h2>
+            <div>
+                X: <span id="valX" style="color:red">--</span> | 
+                Y: <span id="valY" style="color:green">--</span> | 
+                Z: <span id="valZ" style="color:blue">--</span>
+            </div>
+            <div class="controls-bar">
+                <strong>Accel Zoom Y-Axis: </strong>
+                <button onclick="zoomAccelIn()">+</button>
+                <button onclick="zoomAccelOut()">-</button>
+                <button onclick="resetAccelZoom()">Reset</button>
+            </div>
+        </div>
+        <div class="graph-container">
+            <canvas id="accelGraph"></canvas>
         </div>
     </div>
-    <div class="graph-container">
-        <canvas id="accelGraph"></canvas>
+
+    <div id="Instructions" class="tabcontent">
+        <h2>Current Action:</h2>
+        <div id="movementGuide" class="guide-text">REST</div>
     </div>
 
     <script>
+
+        // Tab Function
+        function openTab(evt, tabName) {
+            // Hide all elements of previously active tab
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+        
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+        
+            // 3: Show the current tab
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+        
         // Global variables
         let ws = null;
         let emgGraph = null;
@@ -100,7 +208,7 @@
         let annotations = [];
         let pendingEmgData = []; // EMG Data Buffer
         let pendingAccelData = []; // Accel Data Buffer
-
+        
         // Graph configuration
         const MAX_DATA_POINTS = 1000; // Limit data for scrolling graph (5s * 200Hz)
         const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
@@ -110,17 +218,16 @@
         let isGraphPaused = false; // tracks whether the graphs are paused or not
         let isStreaming = false;
         let lastMarkerInterval = 0;
-        let markerCountdown = 0; // gets countdown value synchronized with backend
-
+        
         document.addEventListener('DOMContentLoaded', () => {
             initGraphs();
             setStreamingState(false, 'Idle');
         });
-
-        // ----- Initialize frontend connection to server via WebSocket ----- //
+        
+        // ----- FRONTEND CONNECTION TO SERVER (via WebSocket) ----- //
         function connectWebSocket() {
             if (ws) return;
-
+        
             // Connect to server via WebSocket + update server connection status
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
             const wsUrl = `${protocol}://${window.location.host}/ws`;
@@ -128,19 +235,21 @@
             console.log("Attempting to connect to:", wsUrl);
             try {
                 ws = new WebSocket(wsUrl);
-
+        
                 ws.onopen = () => {
                     document.getElementById('websocketStatus').innerText = "WS Status: Connected";
                 }
-
+        
+                // DATA COMMUNICATION 
                 ws.onmessage = (event) => {
-                    // Update buffers with most recent EMG + Accel data
+                    
+                    // Update graph buffers with most recent EMG + Accel data
                     const data = JSON.parse(event.data);
                     if (data.type === 'emg_data') {
                         data.value.forEach((val, i) => {
                             pendingEmgData.push({ x: data.timestamp[i], y: val });
                         });
-
+        
                         document.getElementById('emgValue').innerText = data.value[data.value.length-1].toFixed(2);
                     } 
                     else if (data.type === 'accel_data') {
@@ -150,7 +259,7 @@
                                                     y_y: data.value[1][i],
                                                     y_z: data.value[2][i] });
                         });
-
+        
                         valuesMatrix = data.value;
                         const len = valuesMatrix[0].length;
                         if (len > 0) {
@@ -167,17 +276,23 @@
                         });
                     }
                     
-                    // Update next marker countdown
+                    // Update marker display and exercise instructions
                     else if (data.type === 'marker_countdown') {
                         updateMarkerDisplay(data.time_remaining);
+                        updateMovementGuide(data.time_remaining);
+                    }
+
+                    // Update chat-terminal
+                    else if (data.type === 'server_log') {
+                        addLog(data.message);
                     }
                 }
-
+        
                 ws.onclose = () => {
                     document.getElementById('websocketStatus').innerText = "WS Status: Disconnected";
                     ws = null;
                 };
-
+        
                 ws.onerror = (error) => {
                     console.error("WebSocket Error:", error);
                     document.getElementById('websocketStatus').innerText = "WS Status: Connection Error";
@@ -187,8 +302,58 @@
                 document.getElementById('websocketStatus').innerText = "WS Status: Setup Error";
             }
         }
+        
+        // ----- EVENT MARKER TIMER ----- //
+        function updateMarkerDisplay(timeRemaining) {
+            const display = document.getElementById('markerCountdownDisplay');
+            if (!display) return;
+             
+            if (timeRemaining < 3) { // Detect rest period
+                display.style.color = 'blue'; 
+            } 
+            else {// Detect event marker (movement begins)
+                display.style.color = 'green';
+            }
+        
+            display.innerText = `NEXT MARKER: ${timeRemaining.toFixed(2)}s`;
+        }
 
-        // ----- Initialize Graphs ----- //
+        // ----- CHAT WINDOW ----- //
+        function addLog(message) {
+            const terminal = document.getElementById('chatTerminal');
+            const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            // Add new message to the bottom
+            terminal.innerHTML += `<div class="log-entry">[${timestamp}] ${message}</div>`;
+            
+            // Auto-scroll to the bottom
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+                
+        // ----- EXERCISE INSTRUCTIONS ----- //
+        
+        // Basic go-rest display
+        function updateMovementGuide(timeRemaining) {
+            const instruction = document.getElementById('movementGuide');
+            if (!instruction) return;
+        
+            // Detect GO window (6-3 seconds left until next marker)
+            if (timeRemaining >= 3.0) {
+                instruction.style.color = '#2ecc71'; // green
+                instruction.innerText = `GO`;
+            }
+        
+            // Detect REST window (3-0 seconds left until next marker)
+            if (timeRemaining < 3.0) {
+                instruction.style.color = '#3498db'; // blue
+                instruction.innerText = `REST`;
+            }
+            
+        }
+        
+        // ----- EMG & ACCEL GRAPHS ----- //
+        
+        // Initialize Graphs //
         function getCommonChartOptions(yLabel) {
             return {
                 animation: false,
@@ -254,14 +419,14 @@
                 },
                 options: getCommonChartOptions('G-Force') 
             });
-
+        
         }
-
-        // ----- Graph Display Logic (using render loops) ----- //
+        
+        // Graph Display Logic (using render loops) //
         function startRenderLoop() {
             requestAnimationFrame(renderLoop);
         }
-
+        
         function renderLoop() {
             if (!isGraphPaused) {
                 batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
@@ -269,10 +434,10 @@
             }
             requestAnimationFrame(renderLoop); // Continue looping
         }
-
+        
         function batchUpdateGraph(chart, buffer, type) {
             if (!chart || buffer.length === 0) return;
-
+        
             // 1: Push all pending data to Chart dataset
             if (type === 'emg') {
                 chart.data.datasets[0].data.push(...buffer);
@@ -284,9 +449,9 @@
                     chart.data.datasets[2].data.push({ x: pt.x, y: pt.y_z });
                 });
             }
-
+        
             buffer.length = 0 // 2: Clear buffer
-
+        
             // 3: Prune graph (along x-axis) 
             const currentLength = chart.data.datasets[0].data.length;
             if (currentLength > MAX_DATA_POINTS) {
@@ -295,7 +460,7 @@
                     dataset.data.splice(0, removeCount);
                 });
             }
-
+        
             // 4: Update x-axis (time) window 
             const lastPoint = chart.data.datasets[0].data[chart.data.datasets[0].data.length - 1];
             if (lastPoint) {
@@ -305,17 +470,17 @@
                 chart.options.scales.x.min = latestTime - WINDOW_SIZE;
                 chart.options.scales.x.max = latestTime;
             }
-
+        
             // 5: Marker interval filtering
             chart.options.plugins.annotation.annotations = annotations.filter(a => 
                 a.value >= chart.options.scales.x.min && 
                 a.value <= chart.options.scales.x.max
             );
-
+        
             chart.update('none'); // 6: Render
         }
-
-        // ----- Event Marker Logic ----- //
+        
+        // Event Marker Logic //
         function updateEventDisplay(timestamp) {
             if (isGraphPaused) return;
             
@@ -336,25 +501,11 @@
                 color: 'white'
                 }
             };
-
+        
             annotations.push(annotationConfig); // update annotations
         }
         
-        function updateMarkerDisplay(timeRemaining) {
-            const display = document.getElementById('markerCountdownDisplay');
-            if (!display) return;
-            
-            // Detect when marker begins (time remaining goes near 0)
-            if (timeRemaining < 0.5 && markerCountdown >= 0.5) { // small threshold (0.1s) for reliability
-                display.style.color = 'red'; // visual flash for marker
-                setTimeout(() => display.style.color = 'blue', 200);
-            }
-
-            markerCountdown = timeRemaining;
-            display.innerText = `NEXT MARKER: ${timeRemaining.toFixed(2)}s`;
-        }
-        
-        // ----- Graph Control Functions ----- //
+        // Graph Control Functions //
         // Pause control for BOTH graphs (synchronized)
         function togglePauseGraph() {
             isGraphPaused = !isGraphPaused;
@@ -366,14 +517,14 @@
                 redrawAccelGraph();
             }
         }
-
+        
         // Zoom control functions
         // 1: Calculate min/max of graphs current data
         function getGraphRangeY(graph) {
             let min = Infinity;
             let max = -Infinity;
             let hasData = false;
-
+        
             // Loop through all datasets (handles Accel X, Y, Z simultaneously)
             graph.data.datasets.forEach(dataset => {
                 dataset.data.forEach(point => {
@@ -385,7 +536,7 @@
                     hasData = true;
                 });
             });
-
+        
             if (!hasData || min === Infinity || max === -Infinity) return null;
             
             // Add a tiny buffer if flatline
@@ -399,11 +550,11 @@
         // 2: Zoom in/out Function
         function applyZoom(graph, factor) {
             if (!graph) return;
-
+        
             // Get current scale limits
             let currentMin = graph.options.scales.y.min;
             let currentMax = graph.options.scales.y.max;
-
+        
             // If manual zoom isn't set yet, calculate it from the data
             if (currentMin === undefined || currentMax === undefined) {
                 const limits = getGraphRangeY(graph);
@@ -411,7 +562,7 @@
                 currentMin = limits.min;
                 currentMax = limits.max;
             }
-
+        
             // Calculate center and span
             const center = (currentMin + currentMax) / 2;
             const span = (currentMax - currentMin);
@@ -419,13 +570,13 @@
             // Apply Zoom Factor (newSpan = oldSpan * factor)
             // Factor < 1 zooms IN (smaller span), Factor > 1 zooms OUT (larger span)
             const newHalfSpan = (span * factor) / 2;
-
+        
             graph.options.scales.y.min = center - newHalfSpan;
             graph.options.scales.y.max = center + newHalfSpan;
             
             graph.update('none');
         }
-
+        
         // 3: Reset function
         function resetZoom(graph) {
             if (!graph) return;
@@ -439,19 +590,22 @@
         function zoomEMGIn() { applyZoom(emgGraph, 1 / Y_ZOOM_FACTOR); }
         function zoomEMGOut() { applyZoom(emgGraph, Y_ZOOM_FACTOR); }
         function resetEMGZoom() { resetZoom(emgGraph); }
-
+        
         // Accelerometer zoom controls
         function zoomAccelIn() { applyZoom(accelGraph, 1 / Y_ZOOM_FACTOR); }
         function zoomAccelOut() { applyZoom(accelGraph, Y_ZOOM_FACTOR); }
         function resetAccelZoom() { resetZoom(accelGraph); }
         
-        // ----- Streaming Control Helper ----- //
+        
+        // ----- STREAMING ---- //
+        
+        // Streaming Control Helper //
         function setStreamingState(active, statusMessage, color="333") {
             isStreaming = active;
             const button = document.getElementById('streamBtn');
             const input = document.getElementById('trialInput');
             const status = document.getElementById('streamingStatus');
-
+        
             if (button) {
                 button.innerText = active ? 'Stop Stream + Recording' : 'Start Stream + Recording';
                 button.disabled = false;
@@ -459,21 +613,21 @@
             
             // Lock input while active
             if (input) input.disabled = active;
-
+        
             if (status) {
                 status.innerText = statusMessage;
                 status.style.color = color;
             }
         }
         
-        // ----- MAIN STREAMING LOGIC ----- //
+        // Main Sreaming Logic //
         async function handleStreamingClick() {
             // Case 1: Stop streaming + recording
             if (isStreaming) {
                 await stopStream();
                 return
             }
-
+        
             // Case 2: Start streaming + recording
             const boardID = document.getElementById('boardID');
             let useSyntheticData = false
@@ -484,14 +638,14 @@
             if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
                 alert("Please enter a valid number of trials (1-15)");
             }
-
+        
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
             document.getElementById('trialInput').disabled = true;
-
+        
             const status = document.getElementById('streamingStatus');
             status.style.color = '#e65100'; // Orange for warning
-
+        
             for (let i = 3; i > 0; i--) {
                 status.innerText = `Starting in ${i}...`;
                 
@@ -504,7 +658,7 @@
             // Send number of trials per session and start stream + recording
             await startStream(numTrials, useSyntheticData);
         }
-
+        
         async function startStream(numTrials, useSyntheticData)  {
             connectWebSocket();
             
@@ -526,9 +680,9 @@
                     graph.update('none');
                 }
             });
-
+        
             startRenderLoop();
-
+        
             try { 
                 // Wait 1 second for WebSocket to connect first 
                 await new Promise(resolve => setTimeout(resolve, 100)); 
@@ -543,7 +697,7 @@
                 alert("Error: " + error.message);
             }
         }
-
+        
         async function stopStream() {
             try {
                 // Lock button briefly
@@ -558,7 +712,7 @@
                     display.innerText = "";
                     display.style.color = 'blue';
                 }
-            markerCountdown = 0; // Reset state
+
             setStreamingState(false, 'Idle', '#333');
             } catch (e) {
                 console.error(e);
@@ -566,7 +720,7 @@
                 setStreamingState(true, 'Error Stopping', 'red'); // Revert if failed
             }
         }
-    
+        
     </script>
 
 </body>

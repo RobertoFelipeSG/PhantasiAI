@@ -19,11 +19,11 @@ async def root():
     Read the HTML file and return
     '''
     try:
-        with open("templates/index.html", "r", encoding="utf-8") as f:
+        with open("front-end/index.html", "r", encoding="utf-8") as f:
             html_content = f.read()
         return HTMLResponse(content=html_content)
     except FileNotFoundError:
-         return HTMLResponse(content="<h1>Error: templates/index.html not found!</h1>", status_code=500)
+         return HTMLResponse(content="<h1>Error: front-end/index.html not found!</h1>", status_code=500)
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -80,4 +80,4 @@ async def stop_stream():
 
 if __name__ == "__main__":
     logging.info("Starting FastAPI server")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="10.42.0.1", port=8000)
