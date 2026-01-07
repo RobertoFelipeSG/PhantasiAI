@@ -317,6 +317,37 @@ class PeakClassifier:
         # Save to CSV
         df = pd.DataFrame(data)
         df.to_csv(output_file, index=False)
+
+    def _save_classification_results_txt(self, output_path: Path):
+
+        """
+        Save classification results to TXT file with specified structure
+        """
+
+        output_file = output_path / "peak_classifications.txt"
+
+        # Extract vectors from all results
+        amplitude_vector = [result['amplitude'] for result in self.classification_results]
+        min_amplitude_vector = [result['min_amplitude'] for result in self.classification_results]
+        mean_frequency_vector = [result['mean_frequency'] for result in self.classification_results]
+        median_frequency_vector = [result['median_frequency'] for result in self.classification_results]
+
+        # Write header
+        with open(output_file, 'w') as f:
+            f.write("sujet;amplitude;min_amplitude;mean_frequency;median_frequency\n")
+
+            # Write data as row vectors
+            sujet = 0  # Always 0 as specified
+            
+            # Format vectors as strings with proper precision
+            amplitude_str = ",".join([f"{val:.4f}" for val in amplitude_vector])
+            min_amplitude_str = ",".join([f"{val:.4f}" for val in min_amplitude_vector])
+            mean_frequency_str = ",".join([f"{val:.2f}" for val in mean_frequency_vector])
+            median_frequency_str = ",".join([f"{val:.2f}" for val in median_frequency_vector])
+            
+            f.write(f"{sujet};{amplitude_str};{min_amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
+        
+        logging.info(f"Classification results (TXT format) saved to: {output_file}")
     
     def run(self, features_df: pd.DataFrame, output_path: Path) -> Dict:
         """
@@ -340,6 +371,7 @@ class PeakClassifier:
         
         # Save results
         self._save_classification_results_csv(output_path)
+        self._save_classification_results_txt(output_path)
         
         # Print summary
         class_counts = {}
