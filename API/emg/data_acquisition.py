@@ -7,30 +7,33 @@ import csv
 import numpy as np
 import pandas as pd
 from collections import deque
+from pathlib import Path
 
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
 from brainflow.data_filter import DataFilter, FilterTypes
 from pylsl import StreamInfo, StreamOutlet
 
-from connection_manager import manager, logging
-from emg_feature_extractor import FeatureExtractor
-from emg_peak_classifier import PeakClassifier
+from config.connection_manager import manager, logging
+from emg.emg_feature_extractor import FeatureExtractor
+from emg.emg_peak_classifier import PeakClassifier
 
-# ----- Synthetic EMG Recorder: CSV Storing & Analysis Files ---- #
-class SyntheticRecorder:
-    def __init__(self, num_emg_channels=4, num_accel_channels=3):
+# ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
+class RealTimeRecorder:
+    def __init__(self, base_path, num_emg_channels=4, num_accel_channels=3):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
+        
+        self.base_path = base_path
         self.filename = None
         self.session_dir = None
         self.analyses_dir = None
         self.classification_dir = None
         self._index = 0
         
-        self._sample_rate = 250
+        self._sample_rate = 200
         self._buffer_seconds = 120
-        self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session=24000 (~15 trials MAX per session) 
+        self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session=24000 (~15 trials MAX per session)         
         self._buffer = deque(maxlen=self._buffer_len)
         self._buffer_header = None
 
@@ -48,7 +51,6 @@ class SyntheticRecorder:
 
     def _mark_event(self, timestamp):
         event_flag = 0
-        
         if timestamp >= self.next_event_time:
             event_flag = 1
             self._event_times.append(timestamp)
@@ -56,7 +58,6 @@ class SyntheticRecorder:
             
             # Advance the marker time
             self.next_event_time += float(self.marker_interval)
-            
             logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
         
         return event_flag
@@ -104,7 +105,7 @@ class SyntheticRecorder:
                 self.csv_file.flush()
             self._index += 1
 
-            return bool(event_flag)
+            return bool(event_flag)            
 
         except Exception as e:
             logging.warning(f"[Recorder] Failed to record data point: {e}")
@@ -125,6 +126,8 @@ class SyntheticRecorder:
             # Calculate analysis window and get data
             analysis_data = df[(df['timestamp'] > self.min_time) & (df['timestamp'] < max_time)]
 
+            self.min_time = self._event_times[trial - 1] # Advance minimum timestamp pointer
+
             if analysis_data.empty:
                 return None
 
@@ -132,8 +135,6 @@ class SyntheticRecorder:
             filename = f"{max_time:.1f}.csv"
             output_path = os.path.join(self.analyses_dir, filename)
             analysis_data.to_csv(output_path, index=False)
-
-            self.min_time = self._event_times[trial - 1] # Advance minimum timestamp pointer
 
             return analysis_data
 
@@ -149,8 +150,7 @@ class SyntheticRecorder:
         
         # Create session recording folder
         timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
-        base_dir = os.getcwd() # create recordings folder in current directory
-        self.session_dir = os.path.join(base_dir, "synthetic-emg-recordings", timestamp)
+        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", timestamp)
         os.makedirs(self.session_dir, exist_ok=True)
         
         # Create minute analyses, features, and classification folder within session folder
@@ -199,9 +199,11 @@ class SyntheticRecorder:
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 ganglion_instance = None
 
-class SyntheticGanglionData:
-    def __init__(self, num_trials=10, mac_address=None, channel_list=None, sample_rate=250, buffer_seconds=2):
+class GanglionData:
+    def __init__(self, num_trials=10, mac_address=None, channel_list=None, sample_rate=200, buffer_seconds=2):
         '''Initialize Ganglion board system'''
+
+        self.base_path = base_path = Path(__file__).resolve().parent
         
         self.serial_port = "COM4"
         self.mac_address = mac_address
@@ -210,7 +212,7 @@ class SyntheticGanglionData:
         self._buffer_seconds = buffer_seconds
         self._buffer_len = sample_rate * buffer_seconds
         self._num_points = 20 # number of data points processed at once
-        
+
         self._stop_event = threading.Event() # create threading flag for EMG stream
         self._emg_thread = None
         self._session_start_time = None
@@ -219,25 +221,35 @@ class SyntheticGanglionData:
         self.next_trial_block = int(num_trials)
         self._total_events = 0
         self.marker_broadcast_counter = 0
-
-        self.recorder = SyntheticRecorder()
-        self.feature_extractor = FeatureExtractor(sampling_rate=250, height_percentile=98, min_distance=3.0)
-        self.peak_classifier = PeakClassifier(model_path="./models/xgboost_model.pkl")
         
         self._outlets = {} # LSL StreamOutlets for each channel
         self._accel_outlet = None # LSL StreamOutlets for accel channel
 
         self.board_shim = None
-        self.board_id = BoardIds.SYNTHETIC_BOARD
+        self.board_id = BoardIds.GANGLION_BOARD.value
+        self.emg_channels = BoardShim.get_exg_channels(self.board_id)
+        self.accel_channels = BoardShim.get_accel_channels(self.board_id)
 
-    
+        self.timestamp_channel = BoardShim.get_timestamp_channel(self.board_id)
+        self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
+        self._all_channels = self.emg_channels + self.accel_channels
+        
+        self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
+        self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
+
+        self.recorder = RealTimeRecorder(base_path=self.base_path, num_emg_channels=len(self.emg_channels), num_accel_channels=len(self.accel_channels))
+        self.feature_extractor = FeatureExtractor(sampling_rate=200, height_percentile=98, min_distance=3.0)
+        
+        model_path = base_path / "models" / "xgboost_model.pkl"
+        self.peak_classifier = PeakClassifier(model_path=str(model_path))
+            
     def _process_data(self, loop):
         # Read and remove current data chunk
         data = self.board_shim.get_board_data() 
         if data.size == 0: return False
 
         timestamps = data[self.timestamp_channel] # get raw timestamps
-
+        
         # Set session start time and calculate relative timestamps
         if self._session_start_time is None:
             self._session_start_time = timestamps[0]
@@ -249,14 +261,14 @@ class SyntheticGanglionData:
         for i in range(len(timestamps)):
             curr_emg_ch = data[self.emg_channels, i]
             curr_accel_ch = data[self.accel_channels, i]
-            curr_timestamp = relative_timestamps[i] 
+            curr_timestamp = relative_timestamps[i]
 
             has_event = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
             
             if has_event: 
                 self._total_events += 1
-                logging.info(f"Recorded {self._total_events} events")
-
+                logging.info(f"Recorded {self._total_events} events")            
+            
             # Perform analysis on selected trials
             curr_trials = self._total_events - 1
             if curr_trials == self.next_trial_block:
@@ -271,15 +283,16 @@ class SyntheticGanglionData:
                     features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=['ch1 (µV)'])
                     
                     # Peak Classification
-                    class_filename = f"{int(curr_timestamp)}_classification.csv"
-                    class_filepath = os.path.join(self.recorder.classification_dir, class_filename)
-                    classification_results = self.peak_classifier.run(
-                        features_df=features_df, output_path=class_filepath)
-                
+                    class_folder = f"{int(curr_timestamp)}_classification"
+                    output_path = Path(self.recorder.classification_dir) / class_folder
+                    output_path.mkdir(parents=True, exist_ok=True)
+                    
+                    self.peak_classifier.run(features_df=features_df, output_path=output_path)
+
                 # Advance to next trial block
                 while curr_trials == self.next_trial_block:
                     self.next_trial_block += self._num_trials
-                
+            
         # Broadcast event markers
         if self.recorder.event_times_buffer: 
             new_event_times = self.recorder.event_times_buffer[:]
@@ -293,14 +306,14 @@ class SyntheticGanglionData:
         
         # Send marker interval countdown to frontend
         if self.recorder.marker_interval > 0.0:
-            self.marker_broadcast_counter += len(relative_timestamps)
+            self.marker_broadcast_counter += len(timestamps)
             
             # Only broadcast remaining time every 40 samples (~200ms at 200Hz)
             if self.marker_broadcast_counter >= self._num_points:
                 self.marker_broadcast_counter = 0 
                 
                 next_event_time = self.recorder.next_event_time
-                curr_timestamp = relative_timestamps[-1] 
+                curr_timestamp = relative_timestamps[-1]
                 time_remaining = max(0.0, (next_event_time - curr_timestamp)) 
                 
                 marker_data = json.dumps({
@@ -315,7 +328,7 @@ class SyntheticGanglionData:
         self._accel_outlet.push_chunk(accel_data.T.tolist()) # push to LSL
         json_accel = json.dumps({
             "type": "accel_data",
-            "timestamp": relative_timestamps.tolist(), 
+            "timestamp": relative_timestamps.tolist(),
             "value": accel_data.tolist()
         })
         asyncio.run_coroutine_threadsafe(manager.broadcast(json_accel), loop)
@@ -346,7 +359,7 @@ class SyntheticGanglionData:
                     json_data = json.dumps({
                         "type": "emg_data",
                         "channel_index": ch,
-                        "timestamp": relative_timestamps.tolist(), 
+                        "timestamp": relative_timestamps.tolist(),
                         "value": emg_data.tolist()})
                     # safely place async task onto event loop's queue
                     asyncio.run_coroutine_threadsafe(manager.broadcast(json_data), loop)
@@ -361,25 +374,11 @@ class SyntheticGanglionData:
         BoardShim.enable_dev_board_logger()
         
         # Ganglion set-up and initialization
-
-        # For synthetic data
         params = BrainFlowInputParams()
-        self.board_shim = BoardShim(BoardIds.SYNTHETIC_BOARD.value, params)
-
-        self.board_shim.prepare_session()
-        self.board_shim.config_board("n") # Turn on accelerometer
-        self.board_shim.start_stream()
-        logging.info("Streaming EMG and Accel data...")
-
-        self.emg_channels = BoardShim.get_exg_channels(self.board_id)
-        self.accel_channels = BoardShim.get_accel_channels(self.board_id)
-
-        self.timestamp_channel = BoardShim.get_timestamp_channel(self.board_id)
-        self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
-        self._all_channels = self.emg_channels + self.accel_channels
-        
-        self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
-        self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
+        params.serial_port = self.serial_port
+        if self.mac_address:
+            params.mac_address = self.mac_address
+        self.board_shim = BoardShim(self.board_id, params)
 
         # LSL initialization for each channel
         for ch in self._selected_channels:
@@ -396,7 +395,10 @@ class SyntheticGanglionData:
         self._accel_outlet = StreamOutlet(accel_info)
         
         try:
-            # For real data
+            self.board_shim.prepare_session()
+            self.board_shim.config_board("n") # Turn on accelerometer
+            self.board_shim.start_stream()
+            logging.info("Streaming EMG and Accel data...")
 
             if self.recorder:
                 self.recorder.start_recording()

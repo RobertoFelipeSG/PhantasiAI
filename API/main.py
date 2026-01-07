@@ -4,10 +4,10 @@ import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
-from connection_manager import manager, logging
+from config.connection_manager import manager, logging
 
-from data_acquisition import GanglionData
-from synthetic_data_acquisition import SyntheticGanglionData
+from emg.data_acquisition import GanglionData
+from emg.synthetic_data_acquisition import SyntheticGanglionData
 
 app = FastAPI()
 

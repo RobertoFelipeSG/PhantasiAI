@@ -3,8 +3,8 @@ import numpy as np
 import pickle
 import warnings
 from pathlib import Path
-from typing import Optional, List, Dict
-from connection_manager import logging
+from typing import List, Dict
+from config.connection_manager import logging
 
 warnings.filterwarnings('ignore')
 
@@ -280,7 +280,7 @@ class PeakClassifier:
             traceback.print_exc()
             return []
         
-    def _save_classification_results(self, output_path: str):
+    def _save_classification_results_csv(self, output_path: Path):
         """
         Save classification results to CSV
         """
@@ -288,7 +288,7 @@ class PeakClassifier:
             logging.warning("No classification results to save")
             return
         
-        output_path = Path(output_path)
+        output_file = output_path / "peak_classifications.csv"
         
         # Prepare data for CSV
         data = []
@@ -316,9 +316,9 @@ class PeakClassifier:
         
         # Save to CSV
         df = pd.DataFrame(data)
-        df.to_csv(output_path, index=False)
+        df.to_csv(output_file, index=False)
     
-    def run(self, features_df: pd.DataFrame, output_path: str) -> Dict:
+    def run(self, features_df: pd.DataFrame, output_path: Path) -> Dict:
         """
         Run the full classification pipeline.
         
@@ -339,7 +339,7 @@ class PeakClassifier:
             }
         
         # Save results
-        self._save_classification_results(output_path)
+        self._save_classification_results_csv(output_path)
         
         # Print summary
         class_counts = {}

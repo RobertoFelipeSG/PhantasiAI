@@ -2,12 +2,11 @@ import pandas as pd
 import numpy as np
 import neurokit2 as nk
 import warnings
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from mne import create_info
 from mne.io import RawArray
 from scipy.signal import find_peaks, hilbert
-from connection_manager import logging
+from config.connection_manager import logging
 
 warnings.filterwarnings('ignore')
 
