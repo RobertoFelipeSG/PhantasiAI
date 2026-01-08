@@ -1,11 +1,7 @@
-import os
 import time
 import threading
 import asyncio
 import json
-import csv
-import numpy as np
-import pandas as pd
 from collections import deque
 from pathlib import Path
 
@@ -14,210 +10,35 @@ from brainflow.data_filter import DataFilter, FilterTypes
 from pylsl import StreamInfo, StreamOutlet
 
 from config.connection_manager import manager, logging
+from config.config_manager import load_config
+from emg.recorder import RealTimeRecorder
 from emg.emg_feature_extractor import FeatureExtractor
 from emg.emg_peak_classifier import PeakClassifier
 
-# ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
-class RealTimeRecorder:
-    def __init__(self, base_path, num_emg_channels=4, num_accel_channels=3):
-        self.recording = False
-        self.csv_file = None
-        self.csv_writer = None
-        
-        self.base_path = base_path
-        self.filename = None
-        self.session_dir = None
-        self.analyses_dir = None
-        self.classification_dir = None
-        self._index = 0
-        
-        self._sample_rate = 200
-        self._buffer_seconds = 120
-        self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session=24000 (~15 trials MAX per session)         
-        self._buffer = deque(maxlen=self._buffer_len)
-        self._buffer_header = None
-
-        self.emg_channel_count = num_emg_channels # auto: all 4
-        self.accel_channel_count = num_accel_channels # auto: all 3
-        
-        self.marker_interval = 6.0 # event every 6 seconds
-        self.next_event_time = self.marker_interval // 2 # first marker occurs at 3 seconds
-        self.min_time = 0.0 # minimum timestamp pointer for analysis DataFrame
-        
-        self.event_times_buffer = [] # buffer to store event times for frontend push
-        self._event_times = [] # store event times for entire session 
-        
-        logging.info(f"[Recorder] initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels")
-
-    def _mark_event(self, timestamp):
-        event_flag = 0
-        if timestamp >= self.next_event_time:
-            event_flag = 1
-            self._event_times.append(timestamp)
-            self.event_times_buffer.append(timestamp)
-            
-            # Advance the marker time
-            self.next_event_time += float(self.marker_interval)
-            logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
-        
-        return event_flag
-        
-    def record_data_point(self, timestamp, emg_values, accel_values):
-        '''
-        Records single row of EMG and Accel data in csv file
-        Returns if event occured
-        '''
-        if not self.recording or not self.csv_writer:
-            return False
-
-        try:
-            # Ensure emg_values and accel_values are a list of floats
-            if isinstance(emg_values, (np.ndarray, list)):
-                emg_values = [float(v) for v in emg_values]
-            else:
-                emg_values = [float(emg_values)]
-
-            if isinstance(accel_values, (np.ndarray, list)):
-                accel_values = [float(v) for v in accel_values]
-            else:
-                accel_values = [float(accel_values)]
-            
-            # Get event flag
-            event_flag = self._mark_event(timestamp)
-            
-            # safety filters
-            emg_values = emg_values[:self.emg_channel_count]
-            accel_values = accel_values[:self.accel_channel_count]
-
-            # Numeric row for buffers
-            numeric_row = [timestamp] + emg_values + accel_values + [event_flag]
-            self._buffer.append(numeric_row)
-            
-            # Format Row: Timestamp | Ch1 | Ch2 ... | AccelX | ... | EventFlag
-            formatted_emg = [f"{v:.2f}" for v in emg_values]
-            formatted_accel = [f"{v:.2f}" for v in accel_values]
-            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)]
-            
-            self.csv_writer.writerow(row)
-
-            # Flush periodically 
-            if self._index % 10 == 0:
-                self.csv_file.flush()
-            self._index += 1
-
-            return bool(event_flag)            
-
-        except Exception as e:
-            logging.warning(f"[Recorder] Failed to record data point: {e}")
-            return False
-
-    def create_analysis_file(self, max_time, trial): 
-        """
-        Create an analysis file with X number of trials and saves file as CSV 
-        Return: DataFrame (df of analysis data) 
-        """
-
-        if not self.recording or not self._buffer: return None
-
-        try:
-            df = pd.DataFrame(self._buffer, columns=self._buffer_header)
-            df['timestamp'] = df['timestamp'].astype(float)
-
-            # Calculate analysis window and get data
-            analysis_data = df[(df['timestamp'] > self.min_time) & (df['timestamp'] < max_time)]
-
-            self.min_time = self._event_times[trial - 1] # Advance minimum timestamp pointer
-
-            if analysis_data.empty:
-                return None
-
-            # Save df as csv
-            filename = f"{max_time:.1f}.csv"
-            output_path = os.path.join(self.analyses_dir, filename)
-            analysis_data.to_csv(output_path, index=False)
-
-            return analysis_data
-
-        except Exception as e:
-            print(f"[Recorder] Failed to create temp analysis file: {e}")
-            return None
-    
-    def start_recording(self):
-        ''' Initialize main CSV file '''
-        
-        if self.recording:
-            return
-        
-        # Create session recording folder
-        timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
-        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", timestamp)
-        os.makedirs(self.session_dir, exist_ok=True)
-        
-        # Create minute analyses, features, and classification folder within session folder
-        self.analyses_dir = os.path.join(self.session_dir, "minute_analyses")
-        os.makedirs(self.analyses_dir, exist_ok=True)
-        self.classification_dir = os.path.join(self.session_dir, "classifications")
-        os.makedirs(self.classification_dir, exist_ok=True)
-
-        self.filename = os.path.join(self.session_dir, "emg_accel.csv")
-
-        try:
-            self.csv_file = open(self.filename, 'w', newline='', encoding='utf-8')
-            self.csv_writer = csv.writer(self.csv_file)
-
-            emg_headers = [f'ch{i+1} (µV)' for i in range(self.emg_channel_count)]
-            accel_headers = [f'accel_{axis}' for axis in ['x', 'y', 'z']]
-            header = ['timestamp'] + emg_headers + accel_headers + ['event']
-            
-            self._buffer_header = header
-            self.csv_writer.writerow(header)
-            self.csv_file.flush()
-
-            self.recording = True
-
-            logging.info(f"[Recorder] Recording started: {self.filename}")
-        except Exception as e:
-            logging.error(f"[Recorder] Failed to start recording: {e}")
-            self.recording = False
-    
-    def stop_recording(self):
-        if not self.recording:
-            return
-        
-        try:
-            if self.csv_file:
-                self.csv_file.close()
-                self.csv_file = None
-            self.csv_writer = None
-            self.recording = False
-            self.next_event_time = 0.0 # Reset marker time on stop
-
-            logging.info("[Recorder] Recording stopped")
-        except Exception as e:
-            logging.error(f"[Recorder] Failed to stop recording: {e}")
+config = load_config() # load config settings
 
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 ganglion_instance = None
 
 class GanglionData:
-    def __init__(self, num_trials=10, mac_address=None, channel_list=None, sample_rate=200, buffer_seconds=2):
+    def __init__(self, num_trials=5):
         '''Initialize Ganglion board system'''
 
-        self.base_path = base_path = Path(__file__).resolve().parent
+        self.base_path = Path(__file__).resolve().parent
         
-        self.serial_port = "COM4"
-        self.mac_address = mac_address
-        self._selected_channels = channel_list or [0] # default EMG channel 1 + accel channels
-        self._sample_rate = sample_rate
-        self._buffer_seconds = buffer_seconds
-        self._buffer_len = sample_rate * buffer_seconds
-        self._num_points = 20 # number of data points processed at once
+        self.serial_port = config.get("serial_port")
+        self.mac_address = config.get("mac_address")
+        self._selected_channels = config.get("selected_channels")
+        self._sample_rate = config.get("sample_rate")
+        self._buffer_seconds = config.get("data_acq_buffer_seconds")
+        self._buffer_len = self._sample_rate * self._buffer_seconds
+        self._num_points = config.get("num_points") # number of data points processed at once
 
         self._stop_event = threading.Event() # create threading flag for EMG stream
         self._emg_thread = None
         self._session_start_time = None
         
-        self._num_trials = int(num_trials) # trials per session
+        self._num_trials = int(num_trials) # trials per session (inputed by user)
         self.next_trial_block = int(num_trials)
         self._total_events = 0
         self.marker_broadcast_counter = 0
@@ -237,11 +58,9 @@ class GanglionData:
         self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
         self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
 
-        self.recorder = RealTimeRecorder(base_path=self.base_path, num_emg_channels=len(self.emg_channels), num_accel_channels=len(self.accel_channels))
-        self.feature_extractor = FeatureExtractor(sampling_rate=200, height_percentile=98, min_distance=3.0)
-        
-        model_path = base_path / "models" / "xgboost_model.pkl"
-        self.peak_classifier = PeakClassifier(model_path=str(model_path))
+        self.recorder = RealTimeRecorder(self.base_path)
+        self.feature_extractor = FeatureExtractor()
+        self.peak_classifier = PeakClassifier(self.base_path)
             
     def _process_data(self, loop):
         # Read and remove current data chunk
@@ -280,7 +99,8 @@ class GanglionData:
                     logging.error("Skipping feature extraction because analysis_df is None.")
                 else:
                     # Peak detection
-                    features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=['ch1 (µV)'])
+                    channels = [f"ch{ch + 1} (µV)" for ch in config.get("selected_channels", [])]
+                    features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=channels)
                     
                     # Peak Classification
                     class_folder = f"{int(curr_timestamp)}_classification"
@@ -308,7 +128,7 @@ class GanglionData:
         if self.recorder.marker_interval > 0.0:
             self.marker_broadcast_counter += len(timestamps)
             
-            # Only broadcast remaining time every 40 samples (~200ms at 200Hz)
+            # Only broadcast remaining time every x samples
             if self.marker_broadcast_counter >= self._num_points:
                 self.marker_broadcast_counter = 0 
                 
@@ -343,8 +163,9 @@ class GanglionData:
                     emg_data = data[emg_channel] 
                     
                     # Apply 50Hz low pass filter to remove high freq noise
-                    DataFilter.perform_lowpass(emg_data, self.actual_sample_rate, 50.0, 4, 
-                                            FilterTypes.BUTTERWORTH.value, 0)
+                    DataFilter.perform_lowpass(emg_data, self.actual_sample_rate, 
+                                               config.get("cutoff_freq"), config.get("cutoff_order"),
+                                               FilterTypes.BUTTERWORTH.value, 0)
 
                     # Store in buffers
                     self._buffers[ch].extend(emg_data.tolist())
@@ -382,14 +203,14 @@ class GanglionData:
 
         # LSL initialization for each channel
         for ch in self._selected_channels:
-                info = StreamInfo(name=f"EMG_Channel_{ch+1}", type="EMG", channel_count=1,
+                info = StreamInfo(name=f"EMG_Channel_{ch+1}", type="EMG", channel_count=config.get("num_emg_ch"), 
                     nominal_srate=self.actual_sample_rate, channel_format='float32',
                     source_id=f"ganglion_ch_{ch}"
                 )
                 self._outlets[ch] = StreamOutlet(info)
 
         # LSL initialization for accelerometer (handles multiple channels at once)
-        accel_info = StreamInfo(name="Ganglion_Accel", type="MOCAP", channel_count=3,
+        accel_info = StreamInfo(name="Ganglion_Accel", type="MOCAP", channel_count=config.get("num_accel_ch"),
                                 nominal_srate=self.actual_sample_rate, channel_format='float32',
                                 source_id="ganglion_accel")
         self._accel_outlet = StreamOutlet(accel_info)

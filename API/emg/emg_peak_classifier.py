@@ -19,11 +19,12 @@ class PeakClassifier:
     4. Saves results in the same format as the original peak_classifier.py
     """
     
-    def __init__(self, model_path: str):
+    def __init__(self, base_path):
         """
         Initialize the peak classifier
         """
-        self.model_path = model_path
+        model_path = base_path / "models" / "xgboost_model.pkl"
+        self.model_path = str(model_path)
         
         # Model components (loaded from pickle)
         self.model = None

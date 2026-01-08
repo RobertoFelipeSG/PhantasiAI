@@ -31,9 +31,11 @@ async def websocket_endpoint(websocket: WebSocket):
     Initialize connection to websocket manager and await data
     '''
     await manager.connect(websocket)
+    
     try:
         while True:
             await websocket.receive_text()
+    
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         logging.info("WebSocket disconnected.")
@@ -80,4 +82,4 @@ async def stop_stream():
 
 if __name__ == "__main__":
     logging.info("Starting FastAPI server")
-    uvicorn.run(app, host="10.42.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

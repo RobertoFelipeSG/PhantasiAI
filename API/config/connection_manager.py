@@ -1,7 +1,7 @@
 import logging
 import asyncio
 import json 
-from typing import List
+from typing import List, Optional
 from fastapi import WebSocket
 
 logging.basicConfig(

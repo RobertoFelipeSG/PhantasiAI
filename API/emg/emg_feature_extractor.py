@@ -7,6 +7,9 @@ from mne import create_info
 from mne.io import RawArray
 from scipy.signal import find_peaks, hilbert
 from config.connection_manager import logging
+from config.config_manager import load_config
+
+config = load_config()
 
 warnings.filterwarnings('ignore')
 
@@ -22,13 +25,13 @@ class FeatureExtractor:
     - Optional tangential acceleration calculation from accelerometer data
     """
     
-    def __init__(self, sampling_rate=200, height_percentile=98.0, min_distance=3.0, lowpass_cutoff=80.0, window_duration=6.0):
-        self.sampling_rate = sampling_rate
-        self.height_percentile = height_percentile
-        self.min_distance = min_distance # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
-        self.lowpass_cutoff = min(lowpass_cutoff, sampling_rate // 2 - 10)  # Ensure below Nyquist
-        self.window_duration = window_duration # window of feature extraction (changed from 3 to 1 minutes)
-        self.window_samples = int(window_duration * sampling_rate)
+    def __init__(self):
+        self.sampling_rate = config.get("sample_rate")
+        self.height_percentile = config.get("height_percentile")
+        self.min_distance = config.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
+        self.lowpass_cutoff = min(config.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
+        self.window_duration = config.get("marker_interval") # window of feature extraction (changed from 3 to 1 minutes)
+        self.window_samples = int(self.window_duration * self.sampling_rate)
     
     def load_data(self, df: pd.DataFrame) -> pd.DataFrame:
         # Validate required columns
