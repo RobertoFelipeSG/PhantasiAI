@@ -63,7 +63,7 @@ class GanglionData:
         self._all_channels = self.emg_channels + self.accel_channels
 
         self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path)
-        self.feature_extractor = FeatureExtractor()
+        self.feature_extractor = FeatureExtractor(self._sample_rate)
         self.peak_classifier = PeakClassifier(self.base_path)
 
     def _handle_analysis(self, curr_timestamp: float, curr_trials: int):

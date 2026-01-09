@@ -5,6 +5,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 from config.connection_manager import manager, logging
+from config.config_manager import load_config
 
 from emg.data_acquisition import GanglionData
 from emg.synthetic_data_acquisition import SyntheticGanglionData
@@ -12,6 +13,8 @@ from emg.synthetic_data_acquisition import SyntheticGanglionData
 app = FastAPI()
 
 ganglion_instance = None
+
+CONFIG = load_config()
 
 @app.get("/")
 async def root():
@@ -82,4 +85,4 @@ async def stop_stream():
 
 if __name__ == "__main__":
     logging.info("Starting FastAPI server")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host=CONFIG.get('host_IPv4'), port=8000)

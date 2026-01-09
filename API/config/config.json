@@ -1,4 +1,6 @@
 {
+    "host_IPv4": "0.0.0.0",
+    
     "serial_port": "/dev/ttyACM0",
     "mac_address": null, 
     

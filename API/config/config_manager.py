@@ -3,10 +3,12 @@ from pathlib import Path
 
 # Save the config file in this module’s directory
 CONFIG_DIR  = Path(__file__).resolve().parent
-CONFIG_PATH = CONFIG_DIR / "phantasiai_config.json"
+CONFIG_PATH = CONFIG_DIR / "config.json"
 
 # default settings: Ganglion Board + RPi500 
 DEFAULT_CONFIG = {
+    "host_IPv4": "0.0.0.0",
+    
     "serial_port": "/dev/ttyACM0",
     "mac_address": None, 
     
