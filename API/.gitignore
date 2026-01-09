@@ -20,5 +20,8 @@ Thumbs.db
 *.tmp
 
 # Ignore EMG CSV files
-emg-recordings/
-synthetic-emg-recordings/
+emg/emg-recordings/
+emg/synthetic-emg-recordings/
+
+# Ignore personal settings
+config/config.json
