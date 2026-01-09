@@ -25,8 +25,8 @@ class FeatureExtractor:
     - Optional tangential acceleration calculation from accelerometer data
     """
     
-    def __init__(self):
-        self.sampling_rate = config.get("sample_rate")
+    def __init__(self, sample_rate):
+        self.sampling_rate = sample_rate
         self.height_percentile = config.get("height_percentile")
         self.min_distance = config.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
         self.lowpass_cutoff = min(config.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist

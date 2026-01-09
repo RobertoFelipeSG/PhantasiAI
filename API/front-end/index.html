@@ -62,7 +62,6 @@
             font-size: 80px;      
             font-weight: 900;     
             margin: 40px 0;
-            transition: all 0.2s ease;
             text-transform: uppercase;
             color: #3498db;
         }
@@ -143,7 +142,6 @@
     
         <!-- EMG Value + Graph Display -->
         <div>
-            <h2>EMG Signal: <span id="emgValue">--</span> µV</h2>
             <div class="controls-bar">
                 <strong>EMG Zoom Y-Axis: </strong>
                 <button onclick="zoomEMGIn()">+</button>
@@ -158,11 +156,6 @@
         <!-- Accel Values + Graph Display -->
         <div>
             <h2>Accelerometer Signals:</h2>
-            <div>
-                X: <span id="valX" style="color:red">--</span> | 
-                Y: <span id="valY" style="color:green">--</span> | 
-                Z: <span id="valZ" style="color:blue">--</span>
-            </div>
             <div class="controls-bar">
                 <strong>Accel Zoom Y-Axis: </strong>
                 <button onclick="zoomAccelIn()">+</button>
@@ -208,17 +201,27 @@
         let annotations = [];
         let pendingEmgData = []; // EMG Data Buffer
         let pendingAccelData = []; // Accel Data Buffer
+        let nextEventTargetTime = null;
+        
+        // Movement guide
+        const PHASE_CHANGE = 3.0
+        const PHASES = {
+            GO: 'PHASE_GO',
+            REST: 'PHASE_REST'
+        }
         
         // Graph configuration
         const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
         const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
-        let SAMPLE_RATE = 200
+        let SAMPLE_RATE = 200 // Default sample rate (for Ganglion)
         let MAX_DATA_POINTS = WINDOW_SIZE * SAMPLE_RATE; // Limit data for scrolling graph 
         
         // State management
         let isGraphPaused = false; // tracks whether the graphs are paused or not
         let isStreaming = false;
         let lastMarkerInterval = 0;
+        let lastGuidePhase = null;
+        let renderLoopRunning = false
         
         document.addEventListener('DOMContentLoaded', () => {
             initGraphs();
@@ -250,8 +253,6 @@
                         data.value.forEach((val, i) => {
                             pendingEmgData.push({ x: data.timestamp[i], y: val });
                         });
-        
-                        document.getElementById('emgValue').innerText = data.value[data.value.length-1].toFixed(2);
                     } 
                     else if (data.type === 'accel_data') {
                         data.value[0].forEach((_, i) => {
@@ -263,11 +264,6 @@
         
                         valuesMatrix = data.value;
                         const len = valuesMatrix[0].length;
-                        if (len > 0) {
-                            document.getElementById('valX').innerText = valuesMatrix[0][len-1].toFixed(2);
-                            document.getElementById('valY').innerText = valuesMatrix[1][len-1].toFixed(2);
-                            document.getElementById('valZ').innerText = valuesMatrix[2][len-1].toFixed(2);
-                        }
                     }
                     
                     // Add most recent event markers (vertical lines)
@@ -278,9 +274,8 @@
                     }
                     
                     // Update marker display and exercise instructions
-                    else if (data.type === 'marker_countdown') {
-                        updateMarkerDisplay(data.time_remaining);
-                        updateMovementGuide(data.time_remaining);
+                    else if (data.type === 'marker_target_time') {
+                        nextEventTargetTime = data.target_timestamp;
                     }
 
                     // Update chat-terminal
@@ -303,21 +298,6 @@
                 document.getElementById('websocketStatus').innerText = "WS Status: Setup Error";
             }
         }
-        
-        // ----- EVENT MARKER TIMER ----- //
-        function updateMarkerDisplay(timeRemaining) {
-            const display = document.getElementById('markerCountdownDisplay');
-            if (!display) return;
-             
-            if (timeRemaining < 3) { // Detect rest period
-                display.style.color = 'blue'; 
-            } 
-            else {// Detect event marker (movement begins)
-                display.style.color = 'green';
-            }
-        
-            display.innerText = `NEXT MARKER: ${timeRemaining.toFixed(2)}s`;
-        }
 
         // ----- CHAT WINDOW ----- //
         function addLog(message) {
@@ -330,24 +310,60 @@
             // Auto-scroll to the bottom
             terminal.scrollTop = terminal.scrollHeight;
         }
+        
+        // ----- REAL-TIME VISUALS ----- //
+        function updateTimerVisuals(currentTime) {
+            if (nextEventTargetTime === null) return;
+
+            let timeRemaining = Math.max(0, nextEventTargetTime - currentTime);
+            
+            updateMarkerCountdown(timeRemaining);
+            updateMovementGuide(timeRemaining);
+        }
+          
+        // ----- EVENT MARKER TIMER ----- //
+        function updateMarkerCountdown(timeRemaining) {
+            const display = document.getElementById('markerCountdownDisplay');
+            
+            const formattedTime = timeRemaining.toFixed(1) + "s";
+            const targetText = `NEXT MARKER: ${formattedTime}`;
+             
+            if (display.innerText !== targetText) {
+                if (timeRemaining < PHASE_CHANGE) { // Detect rest period
+                    display.style.color = 'blue'; 
+                } 
+                else {// Detect event marker (movement begins)
+                    display.style.color = 'green';
+                }
+
+                display.innerText = targetText;
+            }
+        }
+
                 
         // ----- EXERCISE INSTRUCTIONS ----- //
-        
         // Basic go-rest display
         function updateMovementGuide(timeRemaining) {
             const instruction = document.getElementById('movementGuide');
             if (!instruction) return;
+
+            const currentPhase = timeRemaining >= PHASE_CHANGE ? PHASES.GO : PHASES.REST;
+
+            console.log(`Time: ${timeRemaining.toFixed(2)} | Phase: ${currentPhase} | Last: ${lastGuidePhase}`);
         
-            // Detect GO window (6-3 seconds left until next marker)
-            if (timeRemaining >= 3.0) {
-                instruction.style.color = '#2ecc71'; // green
-                instruction.innerText = `GO`;
-            }
-        
-            // Detect REST window (3-0 seconds left until next marker)
-            if (timeRemaining < 3.0) {
-                instruction.style.color = '#3498db'; // blue
-                instruction.innerText = `REST`;
+            // Only update if phase has changed
+            if (currentPhase !== lastGuidePhase) {
+                console.log("PHASE CHANGED TO:", currentPhase);
+                
+                if (currentPhase === PHASES.GO) {
+                    instruction.style.color = '#2ecc71'; // green
+                    instruction.innerText = `GO!`;
+                } else {
+                    instruction.style.color = '#3498db'; // blue
+                    instruction.innerText = 'REST';
+                }
+
+                lastGuidePhase = currentPhase;
             }
             
         }
@@ -423,15 +439,30 @@
         
         }
         
-        // Graph Display Logic (using render loops) //
+        // Graph Display + Timed Visuals Logic (using render loops) //
         function startRenderLoop() {
+            if (renderLoopRunning) return;
+
+            renderLoopRunning = true;
             requestAnimationFrame(renderLoop);
         }
         
         function renderLoop() {
+            if (!renderLoopRunning) return;
+            
             if (!isGraphPaused) {
                 batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
                 batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
+
+                if (emgGraph && emgGraph.data && Array.isArray(emgGraph.data.datasets) &&
+                    emgGraph.data.datasets.length > 0 && emgGraph.data.datasets[0].data.length > 0
+                ) {
+                    const lastEmgPoint = emgGraph.data.datasets[0].data[emgGraph.data.datasets[0].data.length - 1];
+                    
+                    if (lastEmgPoint && lastEmgPoint.x !== undefined) {
+                        updateTimerVisuals(lastEmgPoint.x);
+                    }
+                }
             }
             requestAnimationFrame(renderLoop); // Continue looping
         }
@@ -722,6 +753,7 @@
                 }
 
             setStreamingState(false, 'Idle', '#333');
+            renderLoopRunning = false;
             } catch (e) {
                 console.error(e);
                 alert("Error stopping");

@@ -60,9 +60,9 @@ async def start_stream(num_trials: str, synthetic: bool):
     
     # Create and run EMG execution thread (runs concurrently with FastAPI server)
     if synthetic: 
-        ganglion_instance = SyntheticGanglionData(num_trials)
+        ganglion_instance = SyntheticGanglionData(sample_rate=250, num_trials=num_trials)
     else: 
-        ganglion_instance = GanglionData(num_trials)
+        ganglion_instance = GanglionData(sample_rate=250, num_trials=num_trials)
     ganglion_instance.start(current_loop)
     
     return {"status": "success", "message": "EMG streaming started"}

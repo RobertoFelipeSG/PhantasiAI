@@ -14,7 +14,6 @@ DEFAULT_CONFIG = {
     "num_accel_ch": 3,
     "selected_channels": [0],
     
-    "sample_rate": 250,
     "data_acq_buffer_seconds": 2,
     "num_points": 40,
     

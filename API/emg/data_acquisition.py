@@ -2,6 +2,8 @@ import time
 import threading
 import asyncio
 import json
+import queue
+import numpy as np
 from collections import deque
 from pathlib import Path
 
@@ -15,24 +17,22 @@ from emg.recorder import RealTimeRecorder
 from emg.emg_feature_extractor import FeatureExtractor
 from emg.emg_peak_classifier import PeakClassifier
 
-config = load_config() # load config settings
+CONFIG = load_config() # load config settings
 
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 ganglion_instance = None
 
 class GanglionData:
-    def __init__(self, num_trials=5):
+    def __init__(self, sample_rate=200, num_trials=5):
         '''Initialize Ganglion board system'''
 
         self.base_path = Path(__file__).resolve().parent
         
-        self.serial_port = config.get("serial_port")
-        self.mac_address = config.get("mac_address")
-        self._selected_channels = config.get("selected_channels")
-        self._sample_rate = config.get("sample_rate")
-        self._buffer_seconds = config.get("data_acq_buffer_seconds")
-        self._buffer_len = self._sample_rate * self._buffer_seconds
-        self._num_points = config.get("num_points") # number of data points processed at once
+        self.serial_port = CONFIG.get("serial_port")
+        self.mac_address = CONFIG.get("mac_address")
+        self._selected_channels = CONFIG.get("selected_channels")
+        self._buffer_seconds = CONFIG.get("data_acq_buffer_seconds")
+        self._num_points = CONFIG.get("num_points") # minimum chunk size
 
         self._stop_event = threading.Event() # create threading flag for EMG stream
         self._emg_thread = None
@@ -43,8 +43,15 @@ class GanglionData:
         self._total_events = 0
         self.marker_broadcast_counter = 0
         
-        self._outlets = {} # LSL StreamOutlets for each channel
-        self._accel_outlet = None # LSL StreamOutlets for accel channel
+        # Data containers
+        self._sample_rate = sample_rate
+        self._buffer_len = self._sample_rate * self._buffer_seconds
+        self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
+        self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
+
+        # LSL StreamOutlets
+        self._outlets = {} # EMG
+        self._accel_outlet = None 
 
         self.board_shim = None
         self.board_id = BoardIds.GANGLION_BOARD.value
@@ -54,15 +61,62 @@ class GanglionData:
         self.timestamp_channel = BoardShim.get_timestamp_channel(self.board_id)
         self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
         self._all_channels = self.emg_channels + self.accel_channels
-        
-        self._buffers = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
-        self._timestamps = {ch: deque(maxlen=self._buffer_len) for ch in self._selected_channels}
 
-        self.recorder = RealTimeRecorder(self.base_path)
+        self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path)
         self.feature_extractor = FeatureExtractor()
         self.peak_classifier = PeakClassifier(self.base_path)
+
+    def _handle_analysis(self, curr_timestamp: float, curr_trials: int):
+        ''' Helper to handle analysis: peak extraction + classification'''
+        
+        # Create analysis DataFrame
+        logging.info(f"Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
+        analysis_df = self.recorder.create_analysis_file(curr_timestamp, curr_trials)
+        
+        # Signal processing of analysis file
+        if analysis_df is None:
+            logging.error("Skipping feature extraction because analysis_df is None.")
+        else:
+            # Peak detection
+            channels = [f"ch{ch + 1} (µV)" for ch in CONFIG.get("selected_channels", [])]
+            features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=channels)
+            
+            # Peak Classification
+            class_folder = f"{int(curr_timestamp)}_classification"
+            output_path = Path(self.recorder.classification_dir) / class_folder
+            output_path.mkdir(parents=True, exist_ok=True)
+            
+            self.peak_classifier.run(features_df=features_df, output_path=output_path)
+        
+        # Advance to next trial block
+        while curr_trials == self.next_trial_block:
+            self.next_trial_block += self._num_trials
+    
+    def _broadcast_events(self, loop):
+        '''Helper to broadcast event marker times to frontend'''
+        new_event_times = self.recorder.event_times_buffer[:]
+        self.recorder.event_times_buffer.clear() # Clear event times after capturing
+
+        event_data = json.dumps({
+            "type": "event_times",
+            "timestamps": new_event_times
+        })
+        asyncio.run_coroutine_threadsafe(manager.broadcast(event_data), loop)
+
+    def _broadcast_countdown(self, loop):
+        '''Helper to broadcast countdown until next event to frontend'''
+        
+        next_event_time = self.recorder.next_event_time
+        
+        marker_data = json.dumps({
+            "type": "marker_target_time", 
+            "target_timestamp": float(next_event_time)
+        })
+        asyncio.run_coroutine_threadsafe(manager.broadcast(marker_data), loop)
             
     def _process_data(self, loop):
+        '''Complete data processing for current chunk '''
+        
         # Read and remove current data chunk
         data = self.board_shim.get_board_data() 
         if data.size == 0: return False
@@ -72,9 +126,7 @@ class GanglionData:
         # Set session start time and calculate relative timestamps
         if self._session_start_time is None:
             self._session_start_time = timestamps[0]
-            logging.info(f"Recording reference time set: {self._session_start_time}")
-        start_ref = self._session_start_time
-        relative_timestamps = timestamps - start_ref
+        relative_timestamps = timestamps - self._session_start_time
         
         # Transpose and write raw data to CSV files
         for i in range(len(timestamps)):
@@ -91,56 +143,17 @@ class GanglionData:
             # Perform analysis on selected trials
             curr_trials = self._total_events - 1
             if curr_trials == self.next_trial_block:
-                logging.info(f"Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
-                analysis_df = self.recorder.create_analysis_file(curr_timestamp, curr_trials)
-                
-                # Signal processing of analysis file
-                if analysis_df is None:
-                    logging.error("Skipping feature extraction because analysis_df is None.")
-                else:
-                    # Peak detection
-                    channels = [f"ch{ch + 1} (µV)" for ch in config.get("selected_channels", [])]
-                    features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=channels)
-                    
-                    # Peak Classification
-                    class_folder = f"{int(curr_timestamp)}_classification"
-                    output_path = Path(self.recorder.classification_dir) / class_folder
-                    output_path.mkdir(parents=True, exist_ok=True)
-                    
-                    self.peak_classifier.run(features_df=features_df, output_path=output_path)
-
-                # Advance to next trial block
-                while curr_trials == self.next_trial_block:
-                    self.next_trial_block += self._num_trials
+                self._handle_analysis(curr_timestamp, curr_trials)
             
         # Broadcast event markers
         if self.recorder.event_times_buffer: 
-            new_event_times = self.recorder.event_times_buffer[:]
-            self.recorder.event_times_buffer.clear() # Clear event times after capturing
-
-            event_data = json.dumps({
-                "type": "event_times",
-                "timestamps": new_event_times
-            })
-            asyncio.run_coroutine_threadsafe(manager.broadcast(event_data), loop)
+            self._broadcast_events(loop)
         
-        # Send marker interval countdown to frontend
-        if self.recorder.marker_interval > 0.0:
-            self.marker_broadcast_counter += len(timestamps)
-            
-            # Only broadcast remaining time every x samples
-            if self.marker_broadcast_counter >= self._num_points:
-                self.marker_broadcast_counter = 0 
-                
-                next_event_time = self.recorder.next_event_time
-                curr_timestamp = relative_timestamps[-1]
-                time_remaining = max(0.0, (next_event_time - curr_timestamp)) 
-                
-                marker_data = json.dumps({
-                    "type": "marker_countdown", 
-                    "time_remaining": float(time_remaining)
-                })
-                asyncio.run_coroutine_threadsafe(manager.broadcast(marker_data), loop)
+        # Broadcast marker interval countdown to frontend
+        self.marker_broadcast_counter += len(relative_timestamps)
+        if self.marker_broadcast_counter >= self._num_points:
+            self._broadcast_countdown(loop) 
+            self.marker_broadcast_counter = 0
 
         # Accel channel processing
         accel_data = data[self.accel_channels]
@@ -164,7 +177,7 @@ class GanglionData:
                     
                     # Apply 50Hz low pass filter to remove high freq noise
                     DataFilter.perform_lowpass(emg_data, self.actual_sample_rate, 
-                                               config.get("cutoff_freq"), config.get("cutoff_order"),
+                                               CONFIG.get("cutoff_freq"), CONFIG.get("cutoff_order"),
                                                FilterTypes.BUTTERWORTH.value, 0)
 
                     # Store in buffers
@@ -203,14 +216,14 @@ class GanglionData:
 
         # LSL initialization for each channel
         for ch in self._selected_channels:
-                info = StreamInfo(name=f"EMG_Channel_{ch+1}", type="EMG", channel_count=config.get("num_emg_ch"), 
+                info = StreamInfo(name=f"EMG_Channel_{ch+1}", type="EMG", channel_count=CONFIG.get("num_emg_ch"), 
                     nominal_srate=self.actual_sample_rate, channel_format='float32',
                     source_id=f"ganglion_ch_{ch}"
                 )
                 self._outlets[ch] = StreamOutlet(info)
 
         # LSL initialization for accelerometer (handles multiple channels at once)
-        accel_info = StreamInfo(name="Ganglion_Accel", type="MOCAP", channel_count=config.get("num_accel_ch"),
+        accel_info = StreamInfo(name="Ganglion_Accel", type="MOCAP", channel_count=CONFIG.get("num_accel_ch"),
                                 nominal_srate=self.actual_sample_rate, channel_format='float32',
                                 source_id="ganglion_accel")
         self._accel_outlet = StreamOutlet(accel_info)

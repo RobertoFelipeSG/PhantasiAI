@@ -12,7 +12,7 @@ config = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, base_path):
+    def __init__(self, sample_rate, base_path):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
@@ -24,7 +24,7 @@ class RealTimeRecorder:
         self.classification_dir = None
         self._index = 0
         
-        self._sample_rate = config.get("sample_rate")
+        self._sample_rate = sample_rate
         self._buffer_seconds = config.get("recorder_buffer_seconds")
         self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session         
         self._buffer = deque(maxlen=self._buffer_len)
