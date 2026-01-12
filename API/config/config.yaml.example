@@ -1,0 +1,34 @@
+# Web connection
+host_IPv4: "0.0.0.0"
+
+# Board setup
+serial_port: "/dev/ttyACM0"
+mac_address: null          # YAML uses 'null' for Python's None
+num_emg_ch: 1
+num_accel_ch: 3
+selected_channels:
+  - 0                      # Lists use a dash and a space
+
+# Data processing
+data_acq_buffer_seconds: 2
+num_points: 40
+
+# EMG signal filterings
+cutoff_freq: 50
+cutoff_order: 4
+
+# Data recording
+recorder_buffer_seconds: 120
+marker_interval: 6
+
+# Feature extraction
+height_percentile: 98
+min_distance: 3
+feature_cutoff_freq: 80
+
+# GPBO 
+iterations: 20
+num_rand: 1
+kappa: 3.0
+AF_name: "NEI" # "NEI", "EI", "UBC"
+noise_level: 0.05

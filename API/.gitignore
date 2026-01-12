@@ -24,4 +24,4 @@ emg/emg-recordings/
 emg/synthetic-emg-recordings/
 
 # Ignore personal settings
-config/config.json
+config/config.yaml
