@@ -1,9 +1,11 @@
+import os
 import asyncio
 import uvicorn
 import paho.mqtt.client as mqtt
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from config.connection_manager import manager, logging
@@ -45,6 +47,10 @@ async def lifespan(app: FastAPI):
     logging.info("Cleanup complete: Watchdog and MQTT stopped")
 
 app = FastAPI(lifespan=lifespan)
+
+script_dir = os.path.dirname(__file__)
+static_path = os.path.join(script_dir, "front-end", "static")
+app.mount("/static", StaticFiles(directory=static_path), name="static")
 
 @app.get("/")
 async def root():
