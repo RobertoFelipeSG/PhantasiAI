@@ -82,11 +82,9 @@ class GanglionData:
             features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=channels)
             
             # Peak Classification
-            class_folder = f"{int(curr_timestamp)}_classification"
-            output_path = Path(self.recorder.classification_dir) / class_folder
-            output_path.mkdir(parents=True, exist_ok=True)
-            
-            self.peak_classifier.run(features_df=features_df, output_path=output_path)
+            self.peak_classifier.run(features_df=features_df, 
+                                     output_path=Path(self.recorder.classification_dir), 
+                                     curr_timestamp=int(curr_timestamp))
         
         # Advance to next trial block
         while curr_trials == self.next_trial_block:

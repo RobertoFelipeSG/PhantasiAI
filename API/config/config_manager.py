@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from connection_manager import logging
+from config.connection_manager import logging
 
 # Save the config file in this module’s directory
 CONFIG_DIR  = Path(__file__).resolve().parent

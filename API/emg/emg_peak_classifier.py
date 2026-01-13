@@ -281,7 +281,7 @@ class PeakClassifier:
             traceback.print_exc()
             return []
         
-    def _save_classification_results_csv(self, output_path: Path):
+    def _save_classification_results_csv(self, output_path: Path, curr_timestamp: int):
         """
         Save classification results to CSV
         """
@@ -289,7 +289,7 @@ class PeakClassifier:
             logging.warning("No classification results to save")
             return
         
-        output_file = output_path / "peak_classifications.csv"
+        output_file = output_path / f"{curr_timestamp}peak_classification.csv"
         
         # Prepare data for CSV
         data = []
@@ -325,7 +325,7 @@ class PeakClassifier:
         Save classification results to TXT file with specified structure
         """
 
-        output_file = output_path / "peak_classifications.txt"
+        output_file = output_path / "peak_classification.txt"
 
         # Extract vectors from all results
         amplitude_vector = [result['amplitude'] for result in self.classification_results]
@@ -350,7 +350,7 @@ class PeakClassifier:
         
         logging.info(f"Classification results (TXT format) saved to: {output_file}")
     
-    def run(self, features_df: pd.DataFrame, output_path: Path) -> Dict:
+    def run(self, features_df: pd.DataFrame, output_path: Path, curr_timestamp: int) -> Dict:
         """
         Run the full classification pipeline.
         
@@ -371,7 +371,7 @@ class PeakClassifier:
             }
         
         # Save results
-        self._save_classification_results_csv(output_path)
+        self._save_classification_results_csv(output_path, curr_timestamp)
         self._save_classification_results_txt(output_path)
         
         # Print summary

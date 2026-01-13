@@ -19,10 +19,18 @@ class RealTimeRecorder:
         
         self.base_path = base_path
         self.filename = None
-        self.session_dir = None
-        self.analyses_dir = None
-        self.classification_dir = None
         self._index = 0
+
+        # Create session recording folder
+        timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
+        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", timestamp)
+        os.makedirs(self.session_dir, exist_ok=True)
+        
+        # Create minute analyses and classification folders within session folder
+        self.analyses_dir = os.path.join(self.session_dir, "minute_analyses")
+        os.makedirs(self.analyses_dir, exist_ok=True)
+        self.classification_dir = os.path.join(self.session_dir, "classifications")
+        os.makedirs(self.classification_dir, exist_ok=True)
         
         self._sample_rate = sample_rate
         self._buffer_seconds = config.get("recorder_buffer_seconds")
@@ -140,17 +148,6 @@ class RealTimeRecorder:
         
         if self.recording:
             return
-        
-        # Create session recording folder
-        timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
-        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", timestamp)
-        os.makedirs(self.session_dir, exist_ok=True)
-        
-        # Create minute analyses, features, and classification folder within session folder
-        self.analyses_dir = os.path.join(self.session_dir, "minute_analyses")
-        os.makedirs(self.analyses_dir, exist_ok=True)
-        self.classification_dir = os.path.join(self.session_dir, "classifications")
-        os.makedirs(self.classification_dir, exist_ok=True)
 
         self.filename = os.path.join(self.session_dir, "emg_accel.csv")
 

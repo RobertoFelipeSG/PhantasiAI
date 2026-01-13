@@ -19,9 +19,9 @@ Thumbs.db
 *.log
 *.tmp
 
-# Ignore EMG CSV files
+# Ignore all recording, classification, and stimulation files
 emg/emg-recordings/
-emg/synthetic-emg-recordings/
+stim/stim.txt
 
 # Ignore personal settings
 config/config.yaml
