@@ -1,6 +1,8 @@
 This is a testing file for an API server to stream EMG data on an OpenBCI Ganglion
 
-To use: 
+To use:
+*if you have any problems with these steps check the Detailed Documentation file*
+- BEFORE ANYTHING: ensure your RPi has been setup as an access point
 - install requirements: pip install -r requirements.txt
 - create a config.json file in config/ that follows the same structure as config.json.example
 - change the <IPv4> address to the one associated with your device

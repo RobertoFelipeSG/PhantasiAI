@@ -21,8 +21,7 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOptimizer:
-    def __init__(self, mqtt_client, subject_file_path):
-        self.mqtt_client = mqtt_client
+    def __init__(self, subject_file_path):
         self.subject_file_path = subject_file_path
         self.base_path = Path(__file__).parent
         
@@ -192,15 +191,8 @@ class GPBOptimizer:
                 with open(output_file, 'w') as f:
                     for param, value in best_params_values.items():
                         f.write(str(value)+'\n')
-                        print(f"  {param} = {value}")
             except IOError as e:
                 logging.error(f"Failed to write to stim.txt: {e}")
-            
-            # Publish optimized parameters via MQTT
-            self.mqtt_client.publish('GPBO/frequence', str(best_params_values.get('Freq', '')))
-            self.mqtt_client.publish('GPBO/amplitude', str(best_params_values.get('Amp', '')))
-            self.mqtt_client.publish('GPBO/dutycycle', str(best_params_values.get('DutyCycle', '')))
-            logging.info(f"Parameters published via MQTT")
 
     def run(self):
         logging.info("Starting Bayesian optimization...")
