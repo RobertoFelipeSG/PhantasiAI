@@ -7,6 +7,7 @@ from fastapi import WebSocket
 logging.basicConfig(
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S',
     force=True 
 )
 
@@ -79,5 +80,5 @@ class WebSocketLogHandler(logging.Handler):
             self.handleError(record)
 
 ws_handler = WebSocketLogHandler(manager)
-ws_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+ws_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s', '%H:%M:%S'))
 logging.getLogger().addHandler(ws_handler)
