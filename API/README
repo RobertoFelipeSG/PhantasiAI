@@ -7,6 +7,7 @@ To use:
 - create a config.json file in config/ that follows the same structure as config.json.example
 - change the <IPv4> address to the one associated with your device
     - or for local connections keep as "0.0.0.0"
+- for Mosquitto messages run: mosquitto_sub -h localhost -t "GPBO/#" -v (IN A SEPARATE TERMINAL)
 - in your terminal run: python main.py 
 
 Note: This code is adapted for Linux OS/RaspberryPi, in order to use on Windows:

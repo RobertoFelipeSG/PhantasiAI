@@ -27,7 +27,7 @@ class RealTimeRecorder:
         os.makedirs(self.session_dir, exist_ok=True)
         
         # Create minute analyses and classification folders within session folder
-        self.analyses_dir = os.path.join(self.session_dir, "minute_analyses")
+        self.analyses_dir = os.path.join(self.session_dir, "analyses")
         os.makedirs(self.analyses_dir, exist_ok=True)
         self.classification_dir = os.path.join(self.session_dir, "classifications")
         os.makedirs(self.classification_dir, exist_ok=True)

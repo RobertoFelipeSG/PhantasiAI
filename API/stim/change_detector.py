@@ -54,11 +54,11 @@ class ClassificationChangeHandler(FileSystemEventHandler):
         self.last_hash = new_hash
         self.last_runtime = current_time
     
-        self.mqtt_client.publish("start", "on")
+        self.mqtt_client.publish('GPBO/start', 'on')
 
         # Run GPBO script
         try:
-            optimizer = GPBOptimizer(subject_file_path=event.src_path)
+            optimizer = GPBOptimizer(file_path=event.src_path, mqtt_client=self.mqtt_client)
             optimizer.run()
         except ValueError as e:
             logging.error(f"GPBO aborted due to bad data: {e}")

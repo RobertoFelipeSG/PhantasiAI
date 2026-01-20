@@ -21,8 +21,9 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOptimizer:
-    def __init__(self, subject_file_path):
-        self.subject_file_path = subject_file_path
+    def __init__(self, file_path, mqtt_client):
+        self.file_path = file_path
+        self.mqtt_client = mqtt_client
         self.base_path = Path(__file__).parent
         
         # set configuration parameters
@@ -33,7 +34,7 @@ class GPBOptimizer:
         self.noise_level = CONFIG.get("noise_level")
 
         # Load classification data
-        self.subject_profiles, self.parameter_names, self.n_dim, self.n_val = self._read_subject_profiles(self.subject_file_path)
+        self.subject_profiles, self.parameter_names, self.n_dim, self.n_val = self._read_subject_profiles(self.file_path)
         self.n_sub = len(self.subject_profiles)
 
         # Initialize simulation based on data 
@@ -185,7 +186,7 @@ class GPBOptimizer:
             logging.info(f"Optimized response for subject {s+1}: {best_response}")
             logging.info(f"Optimized parameters for subject {s+1}: {best_params_values}")
 
-            # Write to CSV file
+            # Write to .txt file
             output_file = self.base_path / "stim.txt"
             try:
                 with open(output_file, 'w') as f:
@@ -193,6 +194,14 @@ class GPBOptimizer:
                         f.write(str(value)+'\n')
             except IOError as e:
                 logging.error(f"Failed to write to stim.txt: {e}")
+
+            # Publish optimized parameters via MQTT
+            self.mqtt_client.publish('GPBO/min-amplitude', str(best_params_values.get('min_amplitude', '')))
+            self.mqtt_client.publish('GPBO/amplitude', str(best_params_values.get('amplitude', '')))
+            self.mqtt_client.publish('GPBO/mean-frequency', str(best_params_values.get('mean_frequency', '')))
+            self.mqtt_client.publish('GPBO/median-frequency', str(best_params_values.get('median_frequency', '')))
+            logging.info(f"Parameters published via MQTT")
+
 
     def run(self):
         logging.info("Starting Bayesian optimization...")
