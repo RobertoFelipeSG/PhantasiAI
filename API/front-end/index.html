@@ -18,7 +18,7 @@
             --color-text: #ffffff;
             --color-rest: #3498db;   /* Blue */
             --color-raise: #2ecc71;  /* Green */
-            --color-hold: #e53100;   /* Red */
+            --color-hold: #ff1f1f;   /* Red */
             --color-lower: #ff7c27;  /* Orange */
             --color-inactive: #ccc; /* Light grey */
         }
@@ -44,12 +44,12 @@
         
         h1 { 
             margin: 10px 15px; 
-            font-size: 50px;
+            font-size: clamp(22px, 5vw, 40px);
             background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 2px;
             text-align: center;
         }
@@ -84,6 +84,7 @@
         }
         #toggleSidebarBtn:hover {
             border: 1px solid var(--color-primary);
+            color: var(--color-primary);
         }
         
         .sidebar {
@@ -112,7 +113,6 @@
             padding: 15px;
             background-color: var(--bg-card);
             border-radius: 5px;
-            box-shadow: var(--border-glow);
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -228,6 +228,7 @@
             display: none;
             padding: 6px 12px;
             border: 1px solid var(--border-basic);
+            box-shadow: var(--border-glow);
             border-top: none;
             overflow-y: auto; 
             flex-grow: 1;
@@ -249,6 +250,7 @@
         }
 
         #Instructions {
+            postion: relative;
             height: 100%;
             flex-direction: column;
             justify-content: center;
@@ -261,6 +263,21 @@
         #Instructions[style*="block"] {
             display: flex !important;
         }
+
+        .trial-counter {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--color-primary); /* Uses your Cyan color */
+            background-color: var(--bg-card-light);
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid var(--border-basic);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle depth */
+            letter-spacing: 1px;
+        }
         
         .guide-text {
             font-size: clamp(60px, 10vw, 150px);
@@ -268,12 +285,8 @@
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 4px;
+            color: var(--color-rest);
         }
-
-        .guide-text.phase-rest { color: var(--color-rest); }
-        .guide-text.phase-raise { color: var(--color-raise); }
-        .guide-text.phase-hold { color: var(--color-hold); }
-        .guide-text.phase-lower { color: var(--color-lower); }
 
         .dots-container {
             display: flex;
@@ -320,7 +333,7 @@
 </head>
 
 <body>
-    <h1>Welcome to PhantasiAI</h1>
+    <h1>PhantasiAI Dashboard</h1>
 
     <div class="main-container">
         
@@ -338,8 +351,12 @@
                     </select>
                 </div>
                 <div>
-                    Trials:
+                    Trials per Analysis:
                     <input type="number" id="trialInput" min="1" max="15" step="1" value="10" style="width: 50px;">
+                </div>
+                <div>
+                    Total Trials:
+                    <input type="number" id="totalTrials" min="30" max="180" step="6" value="90" style="width: 50px;">
                 </div>
                 <div> Streaming Status: <span id="streamingStatus">Idle</span> 
                 </div>
@@ -401,6 +418,7 @@
                     <div id="dot-middle" class="dot-wrapper"><div class="dot-circle"></div></div>
                     <div id="dot-right" class="dot-wrapper"><div class="dot-circle"></div></div>
                 </div>
+                <div id="trialCounterDisplay" class="trial-counter">Trials Remaining: --</div>
             </div>            
         </main>
     </div>
@@ -415,18 +433,23 @@
         let pendingEmgData = []; // EMG Data Buffer
         let pendingAccelData = []; // Accel Data Buffer
         let nextEventTargetTime = null;
+        let currTrials = 0;
+        const defaultTotalTrials = 90;
+        const defaultNumTrials = 10;
 
         let isStreaming = false;
+        let isStopping = false;
         let renderLoopRunning = false
         
         // Instructions
-        const PHASE_CHANGE = 3.0
-        let lastInstructionPhase = "";
+        const PHASE_CHANGE = 3.0;
+        let lastPhase = ""; // stores only the instruction
+        let lastInstructionPhase = ""; // stores instruction + active dot
         
         // Graph configuration
         const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
         const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
-        let SAMPLE_RATE = 200 // Default sample rate (for Ganglion)
+        let SAMPLE_RATE = 200; // Default sample rate (for Ganglion)
         let MAX_DATA_POINTS = WINDOW_SIZE * SAMPLE_RATE; // Limit data for scrolling graph
         let isGraphPaused = false; // tracks whether the graphs are paused or not
 
@@ -560,6 +583,7 @@
             let timeRemaining = Math.max(0, nextEventTargetTime - currentTime);
             
             updateMarkerCountdown(timeRemaining);
+            updateTrialCountdown(timeRemaining);
             updateMovementGuide(timeRemaining);
         }
           
@@ -582,6 +606,42 @@
             }
         }
 
+        // ----- TRIAL COUNTER ----- //
+        async function updateTrialCountdown(timeRemaining) {
+            const totalTrialsInput = document.getElementById('totalTrials');
+            const totalTrials = totalTrialsInput ? parseFloat(totalTrialsInput.value) : defaultTotalTrials;
+            const display = document.getElementById('trialCounterDisplay');
+
+            if (!display) return;
+
+            let currentPhase = (timeRemaining <= PHASE_CHANGE) ? "REST" : "GO";
+            
+            // Increment trials after switching from GO to REST
+            if (lastPhase === "GO" && currentPhase === "REST") {
+                currTrials += 1;
+                console.log("Trial Complete! Total:", currTrials);
+            }
+
+            lastPhase = currentPhase;
+            let trialsRemaining = (totalTrials - currTrials);
+
+            // Check for auto-stop if total trials complete
+            if (trialsRemaining <= 0 && isStreaming && !isStopping) {
+                console.log("All trials complete. Auto-stopping...");
+                isStopping = true;
+                await stopStream(); 
+                display.innerText = `Trials Remaining: 0`;
+                isStopping = false;
+                return;
+            }
+            
+            // Update trial display
+            const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
+            if (display.innerText !== newText) {
+                display.innerText = newText;
+            }
+        }
+
                 
         // ----- EXERCISE INSTRUCTIONS ----- //
         // Basic go-rest display
@@ -597,12 +657,12 @@
             if (!instruction) return;
             
             let phase = "";
-            let phaseClass = "";
+            let color = "";
             let activeDot = "";
 
             if (timeRemaining <= PHASE_CHANGE) { // REST PHASE
                 phase = "REST";
-                phaseClass = "phase-rest"; // Blue
+                color = "var(--color-rest)"; // Blue
                 const timeElapsed = PHASE_CHANGE - timeRemaining;
                 if (timeElapsed < 1.0) activeDot = "left";
                 else if (timeElapsed < 2.0) activeDot = "middle";
@@ -613,15 +673,15 @@
 
                 if (timeInGO > ((PHASE_CHANGE / 3.0) * 2.0)) {
                     phase = "RAISE";
-                    phaseClass = "phase-raise"; // Green
+                    color = "var(--color-raise)"; // Green
                     activeDot = "left";
                 } else if (timeInGO > (PHASE_CHANGE / 3.0)) {
                     phase = "HOLD";
-                    phaseClass = "phase-hold"; // Red
+                    color = "var(--color-hold)"; // Red
                     activeDot = "middle";
                 } else {
                     phase = "LOWER";
-                    phaseClass = "phase-lower"; // Orange
+                    color = "var(--color-lower)"; // Orange
                     activeDot = "right";
                 }
             }
@@ -629,9 +689,7 @@
             // DOM updates (optimized): text + colors + dots
             if (phase + activeDot !== lastInstructionPhase) {
                 instruction.innerText = phase;
-
-                instruction.className = "guide-text";
-                instruction.classList.add(phaseClass);
+                instruction.style.color = color;
                 
                 if (phase === "REST") {
                     dotContainer.classList.add('resting');
@@ -917,6 +975,7 @@
             isStreaming = active;
             const button = document.getElementById('streamBtn');
             const input = document.getElementById('trialInput');
+            const trials = document.getElementById('totalTrials');
             const boardId = document.getElementById('boardID');
             const status = document.getElementById('streamingStatus');
         
@@ -927,6 +986,7 @@
             
             // Lock input while active
             if (input) input.disabled = active;
+            if (trials) trials.disabled = active;
             if (boardId) boardId.disabled = active;
         
             if (status) {
@@ -958,13 +1018,14 @@
             const trialInput = document.getElementById('trialInput');
             const numTrials = parseFloat(trialInput.value);
             if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
-                alert("Please enter a valid number of trials (1-15)");
+                numTrials = defaultNumTrials;
             }
         
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
             document.getElementById('trialInput').disabled = true;
             document.getElementById('boardID').disabled = true;
+            document.getElementById('totalTrials').disabled = true;
         
             const status = document.getElementById('streamingStatus');
             status.style.color = '#e65100'; // Orange for warning
@@ -988,6 +1049,8 @@
             pendingAccelData.length = 0;
             lastInstructionPhase = "";
             nextEventTargetTime = null;
+            currTrials = 0;
+            lastPhase = "";
             isGraphPaused = false;
             resetEMGZoom();
             resetAccelZoom();
@@ -995,12 +1058,19 @@
             document.getElementById('streamBtn').disabled = false; // Enable stream + recording
             document.getElementById('trialInput').disabled = false;
             document.getElementById('boardID').disabled = false;
+            document.getElementById('totalTrials').disabled = false;
             
             // Clear the synchronized marker countdown display
             const display = document.getElementById('markerCountdownDisplay');
             if (display) {
                 display.innerText = "";
                 display.style.color = 'blue';
+            }
+
+            // Clear trial countdown
+            const trials = document.getElementById('trialCounterDisplay');
+            if (trials) {
+                trials.innerText = "Trials Remaining: --";
             }
 
             // Set instructions guide to default
