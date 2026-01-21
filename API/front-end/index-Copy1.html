@@ -44,14 +44,13 @@
         
         h1 { 
             margin: 10px 15px; 
-            font-size: 50px;
+            font-size: 2rem;
             background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-weight: 600;
             letter-spacing: 2px;
-            text-align: center;
         }
         
         button {
@@ -66,26 +65,10 @@
         .main-container {
             display: flex;
             flex: 1; 
-            height: calc(100vh - 80px); 
+            height: calc(100vh - 50px); 
         }
 
         /* Left-hand side  (1/4 of page) */
-        #toggleSidebarBtn {
-            position: absolute;
-            top: 20px;       /* Aligns with header */
-            left: 15px;
-            z-index: 1000;   /* Ensures it stays on top */
-            background: transparent;
-            border: 1px solid var(--border-basic);
-            color: var(--color-text);
-            font-size: 1rem;
-            padding: 5px 5px;
-            border-radius: 5px;
-        }
-        #toggleSidebarBtn:hover {
-            border: 1px solid var(--color-primary);
-        }
-        
         .sidebar {
             width: 25%;
             min-width: 300px;
@@ -94,16 +77,6 @@
             padding: 15px;
             box-sizing: border-box;
             gap: 10px;
-            transition: all 0.3s ease-in-out;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-        .sidebar.hidden {
-            width: 0 !important;
-            min-width: 0 !important;
-            padding: 0 !important;
-            opacity: 0;
-            margin: 0;
         }
         
         .controls-bar {
@@ -186,15 +159,13 @@
 
         /* Right-hand side  (3/4 of page) */
         .content-right {
-            width: auto;
+            width: 75%;
             display: flex;
-            flex: 1;
             flex-direction: column;
             overflow: hidden;
             padding: 15px;
             box-sizing: border-box;
             height: 100%; 
-            transition: all 0.3s ease-in-out;
         }
 
         .tab {
@@ -261,6 +232,11 @@
         #Instructions[style*="block"] {
             display: flex !important;
         }
+
+        .phase-rest { color: var(--color-rest); }
+        .phase-raise { color: var(--color-raise); }
+        .phase-hold { color: var(--color-hold); }
+        .phase-lower { color: var(--color-lower); }
         
         .guide-text {
             font-size: clamp(60px, 10vw, 150px);
@@ -268,12 +244,8 @@
             margin: 0;
             text-transform: uppercase;
             letter-spacing: 4px;
+            color: var(--color-rest);
         }
-
-        .guide-text.phase-rest { color: var(--color-rest); }
-        .guide-text.phase-raise { color: var(--color-raise); }
-        .guide-text.phase-hold { color: var(--color-hold); }
-        .guide-text.phase-lower { color: var(--color-lower); }
 
         .dots-container {
             display: flex;
@@ -313,7 +285,7 @@
         .dot-wrapper.active#dot-right .dot-circle { background-color: var(--color-lower);}
         
         .dots-container.resting .dot-wrapper.active .dot-circle {
-            background-color: var(--color-rest) !important;
+            background-color: var(--color-rest); !important;
         }
     </style>
     
@@ -324,7 +296,6 @@
 
     <div class="main-container">
         
-        <button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
         <aside class="sidebar">
             <!-- Controls -->
             <div class="controls-bar">
@@ -530,17 +501,6 @@
             }
             evt.currentTarget.className += " active";
         }
-
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const btn = document.getElementById('toggleSidebarBtn');
-            
-            // Toggle the class
-            sidebar.classList.toggle('hidden');
-            
-            // Resize graphs if they are currently visible
-            window.dispatchEvent(new Event('resize'));
-        }
         
         // ----- CHAT WINDOW ----- //
         function addLog(message) {
@@ -597,7 +557,7 @@
             if (!instruction) return;
             
             let phase = "";
-            let phaseClass = "";
+            let color = "";
             let activeDot = "";
 
             if (timeRemaining <= PHASE_CHANGE) { // REST PHASE
@@ -629,9 +589,7 @@
             // DOM updates (optimized): text + colors + dots
             if (phase + activeDot !== lastInstructionPhase) {
                 instruction.innerText = phase;
-
-                instruction.className = "guide-text";
-                instruction.classList.add(phaseClass);
+                instruction.className = 'guide-text' + phaseClass;
                 
                 if (phase === "REST") {
                     dotContainer.classList.add('resting');
