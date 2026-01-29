@@ -23,12 +23,13 @@ CONFIG = load_config() # load config settings
 ganglion_instance = None
 
 class GanglionData:
-    def __init__(self, sample_rate=200, num_trials=5):
+    def __init__(self, websocket, serial_port="serial_port_A", sample_rate=200, num_trials=10, folder_name=None):
         '''Initialize Ganglion board system'''
 
+        self.websocket = websocket
         self.base_path = Path(__file__).resolve().parent
         
-        self.serial_port = CONFIG.get("serial_port")
+        self.serial_port = CONFIG.get(serial_port)
         self.mac_address = CONFIG.get("mac_address")
         self._selected_channels = CONFIG.get("selected_channels")
         self._buffer_seconds = CONFIG.get("data_acq_buffer_seconds")
@@ -62,7 +63,7 @@ class GanglionData:
         self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
         self._all_channels = self.emg_channels + self.accel_channels
 
-        self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path)
+        self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate)
         self.peak_classifier = PeakClassifier(self.base_path)
 
@@ -70,16 +71,19 @@ class GanglionData:
         ''' Helper to handle analysis: peak extraction + classification'''
         
         # Create analysis DataFrame
-        logging.info(f"Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
+        logging.info(f"[Ganglion] Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
         analysis_df = self.recorder.create_analysis_file(curr_timestamp, curr_trials)
         
         # Signal processing of analysis file
         if analysis_df is None:
-            logging.error("Skipping feature extraction because analysis_df is None.")
+            logging.error("[Ganglion] Skipping feature extraction because analysis_df is None.")
         else:
             # Peak detection
             channels = [f"ch{ch + 1} (µV)" for ch in CONFIG.get("selected_channels", [])]
-            features_df = self.feature_extractor.run(analysis_df=analysis_df, channels=channels)
+            features_df = self.feature_extractor.run(analysis_df=analysis_df, 
+                                                     output_path=Path(self.recorder.features_dir),
+                                                     curr_timestamp=int(curr_timestamp),
+                                                     channels=channels)
             
             # Peak Classification
             self.peak_classifier.run(features_df=features_df, 
@@ -99,7 +103,7 @@ class GanglionData:
             "type": "event_times",
             "timestamps": new_event_times
         })
-        asyncio.run_coroutine_threadsafe(manager.broadcast(event_data), loop)
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(event_data), loop)
 
     def _broadcast_countdown(self, loop):
         '''Helper to broadcast countdown until next event to frontend'''
@@ -110,7 +114,7 @@ class GanglionData:
             "type": "marker_target_time", 
             "target_timestamp": float(next_event_time)
         })
-        asyncio.run_coroutine_threadsafe(manager.broadcast(marker_data), loop)
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(marker_data), loop)
             
     def _process_data(self, loop):
         '''Complete data processing for current chunk '''
@@ -136,7 +140,7 @@ class GanglionData:
             
             if has_event: 
                 self._total_events += 1
-                logging.info(f"Recorded {self._total_events} events")            
+                logging.info(f"[Ganglion] Recorded {self._total_events} events")            
             
             # Perform analysis on selected trials
             curr_trials = self._total_events - 1
@@ -162,7 +166,7 @@ class GanglionData:
             "timestamp": relative_timestamps.tolist(),
             "value": accel_data.tolist()
         })
-        asyncio.run_coroutine_threadsafe(manager.broadcast(json_accel), loop)
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(json_accel), loop)
         
         # EMG channel processing
         for ch in self._selected_channels:
@@ -188,13 +192,13 @@ class GanglionData:
                         self._outlets[emg_channel].push_chunk(chunk)
 
                     # Push to Frontend
-                    json_data = json.dumps({
+                    json_emg = json.dumps({
                         "type": "emg_data",
                         "channel_index": ch,
                         "timestamp": relative_timestamps.tolist(),
                         "value": emg_data.tolist()})
                     # safely place async task onto event loop's queue
-                    asyncio.run_coroutine_threadsafe(manager.broadcast(json_data), loop)
+                    asyncio.run_coroutine_threadsafe(self.websocket.send_text(json_emg), loop)
         
         return True
     
@@ -230,7 +234,7 @@ class GanglionData:
             self.board_shim.prepare_session()
             self.board_shim.config_board("n") # Turn on accelerometer
             self.board_shim.start_stream()
-            logging.info("Streaming EMG and Accel data...")
+            logging.info("[Ganglion] Streaming EMG and Accel data...")
 
             if self.recorder:
                 self.recorder.start_recording()
@@ -248,13 +252,13 @@ class GanglionData:
                     if not processed:
                         continue
                 else: 
-                    logging.warning("Waiting for recorder to be initialized...")
+                    logging.warning("[Ganglion] Waiting for recorder to be initialized...")
 
         except Exception as e:
-            logging.error(f"Error in EMG thread: {e}", exc_info=True)
+            logging.error(f"[Ganglion] Error in EMG thread: {e}", exc_info=True)
         
         finally:
-            logging.info("Stopping EMG stream...")
+            logging.info("[Ganglion] Stopping EMG stream...")
             if self.recorder and self.recorder.recording:
                 self.recorder.stop_recording()
             
@@ -263,12 +267,12 @@ class GanglionData:
                     self.board_shim.stop_stream()
                     self.board_shim.release_session()
                 except Exception as e:
-                    logging.warning(f"Error during board release: {e}")
-            logging.info("Session released.")
+                    logging.warning(f"[Ganglion] Error during board release: {e}")
+            logging.info("[Ganglion] Session released.")
     
     def start(self, loop):
         if getattr(self, "_emg_thread", None) is not None and self._emg_thread.is_alive():
-            logging.warning("Attempted to start EMG thread but one is already running.")
+            logging.warning("[Ganglion] Attempted to start EMG thread but one is already running.")
             return
         
         self._stop_event.clear()

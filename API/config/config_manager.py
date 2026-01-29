@@ -6,13 +6,17 @@ from config.connection_manager import logging
 CONFIG_DIR  = Path(__file__).resolve().parent
 CONFIG_PATH = CONFIG_DIR / "config.yaml"
 
-# default settings: Ganglion Board + RPi500 
+# default settings: Ganglion Board + RPi500 + local host
 DEFAULT_CONFIG = {
     # web connection
     "host_IPv4": "0.0.0.0",
     
     # board setup
-    "serial_port": "/dev/ttyACM0",
+    "is_synthetic": False,
+    "num_trials": 10,
+    "default_serial_port": "/dev/ttyACM0",
+    "serial_port_A": "/dev/ttyACM0",
+    "serial_port_B": "",
     "mac_address": None, 
     "num_emg_ch": 1,
     "num_accel_ch": 3,
@@ -52,7 +56,7 @@ def load_config():
             with open(CONFIG_PATH, "r") as f:
                 return yaml.safe_load(f)
         except Exception as e:
-            logging.info(f"Error loading YAML: {e}. Using default settings")
+            logging.info(f"[Config] Error loading YAML: {e}. Using default settings")
             return DEFAULT_CONFIG.copy()
     return DEFAULT_CONFIG.copy()
 
@@ -65,4 +69,4 @@ def save_config(config):
         with open(CONFIG_PATH, "w") as f:
             yaml.dump(config, f, sort_keys=False)
     except Exception as e:
-        print(f"Failed to save config: {e}")
+        logging.error(f"[Config] Failed to save config: {e}")

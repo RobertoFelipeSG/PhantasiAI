@@ -12,15 +12,29 @@ logging.basicConfig(
 )
 
 # ----- WebSocket Manager: Handles browser connections ----- # 
+class ClientSession:
+    def __init__(self, websocket: WebSocket):
+        '''Initialize single client connection'''
+        self.websocket = websocket
+        self.ganglion = None
+        self.watchdog_class = None
+
+    async def cleanup(self):
+        '''Clean up resources when client disconnects'''
+        if self.watchdog_class:
+            self.watchdog_class.stop_watching()
+        if self.ganglion:
+            self.ganglion.stop()
+
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: List[WebSocket, ClientSession] = {} # Map WebSocket to ClientSession
         self.main_loop: Optional[asyncio.AbstractEventLoop] = None  # Store the loop here
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        self.active_connections.append(websocket)
-        logging.info("New WebSocket connected")
+        self.active_connections[websocket] = ClientSession(websocket)
+        logging.info(f"[Manager] New Client connected. Total connections: {len(self.active_connections)}")
 
         if self.main_loop is None:
             try:
@@ -28,29 +42,32 @@ class ConnectionManager:
             except RuntimeError:
                 pass
 
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-        logging.info("WebSocket disconnected")
+    async def disconnect(self, websocket: WebSocket):
+        if websocket in self.active_connections:
+            await self.active_connections[websocket].cleanup()
+            del self.active_connections[websocket]
+            logging.info("[Manager] Client disconnected.")
 
-    # Broadcast to connected clients 
+    def get_session(self, websocket: WebSocket) -> Optional[ClientSession]:
+        return self.active_connections.get(websocket)
+    
     async def broadcast(self, message: str):
+        '''Broadcast to ALL connected clients'''
         if not self.active_connections:
             return
         
         try: # Use gather for concurrent sending to all clients
             await asyncio.gather(*[
-                conn.send_text(message) 
-                for conn in self.active_connections
+                ws.send_text(message) 
+                for ws in self.active_connections.keys()
             ], return_exceptions=True)
         except Exception as e:
             print(f"Error broadcasting message: {e}")
 
 manager = ConnectionManager()
 
+# ----- Send Python logs to the Frontend via WebSocket ----- #
 class WebSocketLogHandler(logging.Handler):
-    """
-    Send Python logs to the Frontend via WebSocket
-    """
     def __init__(self, ws_manager):
         super().__init__()
         self.manager = ws_manager

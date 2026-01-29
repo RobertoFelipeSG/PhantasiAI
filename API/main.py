@@ -1,12 +1,14 @@
 import os
 import asyncio
 import uvicorn
+import json
 import paho.mqtt.client as mqtt
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from config.connection_manager import manager, logging
 from config.config_manager import load_config
@@ -15,36 +17,30 @@ from emg.data_acquisition import GanglionData
 from emg.synthetic_data_acquisition import SyntheticGanglionData
 from stim.change_detector import WatchDog
 
-ganglion_instance = None
-watchdog_system = None
 mqtt_client = None
 CONFIG = load_config()
     
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global mqtt_client, watchdog_system
+    global mqtt_client
     
-    # MQTT Setup
+    # MQTT Setup (global resource)
     try:
         mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, "FastAPI_Backend")
         mqtt_client.connect("localhost", 1883, 60) 
         mqtt_client.loop_start()
-        logging.info("MQTT Client Connected and loop started")
+        logging.info("[Main] MQTT Client Connected and loop started")
         
     except Exception as e:
-        logging.error(f"Failed to connect to MQTT: {e}") 
-
-    # Setup logic 
-    watchdog_system = WatchDog(mqtt_client)
+        logging.error(f"[Main] Failed to connect to MQTT: {e}") 
 
     yield # Server runs HERE
 
     # Shutdown logic
-    if watchdog_system: watchdog_system.stop_watching()
     if mqtt_client:
         mqtt_client.loop_stop()
         mqtt_client.disconnect()
-    logging.info("Cleanup complete: Watchdog and MQTT stopped")
+    logging.info("[Main] Cleanup complete: Watchdog and MQTT stopped")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -67,67 +63,98 @@ async def root():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     '''
-    Initialize connection to websocket manager and await data
+    Handles the lifecycle of a client connection
+    Listens for commands to Start/Stop streams specific to this client
     '''
     await manager.connect(websocket)
+    session = manager.get_session(websocket)
     
     try:
         while True:
-            await websocket.receive_text()
+            data = await websocket.receive_text()
+
+            try: # get command from frontend (stop or start stream)
+                command_data = json.loads(data)
+                action = command_data.get("action")
+
+                if action == "start_stream":
+                    await handle_start_stream(session, command_data)
+                
+                elif action == "stop_stream":
+                    await handle_stop_stream(session)
+
+            except json.JSONDecodeError:
+                logging.error("[Main] Received invalid JSON over WebSocket")
     
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
-        logging.info("WebSocket disconnected.")
+        await manager.disconnect(websocket)
+    except Exception as e:
+        logging.error(f"[Main] Unexpected error in WebSocket loop: {e}")
+        await manager.disconnect(websocket)
 
-@app.post("/start_stream")
-async def start_stream(num_trials: str, synthetic: bool):
+async def handle_start_stream(session, data):
     '''
-    Initializes Ganglion
-    Starts background EMG thread 
-    Start CSV recording of EMG data
+    Initializes Ganglion and Watchdog for client session
     '''
-    global ganglion_instance, watchdog_system
+    if session.ganglion and session.ganglion._emg_thread.is_alive(): 
+        await session.websocket.send_json({"status": "error", "message": "Stream already running"})
+        return
     
-    if ganglion_instance and ganglion_instance._emg_thread.is_alive(): 
-        return {"status": "error", "message": "EMG already streaming"}
+    serial_port = data.get("serial_port", CONFIG.get('default_serial_port'))
+    num_trials = data.get("num_trials", CONFIG.get('num_trials'))
+    is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
+    folder_name = data.get("folder_name", None)
     
-    # Retrieve reference of event loop running API server
+    # Retrieve reference of current event loop running API server
     try:
         current_loop = asyncio.get_running_loop()
     except RuntimeError:
         current_loop = asyncio.get_event_loop()
     
-    # Create and run EMG execution thread (runs concurrently with FastAPI server)
-    if synthetic: 
-        ganglion_instance = SyntheticGanglionData(sample_rate=250, num_trials=num_trials)
+    # Initialize Ganglion instance
+    if is_synthetic: 
+        session.ganglion = SyntheticGanglionData(
+            websocket=session.websocket,
+            serial_port=serial_port,
+            sample_rate=250, 
+            num_trials=num_trials,
+            folder_name=folder_name)
     else: 
-        ganglion_instance = GanglionData(sample_rate=250, num_trials=num_trials)
+        session.ganglion = GanglionData(
+            websocket=session.websocket,
+            serial_port=serial_port,
+            sample_rate=200, 
+            num_trials=num_trials,
+            folder_name=folder_name)
     
-    if watchdog_system:
-        directory_to_watch = str(ganglion_instance.recorder.classification_dir)
-        watchdog_system.start_watching(directory_to_watch)
+    # Initialize WatchDog instances (using global MQTT client)
+    client_id = id(session)
+    session.watchdog_class = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='classification')
+    class_directory_to_watch = str(session.ganglion.recorder.classification_dir)
+    session.watchdog_class.start_watching(class_directory_to_watch)
     
-    ganglion_instance.start(current_loop)
+    # Start EMG data thread
+    session.ganglion.start(current_loop)
     
-    return {"status": "success", "message": "EMG streaming started"}
+    logging.info(f"[Main] Started stream for client {client_id}")
+    await session.websocket.send_json({"status": "success", "message": "EMG streaming started"})
 
-@app.post("/stop_stream")
-async def stop_stream():
+async def handle_stop_stream(session):
     '''
-    Stops CSV recording
-    Stops background thread
+    Stop Ganglion data thread and Watchdog system for client session
     '''
-    global ganglion_instance, watchdog_system
+    if session.watchdog_class:
+        session.watchdog_class.stop_watching()
+        session.watchdog_class = None
 
-    if watchdog_system:
-        watchdog_system.stop_watching()
-
-    if ganglion_instance: # Ensure stopping process is complete
-        ganglion_instance.stop() 
-        ganglion_instance = None
-        return {"status": "success", "message": "EMG streaming stopped"}
-    return {"status": "error", "message": "No active stream"}
+    if session.ganglion:
+        session.ganglion.stop()
+        session.ganglion = None
+        logging.info(f"[Main] Stopped stream for client {id(session)}")
+        await session.websocket.send_json({"status": "success", "message": "EMG streaming stopped"})
+    else:
+        await session.websocket.send_json({"status": "error", "message": "No active stream to stop"})
 
 if __name__ == "__main__":
-    logging.info("Starting FastAPI server")
+    logging.info("[Main] Starting FastAPI server")
     uvicorn.run(app, host=CONFIG.get('host_IPv4'), port=8000)

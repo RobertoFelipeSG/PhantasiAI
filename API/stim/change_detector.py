@@ -5,15 +5,19 @@ from watchdog.events import FileSystemEventHandler
 
 from config.connection_manager import logging
 from stim.gpbo import GPBOptimizer
+from stim.square import ParamGenerator
 
-class ClassificationChangeHandler(FileSystemEventHandler):
+class ChangeHandler(FileSystemEventHandler):
     '''
     Handles change detection from WatchDog observing
-    Runs GPBO script if change in content is detected in current peak_classification.txt file 
+    Runs GPBO script if change in content is detected in peak_classification.txt file
+    Runs stimulation param generator script if change in content is detected in stim.txt file
     '''
 
-    def __init__(self, mqtt_client):
+    def __init__(self, mqtt_client, client_topic, change_type):
         self.mqtt_client = mqtt_client
+        self.topic = client_topic
+        self.change_type = change_type
         self.last_hash = None
         self.last_runtime = 0
         self.debounce_interval = 1.0 # prevents debounce checks
@@ -46,42 +50,46 @@ class ClassificationChangeHandler(FileSystemEventHandler):
         # Check content of new classification file
         new_hash = self._get_file_hash(event.src_path)
         if new_hash == self.last_hash:
-            logging.info(f"New file detected but identical content. Skipping GPBO...")
+            logging.info(f"[WatchDog] New file detected but identical content. Skipping GPBO...")
             return
         
         # State updates (if content is new)
-        logging.info(f"Change detected in {event.src_path}. Triggering GPBO...")
+        logging.info(f"[WatchDog] Change detected in {event.src_path}. Triggering GPBO...")
         self.last_hash = new_hash
         self.last_runtime = current_time
     
-        self.mqtt_client.publish('GPBO/start', 'on')
+        self.mqtt_client.publish(f"{self.topic}/GPBO/start", "on")
 
         # Run GPBO script
         try:
-            optimizer = GPBOptimizer(file_path=event.src_path, mqtt_client=self.mqtt_client)
+            optimizer = GPBOptimizer(file_path=event.src_path, 
+                                     mqtt_client=self.mqtt_client, 
+                                     client_topic=self.topic)
             optimizer.run()
         except ValueError as e:
-            logging.error(f"GPBO aborted due to bad data: {e}")
+            logging.error(f"[WatchDog] GPBO aborted due to bad data: {e}")
         except Exception as e:
-            logging.error(f"Error running GPBO: {e}", exc_info=True)
+            logging.error(f"[WatchDog] Error running GPBO: {e}", exc_info=True)
 
 class WatchDog:
     '''
-    Detect change in classification folder that contains peak_classification.txt file
+    Detect change in specified folder
     '''
-    def __init__(self, mqtt_client):
+    def __init__(self, mqtt_client, client_topic, change_type):
         self.observer = None
         self.mqtt_client = mqtt_client
+        self.topic = client_topic
+        self.change_type = change_type
     
     def start_watching(self, directory_path):
         if self.observer: self.stop_watching()
 
         self.observer = Observer()
-        handler = ClassificationChangeHandler(self.mqtt_client)
+        handler = ChangeHandler(self.mqtt_client, self.topic, self.change_type)
         self.observer.schedule(handler, path=directory_path, recursive=False)
         self.observer.start()
 
-        logging.info(f"WatchDog initialized for change detection in {directory_path}")
+        logging.info(f"[WatchDog] initialized for change detection in {directory_path}")
 
     def stop_watching(self): 
         if self.observer:

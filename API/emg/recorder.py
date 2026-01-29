@@ -12,7 +12,7 @@ config = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, base_path):
+    def __init__(self, sample_rate, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
@@ -23,12 +23,18 @@ class RealTimeRecorder:
 
         # Create session recording folder
         timestamp = time.strftime("%Y-%m-%d_%Hh%Mm%S", time.localtime())
-        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", timestamp)
+        if folder_name is None:
+            folder_name = timestamp
+        else:
+            folder_name = f"{folder_name}_{timestamp}"
+        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", folder_name)
         os.makedirs(self.session_dir, exist_ok=True)
         
         # Create minute analyses and classification folders within session folder
         self.analyses_dir = os.path.join(self.session_dir, "analyses")
         os.makedirs(self.analyses_dir, exist_ok=True)
+        self.features_dir = os.path.join(self.session_dir, "features")
+        os.makedirs(self.features_dir, exist_ok=True)
         self.classification_dir = os.path.join(self.session_dir, "classifications")
         os.makedirs(self.classification_dir, exist_ok=True)
         

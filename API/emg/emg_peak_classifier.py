@@ -63,11 +63,11 @@ class PeakClassifier:
             self.tangential_features = model_data.get('tangential_features', [])
             self.additional_features = model_data.get('additional_features', [])
             
-            logging.info(f"XGBoost model loaded successfully from: {model_path}")
+            logging.info(f"[Classifier] XGBoost model loaded successfully from: {model_path}")
             return True
         
         except Exception as e:
-            logging.error(f"Error loading model: {e}")
+            logging.error(f"[Classifier] Error loading model: {e}")
             import traceback
             traceback.print_exc()
             self.model = None
@@ -89,7 +89,7 @@ class PeakClassifier:
         if missing_columns:
             raise ValueError(f"Missing required columns in features CSV: {missing_columns}")
         
-        logging.info(f"Loaded {len(self.features_df)} peak features")
+        logging.info(f"[Classifier] Loaded {len(self.features_df)} peak features")
     
     def _handle_nan_values(self, X: np.ndarray) -> np.ndarray:
         """
@@ -231,11 +231,11 @@ class PeakClassifier:
         Classify detected peaks using the XGBoost model
         """
         if self.model is None:
-            logging.warning("No XGBoost model available for classification")
+            logging.warning("[Classifier] No XGBoost model available for classification")
             return []
         
         if self.features_df is None or len(self.features_df) == 0:
-            logging.warning("No features available for classification")
+            logging.warning("[Classifier] No features available for classification")
             return []
         
         # Prepare features for classification
@@ -272,11 +272,11 @@ class PeakClassifier:
                 
                 self.classification_results.append(result)
             
-            logging.info(f"Classified {len(self.classification_results)} peaks")
+            logging.info(f"[Classifier] Classified {len(self.classification_results)} peaks")
             return self.classification_results
             
         except Exception as e:
-            logging.error(f"Error during classification: {e}")
+            logging.error(f"[Classifier] Error during classification: {e}")
             import traceback
             traceback.print_exc()
             return []
@@ -286,7 +286,7 @@ class PeakClassifier:
         Save classification results to CSV
         """
         if not self.classification_results:
-            logging.warning("No classification results to save")
+            logging.warning("[Classifier] No classification results to save")
             return
         
         output_file = output_path / f"{curr_timestamp}peak_classification.csv"
@@ -348,7 +348,7 @@ class PeakClassifier:
             
             f.write(f"{sujet};{amplitude_str};{min_amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
         
-        logging.info(f"Classification results (TXT format) saved to: {output_file}")
+        logging.info(f"[Classifier] Classification results (TXT format) saved to: {output_file}")
     
     def run(self, features_df: pd.DataFrame, output_path: Path, curr_timestamp: int) -> Dict:
         """
@@ -364,7 +364,7 @@ class PeakClassifier:
         classifications = self._classify_peaks()
         
         if not classifications:
-            logging.warning("No classifications generated")
+            logging.warning("[Classifier] No classifications generated")
             return {
                 'classifications': [],
                 'classifier_available': self.model is not None
@@ -381,7 +381,7 @@ class PeakClassifier:
             class_counts[cls] = class_counts.get(cls, 0) + 1
         
         for cls, count in sorted(class_counts.items()):
-            logging.info(f"{cls}% MVC: {count} peaks\n")
+            logging.info(f"[Classifier] {cls}% MVC: {count} peaks\n")
         
         return {
             'classifications': classifications,

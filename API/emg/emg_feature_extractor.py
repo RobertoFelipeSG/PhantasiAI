@@ -5,6 +5,7 @@ import warnings
 from typing import Dict, List, Optional, Tuple
 from mne import create_info
 from mne.io import RawArray
+from pathlib import Path
 from scipy.signal import find_peaks, hilbert
 from config.connection_manager import logging
 from config.config_manager import load_config
@@ -153,7 +154,7 @@ class FeatureExtractor:
                 raise ValueError("NeuroKit2 PSD returned invalid format")
             
         except Exception as e:
-            logging.error(f"Error calculating frequency features with NeuroKit2: {e}")
+            logging.error(f"[Extractor] Error calculating frequency features with NeuroKit2: {e}")
             return np.nan, np.nan
     
     def extract_features(self, emg_signal: np.ndarray, peak_indices: np.ndarray, peak_amplitudes: np.ndarray, timestamps: np.ndarray
@@ -237,7 +238,7 @@ class FeatureExtractor:
         
         return peak_features
     
-    def run(self, analysis_df: pd.DataFrame, channels: Optional[List[str]] = None
+    def run(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """
         Process all EMG channels from a DataFrame and extract features for each peak.
@@ -260,19 +261,19 @@ class FeatureExtractor:
         
         num_events = np.sum(event_column == 1)
         if num_events < 2:
-            logging.warning(f"At least 2 events required for peak detection. Found {num_events} events.")
+            logging.warning(f"[Extractor] At least 2 events required for peak detection. Found {num_events} events.")
             return None
-        logging.info(f"Starting peak detection: {num_events} events detected")
+        logging.info(f"[Extractor] Starting peak detection: {num_events} events detected")
         
         # Process each channel and collect all peak features
         all_peak_features = []
         
         for channel in channels:
             if channel not in df.columns:
-                logging.warning(f"Channel {channel} not found in data. Skipping.")
+                logging.warning(f"[Extractor] Channel {channel} not found in data. Skipping.")
                 continue
             
-            logging.info(f"Processing {channel}...")
+            logging.info(f"[Extractor] Processing {channel}...")
             emg_signal = df[channel].values
             
             # Process channel
@@ -282,15 +283,19 @@ class FeatureExtractor:
             
             # Print summary
             if peak_features:
-                logging.info(f"Detected {len(peak_features)} peaks")
+                logging.info(f"[Extractor] Detected {len(peak_features)} peaks")
         
         # Create DataFrame from all peak features
         if not all_peak_features:
-            logging.warning("No peaks detected in any channel")
+            logging.warning("[Extractor] No peaks detected in any channel")
             return None
         
         features_df = pd.DataFrame(all_peak_features)
+
+        # Save to CSV if output path specified
+        output_file = output_path / f"{curr_timestamp}peak_features.csv"
+        features_df.to_csv(output_file, index=False)
         
-        logging.info(f"Total peaks: {len(features_df)}")
+        logging.info(f"[Extractor] Total peaks: {len(features_df)}")
         
         return features_df

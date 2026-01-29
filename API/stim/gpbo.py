@@ -21,10 +21,12 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOptimizer:
-    def __init__(self, file_path, mqtt_client):
+    def __init__(self, file_path, mqtt_client, client_topic):
         self.file_path = file_path
         self.mqtt_client = mqtt_client
+        self.topic = client_topic
         self.base_path = Path(__file__).parent
+        self.output_file = self.base_path / "stim.txt"
         
         # set configuration parameters
         self.iters = CONFIG.get("iterations")
@@ -39,7 +41,7 @@ class GPBOptimizer:
 
         # Initialize simulation based on data 
         self.resp_1d, self.resp_nd = self._generate_subject_responses(self.n_sub, self.n_val, self.n_dim, self.parameter_names, self.subject_profiles)
-        logging.info(f"Generated subject responses for {self.n_sub} subjects.")
+        logging.info(f"[GPBO] Generated subject responses for {self.n_sub} subjects.")
 
         # Precalculate grid
         self.X_test = self._get_parameter_grid(self.n_val, self.n_dim)
@@ -71,7 +73,7 @@ class GPBOptimizer:
                 if n_val_subject is None:
                     n_val_subject = len(values)
                 elif len(values) != n_val_subject:
-                    logging.error(f"Mismatch in value counts for {param} of subject {row['sujet']}")
+                    logging.error(f"[GPBO] Mismatch in value counts for {param} of subject {row['sujet']}")
                     raise ValueError(f"Mismatch in value counts for {param} of subject {row['sujet']}.")
                 subject[param] = values
             
@@ -81,11 +83,11 @@ class GPBOptimizer:
             subject_profiles.append(subject)
         
         if not n_val_list:
-            logging.error("File is empty or no subjects found")
+            logging.error("[GPBO] File is empty or no subjects found")
             raise ValueError("File is empty or no subjects found")
         
         if len(set(n_val_list)) != 1:
-            logging.error("All subjects must have the same number of parameter values.")
+            logging.error("[GPBO] All subjects must have the same number of parameter values.")
             raise ValueError("All subjects must have the same number of parameter values.")
         
         n_val = n_val_list[0]
@@ -183,29 +185,28 @@ class GPBOptimizer:
                 idx_val = best_params_idx[dim_idx]
                 best_params_values[param] = self.resp_1d[s, dim_idx, idx_val]
             
-            logging.info(f"Optimized response for subject {s+1}: {best_response}")
-            logging.info(f"Optimized parameters for subject {s+1}: {best_params_values}")
+            logging.info(f"[GPBO] Optimized response for subject {s+1}: {best_response}")
+            logging.info(f"[GPBO] Optimized parameters for subject {s+1}: {best_params_values}")
 
             # Write to .txt file
-            output_file = self.base_path / "stim.txt"
             try:
-                with open(output_file, 'w') as f:
+                with open(self.output_file, 'w') as f:
                     for param, value in best_params_values.items():
                         f.write(str(value)+'\n')
             except IOError as e:
-                logging.error(f"Failed to write to stim.txt: {e}")
+                logging.error(f"[GPBO] Failed to write to stim.txt: {e}")
 
             # Publish optimized parameters via MQTT
-            self.mqtt_client.publish('GPBO/min-amplitude', str(best_params_values.get('min_amplitude', '')))
-            self.mqtt_client.publish('GPBO/amplitude', str(best_params_values.get('amplitude', '')))
-            self.mqtt_client.publish('GPBO/mean-frequency', str(best_params_values.get('mean_frequency', '')))
-            self.mqtt_client.publish('GPBO/median-frequency', str(best_params_values.get('median_frequency', '')))
-            logging.info(f"Parameters published via MQTT")
+            self.mqtt_client.publish(f"{self.topic}/GPBO/min-amplitude", str(best_params_values.get('min_amplitude', '')))
+            self.mqtt_client.publish(f"{self.topic}/GPBO/amplitude", str(best_params_values.get('amplitude', '')))
+            self.mqtt_client.publish(f"{self.topic}/GPBO/mean-frequency", str(best_params_values.get('mean_frequency', '')))
+            self.mqtt_client.publish(f"{self.topic}/GPBO/frequency", str(best_params_values.get('median_frequency', '')))
+            logging.info(f"[GPBO] Parameters published via MQTT")
 
 
     def run(self):
-        logging.info("Starting Bayesian optimization...")
+        logging.info("[GPBO] Starting Bayesian optimization...")
         start_time = time()
         
         self._run_bayesian_optimization()
-        logging.info(f"Optimization completed. Duration: {time() - start_time:.2f} seconds.")
+        logging.info(f"[GPBO] Optimization completed. Duration: {time() - start_time:.2f} seconds.")

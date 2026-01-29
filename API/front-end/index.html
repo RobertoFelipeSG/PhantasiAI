@@ -108,7 +108,7 @@
         }
         
         .controls-bar {
-            height: 40%;
+            height: 50%;
             margin: 10px 0;
             padding: 15px;
             background-color: var(--bg-card);
@@ -163,25 +163,27 @@
         }
 
         .terminal-container {
-            height: 60%;
+            height: 50%;
             max-width: 100%;
             flex-grow: 0; 
             background-color: var(--bg-card);          
             padding: 10px;
             border-radius: 5px;
             overflow-y: auto;
-            overflow-x: hidden;
+            overflow-x: auto;
             font-size: 12px;
             border: 2px solid #333;
             font-family: monospace !important;
             min-height: 200px;
-            word-wrap: break-word;
         }
         .log-entry {
             margin-bottom: 4px;
             border-bottom: 1px solid #2a2a2a;
             text-align: left;
             font-family: monospace !important;
+            white-space: pre;
+            width: max-content; 
+            min-width: 100%;
         }
 
         /* Right-hand side  (3/4 of page) */
@@ -351,12 +353,25 @@
                     </select>
                 </div>
                 <div>
+                    Serial Port:
+                    <select id="serialPort">
+                        <option value="PortA" selected>Port A</option>
+                        <option value="PortB">Port B</option>
+                    </select>
+                </div>
+                <div>
                     Trials per Analysis:
                     <input type="number" id="trialInput" min="1" max="15" step="1" value="10" style="width: 50px;">
                 </div>
                 <div>
                     Total Trials:
                     <input type="number" id="totalTrials" min="30" max="180" step="6" value="90" style="width: 50px;">
+                </div>
+                <div>
+                    Data Folder [Optional]:
+                    <input type="text" id="folderName" value="Auto" style="width: 100px;" 
+                        onfocus="if(this.value==='Auto') this.value='';" 
+                        onblur="if(this.value==='') this.value='Auto';" >
                 </div>
                 <div> Streaming Status: <span id="streamingStatus">Idle</span> 
                 </div>
@@ -454,20 +469,22 @@
         let isGraphPaused = false; // tracks whether the graphs are paused or not
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Setup UI 
             initGraphs();
             setStreamingState(false, 'Idle');
             document.getElementById("defaultOpen").click()
+
+            connectWebSocket(); // Setup client connection
         });
         
         // ----- FRONTEND CONNECTION TO SERVER (via WebSocket) ----- //
         function connectWebSocket() {
-            if (ws) return;
+            if (ws && ws.readyState === WebSocket.OPEN) return;
         
             // Connect to server via WebSocket + update server connection status
             const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
             const wsUrl = `${protocol}://${window.location.host}/ws`;
             
-            console.log("Attempting to connect to:", wsUrl);
             try {
                 ws = new WebSocket(wsUrl);
         
@@ -492,9 +509,6 @@
                                                     y_y: data.value[1][i],
                                                     y_z: data.value[2][i] });
                         });
-        
-                        valuesMatrix = data.value;
-                        const len = valuesMatrix[0].length;
                     }
                     
                     // Add most recent event markers (vertical lines)
@@ -513,20 +527,40 @@
                     else if (data.type === 'server_log') {
                         addLog(data.message);
                     }
+
+                    // Handle command responses (success/error feedback)
+                    else if (data.status) {
+                        console.log("Server Response:", data);
+                
+                        if (data.status === 'error') {
+                            alert("Server Error: " + data.message);
+                            // Force the UI back to idle if start failed
+                            setStreamingState(false, 'Error', 'red');
+                            renderLoopRunning = false;
+                        } 
+                        else if (data.status === 'success') {
+                            console.log("Command executed successfully:", data.message);
+                        }
+                    }
                 }
         
-                ws.onclose = () => {
+                ws.onclose = async (event) => {
+                    console.warn("WebSocket Error:", event);
+                    await stopStream(); // auto stop if WS disconnects
+                    setStreamingState(false, "Disconnected", "red");
                     document.getElementById('websocketStatus').innerText = "WS Status: Disconnected";
                     ws = null;
                 };
         
-                ws.onerror = (error) => {
+                ws.onerror = async (error) => {
                     console.error("WebSocket Error:", error);
+                    await stopStream(); // auto stop if WS error
+                    setStreamingState(false, "Connection Error", "red");
                     document.getElementById('websocketStatus').innerText = "WS Status: Connection Error";
+                    ws = null;
                 }
             } catch (e) {
                 console.error("Failed to create WebSocket:", e);
-                document.getElementById('websocketStatus').innerText = "WS Status: Setup Error";
             }
         }
 
@@ -977,6 +1011,8 @@
             const input = document.getElementById('trialInput');
             const trials = document.getElementById('totalTrials');
             const boardId = document.getElementById('boardID');
+            const serialPort = document.getElementById('serialPort');
+            const folderName = document.getElementById('folderName');
             const status = document.getElementById('streamingStatus');
         
             if (button) {
@@ -988,6 +1024,8 @@
             if (input) input.disabled = active;
             if (trials) trials.disabled = active;
             if (boardId) boardId.disabled = active;
+            if (serialPort) serialPort.disabled = active;
+            if (folderName) folderName.disabled = active;
         
             if (status) {
                 status.innerText = statusMessage;
@@ -1004,28 +1042,41 @@
             }
         
             // Case 2: Start streaming + recording
-            const boardID = document.getElementById('boardID');
-            let useSyntheticData = false
-            if (boardID.value === "Synthetic") { 
-                useSyntheticData = true
+            const boardID = document.getElementById('boardID').value;
+            let useSyntheticData = false;
+            if (boardID === "Synthetic") { 
+                useSyntheticData = true;
                 SAMPLE_RATE = 250;
-            } else {
+            } else if (boardID === "Ganglion") {
                 useSyntheticData = false;
                 SAMPLE_RATE = 200;
             }
             MAX_DATA_POINTS = SAMPLE_RATE * WINDOW_SIZE 
+
+            const serialPort = document.getElementById('serialPort').value;
+            let portToUse = 'serial_port_A';
+            if (serialPort === "PortA") {
+                portToUse = 'serial_port_A';
+            } else if (serialPort === "PortB") {
+                portToUse = 'serial_port_B';
+            }
             
-            const trialInput = document.getElementById('trialInput');
-            const numTrials = parseFloat(trialInput.value);
+            const trialInput = document.getElementById('trialInput').value;
+            const numTrials = parseFloat(trialInput);
             if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
                 numTrials = defaultNumTrials;
             }
+
+            const folderName = document.getElementById('folderName').value;
+            let folderToUse = (folderName === 'Auto' || folderName === '') ? null : folderName;
         
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
             document.getElementById('trialInput').disabled = true;
             document.getElementById('boardID').disabled = true;
+            document.getElementById('serialPort').disabled = true;
             document.getElementById('totalTrials').disabled = true;
+            document.getElementById('folderName').disabled = true;
         
             const status = document.getElementById('streamingStatus');
             status.style.color = '#e65100'; // Orange for warning
@@ -1040,7 +1091,7 @@
             status.innerText = "Initializing...";
             
             // Send number of trials per session and start stream + recording
-            await startStream(numTrials, useSyntheticData);
+            await startStream(numTrials, useSyntheticData, portToUse, folderToUse);
         }
         
         function handleReset() {
@@ -1058,6 +1109,7 @@
             document.getElementById('streamBtn').disabled = false; // Enable stream + recording
             document.getElementById('trialInput').disabled = false;
             document.getElementById('boardID').disabled = false;
+            document.getElementById('serialPort').disabled = false;
             document.getElementById('totalTrials').disabled = false;
             
             // Clear the synchronized marker countdown display
@@ -1098,26 +1150,48 @@
             });
         }
         
-        async function startStream(numTrials, useSyntheticData)  {
-            connectWebSocket();
+        async function startStream(numTrials, useSyntheticData, portToUse, folderToUse)  {
+            // If websocket closed/not auto created, attempt connection
+            if (!ws || ws.readyState === WebSocket.CLOSED) {
+                connectWebSocket();
+            }
+            
+            // Wait briefly if connecting
+            if (ws.readyState === WebSocket.CONNECTING) {
+                let attempts = 0;
+                while (ws.readyState === WebSocket.CONNECTING && attempts < 10) {
+                    await new Promise(r => setTimeout(r, 100));
+                    attempts++;
+                }
+            }
+            
+            // Final check for WS connection before streaming 
+            if (ws.readyState !== WebSocket.OPEN) {
+                alert("Connection is not ready. Please check the WS Status.");
+                return;
+            }
 
-            // Reset global states and visual elements
-            handleReset();
-        
-            startRenderLoop();
+            // Prepare backend command payload
+            const payload = {
+                action: "start_stream",
+                serial_port: portToUse,
+                num_trials: numTrials,
+                synthetic: useSyntheticData,
+                folder_name: folderToUse
+            };
         
             try { 
-                // Wait 1 second for WebSocket to connect first 
-                await new Promise(resolve => setTimeout(resolve, 100)); 
-                
-                // note: marker countdown automatically starts when backend sends first marker_countdown data point
-                await fetch(`/start_stream?num_trials=${numTrials}&synthetic=${useSyntheticData}`, { method: 'POST' });
-                setStreamingState(true, `Active`, 'green');
+                // Reset global states and visual elements
+                handleReset();
+                startRenderLoop();
+
+                ws.send(JSON.stringify(payload)); // Send start command to server
+                setStreamingState(true, `Active`, 'green'); // update UI
             
             } catch (error) { 
                 console.error(error);
                 setStreamingState(false, 'Error Starting', 'red');
-                alert("Error: " + error.message);
+                alert("Error sending start command: " + error.message);
             }
         }
         
@@ -1127,13 +1201,16 @@
                 document.getElementById('streamBtn').disabled = true; 
                 document.getElementById('streamingStatus').innerText = "Stopping...";
                 
-                await fetch('/stop_stream', { method: 'POST' });
+                // Send stop command to server
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ action: "stop_stream" }));
+                }
 
-                // Reset visuals
+                // Reset UI
                 handleReset();
-
                 setStreamingState(false, 'Idle', '#333');
                 renderLoopRunning = false;
+            
             } catch (e) {
                 console.error(e);
                 alert("Error stopping");
