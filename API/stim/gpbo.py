@@ -15,6 +15,7 @@ from config.connection_manager import logging
 from config.config_manager import load_config
 
 CONFIG = load_config()
+LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 warnings.filterwarnings("ignore")
 np.random.seed(42)
@@ -209,4 +210,12 @@ class GPBOptimizer:
         start_time = time()
         
         self._run_bayesian_optimization()
-        logging.info(f"[GPBO] Optimization completed. Duration: {time() - start_time:.2f} seconds.")
+        
+        message = f"[GPBO] Optimization completed. Duration: {time() - start_time:.2f} seconds."
+        logging.info(message)
+        
+        try:
+            with open(LOG_FILE, "a") as f:
+                f.write(f"{message}\n")
+        except OSError as e:
+            logging.error(f"Could not write to timing file: {e}")

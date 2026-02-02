@@ -13,7 +13,7 @@ from config.connection_manager import manager, logging
 from config.config_manager import load_config
 from emg.recorder import RealTimeRecorder
 from emg.emg_feature_extractor import FeatureExtractor
-from emg.emg_peak_classifier import PeakClassifier
+#from emg.emg_peak_classifier import PeakClassifier
 
 CONFIG = load_config() # load config settings
 
@@ -57,7 +57,7 @@ class SyntheticGanglionData:
 
         self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate)
-        self.peak_classifier = PeakClassifier(self.base_path)
+        #self.peak_classifier = PeakClassifier(self.base_path)
 
     def _handle_analysis(self, curr_timestamp: float, curr_trials: int):
         ''' Helper to handle analysis: peak extraction + classification'''
@@ -77,10 +77,12 @@ class SyntheticGanglionData:
                                                      curr_timestamp=int(curr_timestamp),
                                                      channels=channels)
             
+            '''
             # Peak Classification
             self.peak_classifier.run(features_df=features_df, 
                                      output_path=Path(self.recorder.classification_dir), 
                                      curr_timestamp=int(curr_timestamp))
+            '''
         
         # Advance to next trial block
         while curr_trials == self.next_trial_block:

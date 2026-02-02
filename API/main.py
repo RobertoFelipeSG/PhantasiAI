@@ -129,9 +129,13 @@ async def handle_start_stream(session, data):
     
     # Initialize WatchDog instances (using global MQTT client)
     client_id = id(session)
-    session.watchdog_class = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='classification')
-    class_directory_to_watch = str(session.ganglion.recorder.classification_dir)
-    session.watchdog_class.start_watching(class_directory_to_watch)
+    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='features')
+    feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
+    session.watchdog_feat.start_watching(feat_directory_to_watch)
+
+    session.watchdog_stim = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='stimulation')
+    stim_directory_to_watch = str(Path(__file__).parent / "stim")
+    session.watchdog_stim.start_watching(stim_directory_to_watch)
     
     # Start EMG data thread
     session.ganglion.start(current_loop)
@@ -143,9 +147,13 @@ async def handle_stop_stream(session):
     '''
     Stop Ganglion data thread and Watchdog system for client session
     '''
-    if session.watchdog_class:
-        session.watchdog_class.stop_watching()
-        session.watchdog_class = None
+    if session.watchdog_feat:
+        session.watchdog_feat.stop_watching()
+        session.watchdog_feat = None
+
+    if session.watchdog_stim:
+        session.watchdog_stim.stop_watching()
+        session.watchdog_stim = None
 
     if session.ganglion:
         session.ganglion.stop()

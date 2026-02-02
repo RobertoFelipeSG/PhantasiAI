@@ -2,11 +2,13 @@ botorch
 brainflow
 fastapi
 gpytorch
+gpiod
 jinja2
 mne
 neurokit2
 paho-mqtt
 pandas
+pigpio
 pydantic
 pylsl
 pyyaml

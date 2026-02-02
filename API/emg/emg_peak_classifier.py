@@ -2,9 +2,12 @@ import pandas as pd
 import numpy as np
 import pickle
 import warnings
+from time import time
 from pathlib import Path
 from typing import List, Dict
 from config.connection_manager import logging
+
+LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 warnings.filterwarnings('ignore')
 
@@ -350,7 +353,7 @@ class PeakClassifier:
         
         logging.info(f"[Classifier] Classification results (TXT format) saved to: {output_file}")
     
-    def run(self, features_df: pd.DataFrame, output_path: Path, curr_timestamp: int) -> Dict:
+    def _run_classification(self, features_df: pd.DataFrame, output_path: Path, curr_timestamp: int) -> Dict:
         """
         Run the full classification pipeline.
         
@@ -381,10 +384,27 @@ class PeakClassifier:
             class_counts[cls] = class_counts.get(cls, 0) + 1
         
         for cls, count in sorted(class_counts.items()):
-            logging.info(f"[Classifier] {cls}% MVC: {count} peaks\n")
+            logging.info(f"[Classifier] {cls}% MVC: {count} peaks")
         
         return {
             'classifications': classifications,
             'classifier_available': True,
             'class_counts': class_counts
         }
+
+    def run(self, features_df: pd.DataFrame, output_path: Path, curr_timestamp: int) -> Dict:
+        logging.info("[Classifier] Starting classification process...")
+        start_time = time()
+        
+        classifications = self._run_classification(features_df, output_path, curr_timestamp)
+        
+        message = f"[Classifier] Classification completed. Duration: {time() - start_time:.2f} seconds."
+        logging.info(message)
+        
+        try:
+            with open(LOG_FILE, "a") as f:
+                f.write(f"{message}\n")
+        except OSError as e:
+            logging.error(f"Could not write to timing file: {e}")
+
+        return classifications

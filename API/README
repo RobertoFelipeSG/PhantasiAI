@@ -8,7 +8,7 @@ To use:
 - change the <IPv4> address to the one associated with your device
     - or for local connections keep as "0.0.0.0"
 - for Mosquitto messages run: mosquitto_sub -h localhost -t "emg/#" -v (IN A SEPARATE TERMINAL)
-- in your terminal run: python main.py 
+- in your terminal run: ./dev.sh 
 
 Note: This code is adapted for Linux OS/RaspberryPi, in order to use on Windows:
 - winget install --interactive usbipd-win (install usbipd tool; in PowerShell as Admin)

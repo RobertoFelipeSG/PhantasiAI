@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import neurokit2 as nk
 import warnings
+from time import time
 from typing import Dict, List, Optional, Tuple
 from mne import create_info
 from mne.io import RawArray
@@ -11,6 +12,7 @@ from config.connection_manager import logging
 from config.config_manager import load_config
 
 config = load_config()
+LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 warnings.filterwarnings('ignore')
 
@@ -238,7 +240,37 @@ class FeatureExtractor:
         
         return peak_features
     
-    def run(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
+    def _save_results_txt(self, output_path: Path, peak_features: List[Dict[str, float]]):
+        """
+        Save classification results to TXT file with specified structure
+        """
+
+        output_file = output_path / "peak_features.txt"
+
+        # Extract vectors from all results
+        amplitude_vector = [peak_feature['amplitude'] for peak_feature in peak_features]
+        min_amplitude_vector = [peak_feature['min_amplitude'] for peak_feature in peak_features]
+        mean_frequency_vector = [peak_feature['mean_frequency'] for peak_feature in peak_features]
+        median_frequency_vector = [peak_feature['median_frequency'] for peak_feature in peak_features]
+
+        # Write header
+        with open(output_file, 'w') as f:
+            f.write("sujet;amplitude;min_amplitude;mean_frequency;median_frequency\n")
+
+            # Write data as row vectors
+            sujet = 0  # Always 0 as specified
+            
+            # Format vectors as strings with proper precision
+            amplitude_str = ",".join([f"{val:.4f}" for val in amplitude_vector])
+            min_amplitude_str = ",".join([f"{val:.4f}" for val in min_amplitude_vector])
+            mean_frequency_str = ",".join([f"{val:.2f}" for val in mean_frequency_vector])
+            median_frequency_str = ",".join([f"{val:.2f}" for val in median_frequency_vector])
+            
+            f.write(f"{sujet};{amplitude_str};{min_amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
+        
+        logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
+    
+    def _run_feature_extraction(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """
         Process all EMG channels from a DataFrame and extract features for each peak.
@@ -283,7 +315,7 @@ class FeatureExtractor:
             
             # Print summary
             if peak_features:
-                logging.info(f"[Extractor] Detected {len(peak_features)} peaks")
+                logging.info(f"[Extractor] Detected {len(peak_features)} peaks in {channel}")
         
         # Create DataFrame from all peak features
         if not all_peak_features:
@@ -292,10 +324,28 @@ class FeatureExtractor:
         
         features_df = pd.DataFrame(all_peak_features)
 
-        # Save to CSV if output path specified
+        # Save to CSV and TXT
         output_file = output_path / f"{curr_timestamp}peak_features.csv"
         features_df.to_csv(output_file, index=False)
+        self._save_results_txt(output_path, all_peak_features)
         
         logging.info(f"[Extractor] Total peaks: {len(features_df)}")
         
+        return features_df
+
+    def run(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
+    ) -> pd.DataFrame:
+        start_time = time()
+        
+        features_df = self._run_feature_extraction(analysis_df, output_path, curr_timestamp, channels)
+        message = f"[Extractor] Feature extractor completed. Duration: {time() - start_time:.2f} seconds."
+
+        logging.info(message)
+        
+        try:
+            with open(LOG_FILE, "a") as f:
+                f.write(f"{message}\n")
+        except OSError as e:
+            logging.error(f"Could not write to timing file: {e}")
+
         return features_df

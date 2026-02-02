@@ -39,37 +39,71 @@ class ChangeHandler(FileSystemEventHandler):
             return None
 
     def on_modified(self, event):
-        if event.is_directory or not event.src_path.endswith("peak_classification.txt"): 
-            return
-        
-        # Debounce check
-        current_time = time.time()
-        if (current_time - self.last_runtime) < self.debounce_interval:
-            return
-
-        # Check content of new classification file
-        new_hash = self._get_file_hash(event.src_path)
-        if new_hash == self.last_hash:
-            logging.info(f"[WatchDog] New file detected but identical content. Skipping GPBO...")
-            return
-        
-        # State updates (if content is new)
-        logging.info(f"[WatchDog] Change detected in {event.src_path}. Triggering GPBO...")
-        self.last_hash = new_hash
-        self.last_runtime = current_time
+        if self.change_type == 'features':
+            if event.is_directory or not event.src_path.endswith("peak_features.txt"): 
+                return
+            
+            # Debounce check
+            current_time = time.time()
+            if (current_time - self.last_runtime) < self.debounce_interval:
+                return
     
-        self.mqtt_client.publish(f"{self.topic}/GPBO/start", "on")
+            # Check content of new classification file
+            new_hash = self._get_file_hash(event.src_path)
+            if new_hash == self.last_hash:
+                logging.info(f"[WatchDog] New file detected but identical content. Skipping GPBO...")
+                return
+            
+            # State updates (if content is new)
+            logging.info(f"[WatchDog] Change detected in {event.src_path}. Triggering GPBO...")
+            self.last_hash = new_hash
+            self.last_runtime = current_time
+        
+            self.mqtt_client.publish(f"{self.topic}/GPBO/start", "on")
+    
+            # Run GPBO script
+            try:
+                optimizer = GPBOptimizer(file_path=event.src_path, 
+                                         mqtt_client=self.mqtt_client, 
+                                         client_topic=self.topic)
+                optimizer.run()
+            except ValueError as e:
+                logging.error(f"[WatchDog] GPBO aborted due to bad data: {e}")
+            except Exception as e:
+                logging.error(f"[WatchDog] Error running GPBO: {e}", exc_info=True)
 
-        # Run GPBO script
-        try:
-            optimizer = GPBOptimizer(file_path=event.src_path, 
-                                     mqtt_client=self.mqtt_client, 
-                                     client_topic=self.topic)
-            optimizer.run()
-        except ValueError as e:
-            logging.error(f"[WatchDog] GPBO aborted due to bad data: {e}")
-        except Exception as e:
-            logging.error(f"[WatchDog] Error running GPBO: {e}", exc_info=True)
+        elif self.change_type == 'stimulation':
+            if event.is_directory or not event.src_path.endswith("stim.txt"): 
+                return
+            
+            # Debounce check
+            current_time = time.time()
+            if (current_time - self.last_runtime) < self.debounce_interval:
+                return
+    
+            # Check content of new classification file
+            new_hash = self._get_file_hash(event.src_path)
+            if new_hash == self.last_hash:
+                logging.info(f"[WatchDog] New file detected but identical content. Skipping param generation...")
+                return
+            
+            # State updates (if content is new)
+            logging.info(f"[WatchDog] Change detected in {event.src_path}. Triggering param generation...")
+            self.last_hash = new_hash
+            self.last_runtime = current_time
+        
+            self.mqtt_client.publish(f"{self.topic}/Square/start", "on")
+    
+            # Run param generator script
+            try:
+                param_generator = ParamGenerator(file_path=event.src_path, 
+                                                 mqtt_client=self.mqtt_client,
+                                                 client_topic=self.topic)
+                param_generator.run()
+            except ValueError as e:
+                logging.error(f"[WatchDog] Param generation aborted due to bad data: {e}")
+            except Exception as e:
+                logging.error(f"[WatchDog] Error running param generation: {e}", exc_info=True)
 
 class WatchDog:
     '''

@@ -25,3 +25,7 @@ stim/stim.txt
 
 # Ignore personal settings
 config/config.yaml
+
+# Ignore testing logs
+test_timings.txt
+config/testing_logs.txt

@@ -1,14 +1,16 @@
 import os
-import time
 import csv
 import numpy as np
 import pandas as pd
+import time
 from collections import deque
+from pathlib import Path
 
 from config.connection_manager import logging
 from config.config_manager import load_config
 
 config = load_config()
+LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
@@ -65,7 +67,7 @@ class RealTimeRecorder:
             
             # Advance the marker time
             self.next_event_time += float(self.marker_interval)
-            logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
+            #logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
         
         return event_flag
         
@@ -127,6 +129,9 @@ class RealTimeRecorder:
         if not self.recording or not self._buffer: return None
 
         try:
+            logging.info("[Recorder] Creating analysis file...")
+            start_time = time.time()
+            
             df = pd.DataFrame(self._buffer, columns=self._buffer_header)
             df['timestamp'] = df['timestamp'].astype(float)
 
@@ -143,10 +148,19 @@ class RealTimeRecorder:
             output_path = os.path.join(self.analyses_dir, filename)
             analysis_data.to_csv(output_path, index=False)
 
+            message = f"[Recorder] Analysis file created. Duration: {time.time() - start_time:.2f} seconds."
+            logging.info(message)
+        
+            try:
+                with open(LOG_FILE, "a") as f:
+                    f.write(f"{message}\n")
+            except OSError as e:
+                logging.error(f"Could not write to timing file: {e}")
+
             return analysis_data
 
         except Exception as e:
-            print(f"[Recorder] Failed to create temp analysis file: {e}")
+            logging.error(f"[Recorder] Failed to create temp analysis file: {e}")
             return None
     
     def start_recording(self):

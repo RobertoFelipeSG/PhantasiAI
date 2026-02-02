@@ -361,7 +361,7 @@
                 </div>
                 <div>
                     Trials per Analysis:
-                    <input type="number" id="trialInput" min="1" max="15" step="1" value="10" style="width: 50px;">
+                    <input type="number" id="trialInput" min="1" max="20" step="1" value="10" style="width: 50px;">
                 </div>
                 <div>
                     Total Trials:
@@ -660,7 +660,7 @@
             let trialsRemaining = (totalTrials - currTrials);
 
             // Check for auto-stop if total trials complete
-            if (trialsRemaining <= 0 && isStreaming && !isStopping) {
+            if (trialsRemaining <= -3 && isStreaming && !isStopping) {
                 console.log("All trials complete. Auto-stopping...");
                 isStopping = true;
                 await stopStream(); 
@@ -1063,7 +1063,7 @@
             
             const trialInput = document.getElementById('trialInput').value;
             const numTrials = parseFloat(trialInput);
-            if (isNaN(numTrials) || numTrials < 1 || numTrials > 15) {
+            if (isNaN(numTrials) || numTrials < 1 || numTrials > 20) {
                 numTrials = defaultNumTrials;
             }
 

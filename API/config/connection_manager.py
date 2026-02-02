@@ -3,8 +3,12 @@ import asyncio
 import json 
 from typing import List, Optional
 from fastapi import WebSocket
+from pathlib import Path
+
+log_path = Path(__file__).parent / "testing_logs.txt"
 
 logging.basicConfig(
+    #filename=log_path,
     level=logging.INFO, 
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%H:%M:%S',
@@ -17,14 +21,20 @@ class ClientSession:
         '''Initialize single client connection'''
         self.websocket = websocket
         self.ganglion = None
-        self.watchdog_class = None
+        self.watchdog_feat = None
+        self.watchdog_stim = None
 
     async def cleanup(self):
         '''Clean up resources when client disconnects'''
-        if self.watchdog_class:
-            self.watchdog_class.stop_watching()
+        if self.watchdog_feat:
+            self.watchdog_feat.stop_watching()
+            self.watchdog_feat = None
+        if self.watchdog_stim:
+            self.watchdog_stim.stop_watching()
+            self.watchdog_stim = None
         if self.ganglion:
             self.ganglion.stop()
+            self.ganglion = None
 
 class ConnectionManager:
     def __init__(self):
