@@ -167,9 +167,6 @@ class FeatureExtractor:
         if len(peak_indices) == 0:
             return []
         
-        # Calculate min peak amplitude (same for all peaks in this trial)
-        min_peak_amplitude = np.min(peak_amplitudes) if len(peak_amplitudes) > 0 else np.nan
-        
         # Extract features for each peak
         peak_features = []
         
@@ -192,8 +189,7 @@ class FeatureExtractor:
             peak_feature = {
                 'peak_id': i + 1,
                 'timestamp': float(peak_timestamp),
-                'amplitude': float(peak_amplitude),
-                'min_amplitude': float(min_peak_amplitude),
+                'max_amplitude': float(peak_amplitude),
                 'mean_frequency': float(mean_freq) if not np.isnan(mean_freq) else np.nan,
                 'median_frequency': float(median_freq) if not np.isnan(median_freq) else np.nan
             }
@@ -245,28 +241,26 @@ class FeatureExtractor:
         Save classification results to TXT file with specified structure
         """
 
-        output_file = output_path / "peak_features.txt"
+        output_file = output_path / "features.txt"
 
         # Extract vectors from all results
-        amplitude_vector = [peak_feature['amplitude'] for peak_feature in peak_features]
-        min_amplitude_vector = [peak_feature['min_amplitude'] for peak_feature in peak_features]
+        amplitude_vector = [peak_feature['max_amplitude'] for peak_feature in peak_features]
         mean_frequency_vector = [peak_feature['mean_frequency'] for peak_feature in peak_features]
         median_frequency_vector = [peak_feature['median_frequency'] for peak_feature in peak_features]
 
         # Write header
         with open(output_file, 'w') as f:
-            f.write("sujet;amplitude;min_amplitude;mean_frequency;median_frequency\n")
+            f.write("sujet;max_amplitude;mean_frequency;median_frequency\n")
 
             # Write data as row vectors
             sujet = 0  # Always 0 as specified
             
             # Format vectors as strings with proper precision
             amplitude_str = ",".join([f"{val:.4f}" for val in amplitude_vector])
-            min_amplitude_str = ",".join([f"{val:.4f}" for val in min_amplitude_vector])
             mean_frequency_str = ",".join([f"{val:.2f}" for val in mean_frequency_vector])
             median_frequency_str = ",".join([f"{val:.2f}" for val in median_frequency_vector])
             
-            f.write(f"{sujet};{amplitude_str};{min_amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
+            f.write(f"{sujet};{amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
         
         logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
     
