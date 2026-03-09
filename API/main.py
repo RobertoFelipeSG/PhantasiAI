@@ -16,6 +16,8 @@ from config.config_manager import load_config
 from emg.data_acquisition import GanglionData
 from emg.synthetic_data_acquisition import SyntheticGanglionData
 from stim.change_detector import WatchDog
+from stim.gpbo_new import GPBOOptimizer
+from stim.square import Stimulator
 
 mqtt_client = None
 CONFIG = load_config()
@@ -127,13 +129,21 @@ async def handle_start_stream(session, data):
             num_trials=num_trials,
             folder_name=folder_name)
     
-    # Initialize WatchDog instances (using global MQTT client)
     client_id = id(session)
-    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='features')
+    
+    # Initialize GPBO Optimizer (one per session)
+    recordings_directory = str(session.ganglion.recorder.session_dir)
+    session.optimizer = GPBOOptimizer(mqtt_client, recordings_directory, client_topic=f"emg/client/{client_id}")
+
+    # Initialize Stimulator
+    session.stimulator = Stimulator(mqtt_client, client_topic=f"emg/client/{client_id}")
+    
+    # Initialize WatchDog instances (using global MQTT client)
+    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='features', optimizer=session.optimizer)
     feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
     session.watchdog_feat.start_watching(feat_directory_to_watch)
 
-    session.watchdog_stim = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='stimulation')
+    session.watchdog_stim = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='stimulation', stimulator=session.stimulator)
     stim_directory_to_watch = str(Path(__file__).parent / "stim")
     session.watchdog_stim.start_watching(stim_directory_to_watch)
     
@@ -145,8 +155,16 @@ async def handle_start_stream(session, data):
 
 async def handle_stop_stream(session):
     '''
-    Stop Ganglion data thread and Watchdog system for client session
+    Stop Ganglion data thread, Watchdog system, Optimizer and Stimulator for client session
     '''
+    
+    if session.optimizer:
+        session.optimizer.stop()
+        session.optimizer = None
+
+    if session.stimulator:
+        session.stimulator = None
+    
     if session.watchdog_feat:
         session.watchdog_feat.stop_watching()
         session.watchdog_feat = None

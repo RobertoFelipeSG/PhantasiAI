@@ -39,12 +39,16 @@ DEFAULT_CONFIG = {
     "min_distance": 3,
     "feature_cutoff_freq": 80,
 
-    # gpbo
-    "iterations": 20,
+    # GPBO
+    "is_calibrated": False,
+    "iterations": 40,
+    "repetitions": 10,
     "num_rand": 1,
     "kappa": 3.0, 
     "AF_name": "NEI", # "NEI", "EI", "UBC"
-    "noise_level": 0.05
+    "noise_level": 0.05,
+    "dutycycles": [0.1, 0.3, 0.5, 0.7, 0.9],
+    "frequencies": [20, 30, 40, 50, 60]
 }
 
 def load_config():

@@ -25,7 +25,8 @@ class SyntheticGanglionData:
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
-        self.base_path = Path(__file__).resolve().parent
+        self.base_path = Path(__file__).resolve().parent.parent / "data"
+        self.base_path.mkdir(parents=True, exist_ok=True)
 
         self.serial_port = CONFIG.get(serial_port)
         self.mac_address = CONFIG.get("mac_address")
@@ -40,6 +41,7 @@ class SyntheticGanglionData:
         self._num_trials = int(num_trials) # trials per session (inputted by user)
         self.next_trial_block = int(num_trials)
         self._total_events = 0
+        self._total_trials = 0
         self.marker_broadcast_counter = 0
 
         # Data containers
@@ -56,15 +58,15 @@ class SyntheticGanglionData:
         self.board_id = BoardIds.SYNTHETIC_BOARD
 
         self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path, folder_name=folder_name)
-        self.feature_extractor = FeatureExtractor(self._sample_rate)
+        self.feature_extractor = FeatureExtractor(self._sample_rate, self._num_trials == 1, output_path=Path(self.recorder.features_dir))
         #self.peak_classifier = PeakClassifier(self.base_path)
 
-    def _handle_analysis(self, curr_timestamp: float, curr_trials: int):
+    def _handle_analysis(self, curr_timestamp: float):
         ''' Helper to handle analysis: peak extraction + classification'''
         
         # Create analysis DataFrame
-        logging.info(f"[Ganglion] Creating analysis file for {curr_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
-        analysis_df = self.recorder.create_analysis_file(curr_timestamp, curr_trials)
+        #logging.info(f"[Ganglion] Creating analysis file for {self._total_trials} trials, from {self.recorder.min_time} to {curr_timestamp} seconds")
+        analysis_df = self.recorder.create_analysis_file(curr_timestamp, self._total_trials)
         
         # Signal processing of analysis file
         if analysis_df is None:
@@ -73,7 +75,6 @@ class SyntheticGanglionData:
             # Peak detection
             channels = [f"ch{ch + 1} (µV)" for ch in CONFIG.get("selected_channels", [])]
             features_df = self.feature_extractor.run(analysis_df=analysis_df, 
-                                                     output_path=Path(self.recorder.features_dir),
                                                      curr_timestamp=int(curr_timestamp),
                                                      channels=channels)
             
@@ -85,7 +86,7 @@ class SyntheticGanglionData:
             '''
         
         # Advance to next trial block
-        while curr_trials == self.next_trial_block:
+        while self._total_trials == self.next_trial_block:
             self.next_trial_block += self._num_trials
     
     def _broadcast_events(self, loop):
@@ -130,16 +131,17 @@ class SyntheticGanglionData:
             curr_accel_ch = data[self.accel_channels, i]
             curr_timestamp = relative_timestamps[i]
 
-            has_event = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
+            has_event, end_trial = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
             
             if has_event: 
                 self._total_events += 1
-                logging.info(f"[Ganglion] Recorded {self._total_events} events")            
+                logging.info(f"[Ganglion] Recorded {self._total_events} events")               
+            if end_trial:
+                self._total_trials += 1
             
             # Perform analysis on selected trials
-            curr_trials = self._total_events - 1
-            if curr_trials == self.next_trial_block:
-                self._handle_analysis(curr_timestamp, curr_trials)
+            if self._total_trials == self.next_trial_block:
+                self._handle_analysis(curr_timestamp)
                 
         # Broadcast event markers
         if self.recorder.event_times_buffer: 
@@ -264,6 +266,9 @@ class SyntheticGanglionData:
             logging.info("[Ganglion] Stopping EMG stream...")
             if self.recorder and self.recorder.recording:
                 self.recorder.stop_recording()
+                self.recorder = None
+            if self.feature_extractor: self.feature_extractor = None
+            #if self.classifier: self.classifier =  None
             
             if self.board_shim and self.board_shim.is_prepared():
                 try:

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import neurokit2 as nk
 import warnings
+import os
 from time import time
 from typing import Dict, List, Optional, Tuple
 from mne import create_info
@@ -23,18 +24,25 @@ class FeatureExtractor:
     Handles:
     - Data loading (requires 'event' column)
     - Signal preprocessing (filtering, DC offset removal, envelope extraction)
-    - Event-based peak detection (requires at least 2 events)
+    - Event-based peak detection (event occurs in the middle of a trial)    
     - Feature extraction (amplitude and frequency features using NeuroKit2)
     - Optional tangential acceleration calculation from accelerometer data
     """
     
-    def __init__(self, sample_rate):
+    def __init__(self, sample_rate, single_trial_analysis, output_path: Path):
         self.sampling_rate = sample_rate
+        self.output_path = output_path
+        self.single_trial_analysis = single_trial_analysis
+        
         self.height_percentile = config.get("height_percentile")
         self.min_distance = config.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
         self.lowpass_cutoff = min(config.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
         self.window_duration = config.get("marker_interval") # window of feature extraction (changed from 3 to 1 minutes)
-        self.window_samples = int(self.window_duration * self.sampling_rate)
+        self.window_samples = int(self.window_duration * self.sampling_rate) 
+
+        # if we are doing ONE dorsiflexion per analysis/extraction, CSV logic is slightly different (for space efficiency)
+        if self.single_trial_analysis:
+            self.output_file = self.output_path / f"all_peak_features.csv"    
     
     def load_data(self, df: pd.DataFrame) -> pd.DataFrame:
         # Validate required columns
@@ -262,7 +270,7 @@ class FeatureExtractor:
             
             f.write(f"{sujet};{amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
         
-        logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
+        #logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
     
     def _run_feature_extraction(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
@@ -286,10 +294,9 @@ class FeatureExtractor:
         event_column = df['event'].values
         
         num_events = np.sum(event_column == 1)
-        if num_events < 2:
-            logging.warning(f"[Extractor] At least 2 events required for peak detection. Found {num_events} events.")
+        if num_events < 1:
+            logging.warning(f"[Extractor] At least 1 event required for peak detection. Found {num_events} events.")
             return None
-        logging.info(f"[Extractor] Starting peak detection: {num_events} events detected")
         
         # Process each channel and collect all peak features
         all_peak_features = []
@@ -299,7 +306,7 @@ class FeatureExtractor:
                 logging.warning(f"[Extractor] Channel {channel} not found in data. Skipping.")
                 continue
             
-            logging.info(f"[Extractor] Processing {channel}...")
+            #logging.info(f"[Extractor] Processing {channel}...")
             emg_signal = df[channel].values
             
             # Process channel
@@ -308,31 +315,34 @@ class FeatureExtractor:
             all_peak_features.extend(peak_features)
             
             # Print summary
-            if peak_features:
-                logging.info(f"[Extractor] Detected {len(peak_features)} peaks in {channel}")
+            #if peak_features:
+                #logging.info(f"[Extractor] Detected {len(peak_features)} peaks in {channel}")
         
         # Create DataFrame from all peak features
         if not all_peak_features:
             logging.warning("[Extractor] No peaks detected in any channel")
             return None
-        
         features_df = pd.DataFrame(all_peak_features)
-
-        # Save to CSV and TXT
-        output_file = output_path / f"{curr_timestamp}peak_features.csv"
-        features_df.to_csv(output_file, index=False)
-        self._save_results_txt(output_path, all_peak_features)
         
-        logging.info(f"[Extractor] Total peaks: {len(features_df)}")
+        # Save to features.txt (triggers GPBO)
+        self._save_results_txt(self.output_path, all_peak_features)
+
+        # Save to CSV 
+        if self.single_trial_analysis: # append single row from dataframe to same CSV file each extraction
+            file_exists = os.path.isfile(self.output_file)
+            features_df.to_csv(self.output_file, mode='a', index=False, header=not file_exists)
+        else: # save features dataframe as a new CSV file each extraction 
+            output_file = self.output_path / f"{curr_timestamp}peak_features.csv"
+            features_df.to_csv(output_file, index=False)
         
         return features_df
 
-    def run(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
+    def run(self, analysis_df: pd.DataFrame, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
         start_time = time()
         
-        features_df = self._run_feature_extraction(analysis_df, output_path, curr_timestamp, channels)
-        message = f"[Extractor] Feature extractor completed. Duration: {time() - start_time:.2f} seconds."
+        features_df = self._run_feature_extraction(analysis_df, curr_timestamp, channels)
+        message = f"[Extractor] Feature extractor completed. Total peaks: {len(features_df)}. Duration: {time() - start_time:.2f} seconds."
 
         logging.info(message)
         

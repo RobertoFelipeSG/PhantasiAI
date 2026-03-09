@@ -21,6 +21,8 @@ class ClientSession:
         '''Initialize single client connection'''
         self.websocket = websocket
         self.ganglion = None
+        self.optimizer = None
+        self.stimulator = None
         self.watchdog_feat = None
         self.watchdog_stim = None
 
@@ -32,6 +34,8 @@ class ClientSession:
         if self.watchdog_stim:
             self.watchdog_stim.stop_watching()
             self.watchdog_stim = None
+        if self.optimizer:
+            self.optimizer = None
         if self.ganglion:
             self.ganglion.stop()
             self.ganglion = None

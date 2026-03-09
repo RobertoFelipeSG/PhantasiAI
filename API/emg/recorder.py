@@ -29,16 +29,16 @@ class RealTimeRecorder:
             folder_name = timestamp
         else:
             folder_name = f"{folder_name}_{timestamp}"
-        self.session_dir = os.path.join(str(self.base_path), "emg-recordings", folder_name)
+        self.session_dir = os.path.join(str(self.base_path), folder_name)
         os.makedirs(self.session_dir, exist_ok=True)
         
         # Create minute analyses and classification folders within session folder
-        self.analyses_dir = os.path.join(self.session_dir, "analyses")
-        os.makedirs(self.analyses_dir, exist_ok=True)
+        #self.analyses_dir = os.path.join(self.session_dir, "analyses")
+        #os.makedirs(self.analyses_dir, exist_ok=True)
         self.features_dir = os.path.join(self.session_dir, "features")
         os.makedirs(self.features_dir, exist_ok=True)
-        self.classification_dir = os.path.join(self.session_dir, "classifications")
-        os.makedirs(self.classification_dir, exist_ok=True)
+        #self.classification_dir = os.path.join(self.session_dir, "classifications")
+        #os.makedirs(self.classification_dir, exist_ok=True)
         
         self._sample_rate = sample_rate
         self._buffer_seconds = config.get("recorder_buffer_seconds")
@@ -50,7 +50,8 @@ class RealTimeRecorder:
         self.accel_channel_count = config.get("num_accel_ch") 
         
         self.marker_interval = config.get("marker_interval") # event every x seconds
-        self.next_event_time = self.marker_interval // 2 # first marker occurs at half of an interval 
+        self.next_event_time = self.marker_interval // 2 # first marker occurs at half of an interval
+        self.next_trial_time = self.marker_interval
         self.min_time = 0.0 # starting timestamp pointer for analysis DataFrame
         
         self.event_times_buffer = [] # buffer to store event times for frontend push
@@ -70,6 +71,16 @@ class RealTimeRecorder:
             #logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
         
         return event_flag
+
+    def _mark_trial(self, timestamp):
+        trial_flag = 0
+        if timestamp >= self.next_trial_time:
+            trial_flag = 1
+
+            # advance next trial time
+            self.next_trial_time += float(self.marker_interval)
+
+        return trial_flag
         
     def record_data_point(self, timestamp, emg_values, accel_values):
         '''
@@ -91,21 +102,22 @@ class RealTimeRecorder:
             else:
                 accel_values = [float(accel_values)]
             
-            # Get event flag
+            # Get event flag and trial flag
             event_flag = self._mark_event(timestamp)
+            trial_flag = self._mark_trial(timestamp)
             
             # safety filters
             emg_values = emg_values[:self.emg_channel_count]
             accel_values = accel_values[:self.accel_channel_count]
 
             # Numeric row for buffers
-            numeric_row = [timestamp] + emg_values + accel_values + [event_flag]
+            numeric_row = [timestamp] + emg_values + accel_values + [event_flag] + [trial_flag]
             self._buffer.append(numeric_row)
             
             # Format Row: Timestamp | Ch1 | Ch2 ... | AccelX | ... | EventFlag
             formatted_emg = [f"{v:.2f}" for v in emg_values]
             formatted_accel = [f"{v:.2f}" for v in accel_values]
-            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)]
+            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)] + [int(trial_flag)]
             
             self.csv_writer.writerow(row)
 
@@ -114,11 +126,11 @@ class RealTimeRecorder:
                 self.csv_file.flush()
             self._index += 1
 
-            return bool(event_flag)            
+            return bool(event_flag), bool(trial_flag)            
 
         except Exception as e:
             logging.warning(f"[Recorder] Failed to record data point: {e}")
-            return False
+            return False, False
 
     def create_analysis_file(self, max_time, trial): 
         """
@@ -129,7 +141,6 @@ class RealTimeRecorder:
         if not self.recording or not self._buffer: return None
 
         try:
-            logging.info("[Recorder] Creating analysis file...")
             start_time = time.time()
             
             df = pd.DataFrame(self._buffer, columns=self._buffer_header)
@@ -138,17 +149,19 @@ class RealTimeRecorder:
             # Calculate analysis window and get data
             analysis_data = df[(df['timestamp'] > self.min_time) & (df['timestamp'] < max_time)]
 
-            self.min_time = self._event_times[trial - 1] # Advance minimum timestamp pointer
+            last_min = self.min_time
+            self.min_time = max_time # Advance minimum timestamp pointer
 
             if analysis_data.empty:
                 return None
 
-            # Save df as csv
+            '''# Save df as csv
             filename = f"{max_time:.1f}.csv"
             output_path = os.path.join(self.analyses_dir, filename)
             analysis_data.to_csv(output_path, index=False)
+            '''
 
-            message = f"[Recorder] Analysis file created. Duration: {time.time() - start_time:.2f} seconds."
+            message = f"[Recorder] Analysis file created for {trial} trials, from {last_min} to {max_time}. Duration: {time.time() - start_time:.2f} seconds."
             logging.info(message)
         
             try:
@@ -177,7 +190,7 @@ class RealTimeRecorder:
 
             emg_headers = [f'ch{i+1} (µV)' for i in range(self.emg_channel_count)]
             accel_headers = [f'accel_{axis}' for axis in ['x', 'y', 'z']]
-            header = ['timestamp'] + emg_headers + accel_headers + ['event']
+            header = ['timestamp'] + emg_headers + accel_headers + ['event'] + ['trial']
             
             self._buffer_header = header
             self.csv_writer.writerow(header)
@@ -185,7 +198,14 @@ class RealTimeRecorder:
 
             self.recording = True
 
-            logging.info(f"[Recorder] Recording started: {self.filename}")
+            message = f"\n[Recorder] Recording started: {self.filename}"
+            logging.info(message)
+        
+            try:
+                with open(LOG_FILE, "a") as f:
+                    f.write(f"{message}\n")
+            except OSError as e:
+                logging.error(f"Could not write to timing file: {e}") 
         except Exception as e:
             logging.error(f"[Recorder] Failed to start recording: {e}")
             self.recording = False

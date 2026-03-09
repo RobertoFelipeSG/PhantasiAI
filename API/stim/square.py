@@ -1,7 +1,6 @@
 import numpy as np
 import os
 import sys
-import linecache
 import gpiod
 from time import sleep, time
 from pathlib import Path
@@ -10,32 +9,32 @@ from gpiod.line import Direction, Value
 
 LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
-class ParamGenerator:
-    def __init__(self, file_path, mqtt_client, client_topic):
-        self.file_path = file_path
+class Stimulator:
+    def __init__(self, mqtt_client, client_topic):
+        self.file_path = None
         self.mqtt_client = mqtt_client
         self.client_topic = client_topic
 
-    def _get_line(self, n: int):
-        ''' Helper function to get value from specific line '''
-        line = linecache.getline(self.file_path, n)
-        
-        if not line: # Line doesn't exist
-            return None 
-            
-        return float(line.strip())
-
-    def _run_stimulation(self):
+    def _run_stimulation(self, file_path):
         ''' Runs parameter generation for GPIO square stimulation '''
+        self.file_path = file_path
+        
         # Define GPIO pin (BCM numbering)
         GPIO_CHIP = "/dev/gpiochip4"
 
         # Open GPIO chip and request the line
         chip = gpiod.Chip(GPIO_CHIP)
         gpio_pin = 12
-        duration = 5
+        duration = 3
         
         # Define frequency (Hz) and duty cycle (0-1)
+        with open(self.file_path, 'r') as f:
+            lines = f.readlines()
+            dutycycle = float(lines[0].strip())
+            frequency = float(lines[1].strip())
+        
+        ''' 
+        OLD CODE (with best emg response features in stim.txt):
         max_amp = self._get_line(1)
         min_amp = self._get_line(2)
         denom = max_amp + min_amp
@@ -49,14 +48,15 @@ class ParamGenerator:
         frequency = (mean_freq + median_freq) / 2 # average of mean and median frequency
         if frequency <= 0: # fail-safe for negative frequency values
             frequency = 1
+        '''
         
-        logging.info(f"[Square] New stimulation values: frequency: {frequency}, dutycycle: {duty_cycle}")
+        logging.info(f"[Square] New stimulation values: frequency: {frequency}, dutycycle: {dutycycle}")
         
         total_cycles = int(duration*frequency)
         period = 1/frequency
-        on_time = period * (duty_cycle/100)
+        on_time = period * (dutycycle/100)
         off_time = period - on_time
-        print(f"[Square]: {chip}")
+        #print(f"[Square]: {chip}")
     
         line_request = gpiod.request_lines(
             GPIO_CHIP,
@@ -89,11 +89,11 @@ class ParamGenerator:
         # Release the GPIO line
         line_request.release()
 
-    def run(self):
-        logging.info("[Square] Starting stimulation process...")
+    def run(self, file_path):
+        #logging.info("[Square] Starting stimulation process...")
         start_time = time()
         
-        self._run_stimulation()
+        self._run_stimulation(file_path)
         
         message= f"[Square] Stimulation completed. Duration: {time() - start_time:.2f} seconds."
         logging.info(message)
