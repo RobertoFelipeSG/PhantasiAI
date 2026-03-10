@@ -64,16 +64,18 @@ class GPBOOptimizer:
         self.curr_iter = 0 # tracks how many iterations completed 
         self.curr_rep = 0 # tracks how many repetitions completed 
         self.opt_complete = False
-        self.history = {}
+        self.history = {} # stores data, gp, and converged params of final iteration for each rep
         
-        # state variables for current repetition
+        # state variables for current repetition, one iteration
         self.selected_params = None # last set of selected parameters 
         self.tested_params = torch.empty(0, 2)
         # initialize with default prior = default posterior mean and uncertainty maps 
         self.x_train = torch.empty(0, 2)
         self.y_train = torch.empty(0, 1) # single outcome
+        self.gp_history = {} # stores posterior mean and variance for each iteration in one rep
 
         # create optimization folder with maps + stim log folders
+        self.opt_log = [] # dict to store stimulation data 
         self._initialize_directory()
 
         # initialize the search grid (bc it's gonna be the same everytime)
@@ -86,23 +88,11 @@ class GPBOOptimizer:
     
     def _initialize_directory(self):  
         # directory to store visual heatmaps of posterior mean and standard deviations
-        self.maps_dir = os.path.join(self.opt_dir, f"maps_{self.n_optimizations}")
+        self.maps_dir = os.path.join(self.opt_dir, f"maps_{self.n_optimizations+1}")
         os.makedirs(self.maps_dir, exist_ok=True)
 
         # CSV to store stimulation params + outputs
-        self.stim_data = os.path.join(self.opt_dir, f"stimulations_{self.n_optimizations}.csv")
-        try:
-            self.csv_file = open(self.stim_data, 'w', newline='', encoding='utf-8')
-            self.csv_writer = csv.writer(self.csv_file)
-
-            inputs = [f'{param}' for param in self.parameter_names]
-            outputs = [f'RMS_{feat}' for feat in self.feature_names]
-            header = ['repetition'] + ['iteration'] + inputs + outputs
-            
-            self.csv_writer.writerow(header)
-            self.csv_file.flush()
-        except Exception as e:
-            logging.error(f"[GPBO] Could not initialize GPBO recording file: {e}")
+        self.stim_data = os.path.join(self.opt_dir, f"stimulations_{self.n_optimizations+1}.csv")
     
     def _initialize_input_grid(self):
         '''
@@ -157,18 +147,11 @@ class GPBOOptimizer:
 
         logging.info(f"[GPBO] Prior visualization saved.")
         
-    def _visualize_maps(self, repetition, tested_params, gp, converged_coord):
+    def _visualize_maps(self, repetition, tested_params, converged_coord, 
+                        estimated_map, uncertainty):
         '''
         Creates the Estimated Mean Map and Uncertainty plot for each iteration
         '''
-        # get prediction from GP
-        gp.eval()
-        gp.likelihood.eval()
-        with torch.no_grad():
-            posterior = gp.posterior(self.X_test_norm.unsqueeze(1))
-            estimated_map = posterior.mean.squeeze().cpu().numpy()
-            uncertainty = posterior.variance.squeeze().cpu().numpy()
-
         # reshape 1D arrays back to 2D (dutycycle x frequency) and transpose
         grid_shape = (len(self.dutycycles), len(self.frequencies))
         estimated_map_2d = estimated_map.reshape(grid_shape).T
@@ -209,7 +192,7 @@ class GPBOOptimizer:
         plt.savefig(output_path)
         plt.close()
 
-        logging.info(f"[GPBO] Repetition {repetition} visualization saved.")
+        #logging.info(f"[GPBO] Repetition {repetition} visualization saved.")
 
     def _visualize_all_maps(self):
         '''
@@ -219,21 +202,16 @@ class GPBOOptimizer:
         start_time = time.time()
         
         for rep_idx, rep_data in self.history.items():
-            x_train = rep_data['x_train']
-            y_train = rep_data['y_train']
-
-            x_train_norm = normalize(x_train, self.bounds_discrete)
-            y_train_std = standardize(y_train)
+            posteriors = rep_data['posteriors']
 
             # get final gp from current repetition
-            gp = SingleTaskGP(x_train_norm, y_train_std)
-            gp.load_state_dict(rep_data['state_dict'])
-            gp.eval()
-            gp.likelihood.eval()
+            final_iter = max(posteriors.keys())
+            final_mean = posteriors[final_iter]['mean']
+            final_var = posteriors[final_iter]['variance']
             
             # plot estimated mean and uncertainty map 
-            self._visualize_maps(rep_idx, rep_data['tested_params'], 
-                                 gp, rep_data['converged_coord']) 
+            self._visualize_maps(rep_idx, rep_data['tested_params'], rep_data['converged_coord'],
+                                 final_mean, final_var) 
 
         message = f"[GPBO] Visualizations complete. Duration: {time.time() - start_time:.2f} seconds."
         logging.info(message)
@@ -299,10 +277,8 @@ class GPBOOptimizer:
             logging.info("[GPBO]: Starting new optimization run.")
             
             # reset ALL state variables for an optimization run
-            self.n_optimizations += 1
             self._initialize_optimization()
         
-        start_opt_time = time.time()
         self.file_path = file_path
         
         # ITERATION CHECK: if this is not the first iteration of a rep, record input->output pair 
@@ -318,16 +294,21 @@ class GPBOOptimizer:
             self.tested_params = torch.cat([self.tested_params,
                                             torch.tensor([self.selected_params]).float()])
 
-            # add to CSV
-            inputs = self.selected_params.tolist()
-            outputs = last_response.tolist()
-            row = [f"{self.curr_rep}"] + [f"{self.curr_iter}"] + inputs + outputs
-            
-            if self.csv_writer and self.csv_file:
-                self.csv_writer.writerow(row)
-                self.csv_file.flush()
+            # add to data log
+            iter_data = {
+                'rep': self.curr_rep + 1, 
+                'iter': self.curr_iter,
+                'duration': self.curr_opt_time,
+            }
+            for i, p_name in enumerate(self.parameter_names):
+                iter_data[p_name] = float(self.selected_params[i])
+            for i, f_name in enumerate(self.feature_names):
+                iter_data[f"RMS_{f_name}"] = float(last_response[i])
+
+            self.opt_log.append(iter_data)
 
         # REPETITION CHECK: if n iterations done, repetition is complete
+        start_opt_time = time.time() # start timer for current optimization iteration
         if self.curr_iter >= self.n_iters:
             
             # fit model on final input->output pair
@@ -339,9 +320,18 @@ class GPBOOptimizer:
 
             gp.eval()
             gp.likelihood.eval()
+        
+            # save posterior mean and variance for current iteration
             with torch.no_grad():
-                mean_preds = gp.posterior(self.X_test_norm.unsqueeze(1)).mean.squeeze()
-                converged_idx = mean_preds.argmax().item()
+                posterior = gp.posterior(self.X_test_norm.unsqueeze(1))
+                posterior_mean = posterior.mean.squeeze()
+                
+                self.gp_history[self.curr_iter]  = {
+                    'mean': posterior_mean.cpu().numpy(),
+                    'variance': posterior.variance.squeeze().cpu().numpy()
+                }
+                
+                converged_idx = posterior_mean.argmax().item()
                 converged_coord = self.X_test[converged_idx]
 
             self.curr_rep += 1
@@ -353,7 +343,8 @@ class GPBOOptimizer:
                 'y_train': self.y_train.clone(),
                 'state_dict': gp.state_dict(),
                 'tested_params': self.tested_params.clone(),
-                'converged_coord': converged_coord
+                'converged_coord': converged_coord,
+                'posteriors': self.gp_history
             }
 
             # reset state repetition variables 
@@ -362,11 +353,18 @@ class GPBOOptimizer:
             self.x_train = torch.empty(0, 2)
             self.y_train = torch.empty(0, 1)
             self.tested_params = torch.empty(0, 2)
+            self.gp_history = {}
 
             # check if all repetitions complete
             if self.curr_rep >= self.n_reps:
                 self.opt_complete = True
+                self.n_optimizations += 1
+                
+                # create CSV with stimulation data and visualize all maps
+                df = pd.DataFrame(self.opt_log)
+                df.to_csv(self.stim_data, index=False)
                 self._visualize_all_maps()
+                
                 logging.info("[GPBO] All repetitions completed and maps generated!")
                 return
         
@@ -395,6 +393,14 @@ class GPBOOptimizer:
 
             gp.eval()
             gp.likelihood.eval()
+
+            # save posterior mean and variance for current iteration
+            with torch.no_grad():
+                posterior = gp.posterior(self.X_test_norm.unsqueeze(1))
+                self.gp_history[self.curr_iter]  = {
+                    'mean': posterior.mean.squeeze().cpu().numpy(),
+                    'variance': posterior.variance.squeeze().cpu().numpy()
+            }
 
             # define acquistion function
             if self.AF_name == "UCB":
@@ -426,6 +432,9 @@ class GPBOOptimizer:
         except IOError as e:
             logging.error(f"[GPBO] Failed to write to stim.txt: {e}")
 
+        # store time duration for current optimization process
+        self.curr_opt_time = time.time() - start_opt_time
+
     def run(self, file_path):
         #logging.info("[GPBO] Starting Bayesian optimization...")
         
@@ -439,13 +448,4 @@ class GPBOOptimizer:
                 f.write(f"{message}\n")
         except OSError as e:
             logging.error(f"Could not write to timing file: {e}")
-
-    def stop(self):
-        try:
-            if self.csv_file:
-                self.csv_file.close()
-                self.csv_file = None
-            self.csv_writer = None
-        except Exception as e:
-            logging.error(f"[GPBO] Failed to close GPBO csv file: {e}")
     

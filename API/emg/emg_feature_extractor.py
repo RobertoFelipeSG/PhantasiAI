@@ -187,19 +187,19 @@ class FeatureExtractor:
             end_idx = min(len(emg_signal), peak_idx + self.window_samples // 2)
             segment = emg_signal[start_idx:end_idx]
             
-            # Calculate frequency features for this peak
+            '''# Calculate frequency features for this peak
             if len(segment) > 0:
                 mean_freq, median_freq = self.calculate_frequency_features(segment)
             else:
-                mean_freq, median_freq = np.nan, np.nan
+                mean_freq, median_freq = np.nan, np.nan'''
             
             # Create feature dictionary for this peak
             peak_feature = {
                 'peak_id': i + 1,
                 'timestamp': float(peak_timestamp),
-                'max_amplitude': float(peak_amplitude),
-                'mean_frequency': float(mean_freq) if not np.isnan(mean_freq) else np.nan,
-                'median_frequency': float(median_freq) if not np.isnan(median_freq) else np.nan
+                'max_amplitude': float(peak_amplitude)
+                #'mean_frequency': float(mean_freq) if not np.isnan(mean_freq) else np.nan,
+                #'median_frequency': float(median_freq) if not np.isnan(median_freq) else np.nan
             }
             
             peak_features.append(peak_feature)
@@ -235,12 +235,13 @@ class FeatureExtractor:
         # Extract features for each peak
         peak_features = self.extract_features(filtered_signal, peak_indices, peak_amplitudes, timestamps)
         
-        # Add channel name and tangential acceleration to each peak feature
-        tangential_acc = self.calculate_tangential_acceleration(accel_x, accel_y, accel_z)
+        # Add tangential acceleration to each peak feature
+        #tangential_acc = self.calculate_tangential_acceleration(accel_x, accel_y, accel_z)
         
+        # Add channel name
         for peak_feature in peak_features:
             peak_feature['channel'] = channel_name
-            peak_feature['tangential_acceleration'] = float(tangential_acc)
+            #peak_feature['tangential_acceleration'] = float(tangential_acc)
         
         return peak_features
     
@@ -253,22 +254,22 @@ class FeatureExtractor:
 
         # Extract vectors from all results
         amplitude_vector = [peak_feature['max_amplitude'] for peak_feature in peak_features]
-        mean_frequency_vector = [peak_feature['mean_frequency'] for peak_feature in peak_features]
-        median_frequency_vector = [peak_feature['median_frequency'] for peak_feature in peak_features]
+        #mean_frequency_vector = [peak_feature['mean_frequency'] for peak_feature in peak_features]
+        #median_frequency_vector = [peak_feature['median_frequency'] for peak_feature in peak_features]
 
         # Write header
         with open(output_file, 'w') as f:
-            f.write("sujet;max_amplitude;mean_frequency;median_frequency\n")
+            f.write("sujet;max_amplitude\n") #;mean_frequency;median_frequency\n")
 
             # Write data as row vectors
             sujet = 0  # Always 0 as specified
             
             # Format vectors as strings with proper precision
             amplitude_str = ",".join([f"{val:.4f}" for val in amplitude_vector])
-            mean_frequency_str = ",".join([f"{val:.2f}" for val in mean_frequency_vector])
-            median_frequency_str = ",".join([f"{val:.2f}" for val in median_frequency_vector])
+            #mean_frequency_str = ",".join([f"{val:.2f}" for val in mean_frequency_vector])
+            #median_frequency_str = ",".join([f"{val:.2f}" for val in median_frequency_vector])
             
-            f.write(f"{sujet};{amplitude_str};{mean_frequency_str};{median_frequency_str}\n")
+            f.write(f"{sujet};{amplitude_str}\n") #;{mean_frequency_str};{median_frequency_str}\n")
         
         #logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
     
@@ -288,9 +289,9 @@ class FeatureExtractor:
         
         # Get info from DataFrame
         timestamps = df['timestamp'].values
-        accel_x = df['accel_x'].values 
+        '''accel_x = df['accel_x'].values 
         accel_y = df['accel_y'].values 
-        accel_z = df['accel_z'].values
+        accel_z = df['accel_z'].values'''
         event_column = df['event'].values
         
         num_events = np.sum(event_column == 1)
@@ -310,7 +311,7 @@ class FeatureExtractor:
             emg_signal = df[channel].values
             
             # Process channel
-            peak_features = self.process_channel(emg_signal, timestamps, event_column, channel, accel_x, accel_y, accel_z)
+            peak_features = self.process_channel(emg_signal, timestamps, event_column, channel) #, accel_x, accel_y, accel_z)
             
             all_peak_features.extend(peak_features)
             

@@ -159,7 +159,6 @@ async def handle_stop_stream(session):
     '''
     
     if session.optimizer:
-        session.optimizer.stop()
         session.optimizer = None
 
     if session.stimulator:
