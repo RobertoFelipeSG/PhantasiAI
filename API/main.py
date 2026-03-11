@@ -131,21 +131,15 @@ async def handle_start_stream(session, data):
     
     client_id = id(session)
     
-    # Initialize GPBO Optimizer (one per session)
+    # Initialize Stimulator and GPBO Optimizer
     recordings_directory = str(session.ganglion.recorder.session_dir)
-    session.optimizer = GPBOOptimizer(mqtt_client, recordings_directory, client_topic=f"emg/client/{client_id}")
-
-    # Initialize Stimulator
     session.stimulator = Stimulator(mqtt_client, client_topic=f"emg/client/{client_id}")
+    session.optimizer = GPBOOptimizer(session.stimulator, mqtt_client, recordings_directory, client_topic=f"emg/client/{client_id}")
     
-    # Initialize WatchDog instances (using global MQTT client)
-    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='features', optimizer=session.optimizer)
+    # Initialize WatchDog instance (using global MQTT client)
+    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", optimizer=session.optimizer)
     feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
     session.watchdog_feat.start_watching(feat_directory_to_watch)
-
-    session.watchdog_stim = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", change_type='stimulation', stimulator=session.stimulator)
-    stim_directory_to_watch = str(Path(__file__).parent / "stim")
-    session.watchdog_stim.start_watching(stim_directory_to_watch)
     
     # Start EMG data thread
     session.ganglion.start(current_loop)
@@ -167,10 +161,6 @@ async def handle_stop_stream(session):
     if session.watchdog_feat:
         session.watchdog_feat.stop_watching()
         session.watchdog_feat = None
-
-    if session.watchdog_stim:
-        session.watchdog_stim.stop_watching()
-        session.watchdog_stim = None
 
     if session.ganglion:
         session.ganglion.stop()

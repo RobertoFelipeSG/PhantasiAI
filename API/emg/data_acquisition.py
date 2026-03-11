@@ -145,7 +145,7 @@ class GanglionData:
                 logging.info(f"[Ganglion] Recorded {self._total_events} events")
             if end_trial:
                 self._total_trials += 1
-                logging.info(f"[Ganglion] Trial {self._total_trials} complete. Starting new trial...")
+                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
             
             # Perform analysis on selected trials
             if self._total_trials == self.next_trial_block:

@@ -29,8 +29,9 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, mqtt_client, recordings_directory, client_topic):
+    def __init__(self, stimulator, mqtt_client, recordings_directory, client_topic):
         self.file_path = None
+        self.stimulator = stimulator
         self.mqtt_client = mqtt_client
         self.recordings_directory = recordings_directory
         self.topic = client_topic
@@ -68,6 +69,7 @@ class GPBOOptimizer:
         
         # state variables for current repetition, one iteration
         self.selected_params = None # last set of selected parameters 
+        self.stim_success = False
         self.tested_params = torch.empty(0, 2)
         # initialize with default prior = default posterior mean and uncertainty maps 
         self.x_train = torch.empty(0, 2)
@@ -273,19 +275,22 @@ class GPBOOptimizer:
         return torch.tensor([resp], dtype=torch.float32)
 
     def _run_optimization(self, file_path):
+        start_opt_time = time.time() # start timer for current optimization iteration
+        self.file_path = file_path
+        
+        # OPTIMIZATION CHECK: if all repetitions+iterations complete, start new optimization process
         if self.opt_complete:
             logging.info("[GPBO]: Starting new optimization run.")
             
             # reset ALL state variables for an optimization run
             self._initialize_optimization()
         
-        self.file_path = file_path
-        
-        # ITERATION CHECK: if this is not the first iteration of a rep, record input->output pair 
-        if self.selected_params is not None:
+        # ITERATION CHECK: if this is not the first iteration and stimulation ran successfully, record input->output pair 
+        if (self.selected_params is not None) and self.stim_success:
             last_response = self._get_response() # get EMG response (output)
             
             self.curr_iter += 1 # increment iteration
+            self.stim_success = False # reset success state
             logging.info(f"[GPBO] Rep:{self.curr_rep + 1}, Iter:{self.curr_iter} | Response for {self.selected_params}: {last_response.item():.2f}")
 
             # add to dataset
@@ -308,7 +313,6 @@ class GPBOOptimizer:
             self.opt_log.append(iter_data)
 
         # REPETITION CHECK: if n iterations done, repetition is complete
-        start_opt_time = time.time() # start timer for current optimization iteration
         if self.curr_iter >= self.n_iters:
             
             # fit model on final input->output pair
@@ -347,6 +351,11 @@ class GPBOOptimizer:
                 'posteriors': self.gp_history
             }
 
+            # add to CSV with stimulation data
+            df = pd.DataFrame(self.opt_log)
+            file_exists = os.path.isfile(self.stim_data)
+            df.to_csv(self.stim_data, mode='a', index=False, header=not file_exists)
+
             # reset state repetition variables 
             self.selected_params = None
             self.curr_iter = 0
@@ -360,9 +369,7 @@ class GPBOOptimizer:
                 self.opt_complete = True
                 self.n_optimizations += 1
                 
-                # create CSV with stimulation data and visualize all maps
-                df = pd.DataFrame(self.opt_log)
-                df.to_csv(self.stim_data, index=False)
+                # visualize all maps
                 self._visualize_all_maps()
                 
                 logging.info("[GPBO] All repetitions completed and maps generated!")
@@ -425,15 +432,26 @@ class GPBOOptimizer:
         }
         logging.info(f"[GPBO] Next parameters to test: {best_params}")
 
-        try:
-            with open(self.output_file, 'w') as f:
-                for param, value in best_params.items():
-                    f.write(str(value)+'\n')
-        except IOError as e:
-            logging.error(f"[GPBO] Failed to write to stim.txt: {e}")
-
         # store time duration for current optimization process
         self.curr_opt_time = time.time() - start_opt_time
+        message = f"[GPBO] Optimization iteration completed. Duration: {self.curr_opt_time:.2f} seconds."
+        logging.info(message)
+        try:
+            with open(LOG_FILE, "a") as f:
+                f.write(f"{message}\n")
+        except OSError as e:
+            logging.error(f"Could not write to timing file: {e}")
+
+        try:
+            self.stimulator.run(best_params)
+            self.stim_success = True
+            logging.info(f"[GPBO] Stimulation successful!")
+        except (OSError, FileNotFoundError) as e:
+            logging.error(f"[GPBO] Hardware Error: Cannot access GPIO chip. {e}")
+        except KeyError as e:
+            logging.error(f"[GPBO] Parameter Error: Missing key in best_params: {e}")
+        except Exception as e:
+            logging.error(f"[GPBO] Unexpected error during stimulation: {type(e).__name__}: {e}")
 
     def run(self, file_path):
         #logging.info("[GPBO] Starting Bayesian optimization...")
@@ -441,7 +459,7 @@ class GPBOOptimizer:
         start_time = time.time()
         self._run_optimization(file_path)
         
-        message = f"[GPBO] Overall optimization completed. Duration: {time.time() - start_time:.2f} seconds."
+        message = f"[GPBO] Overall optimization + stimulation completed. Duration: {time.time() - start_time:.2f} seconds."
         logging.info(message)
         try:
             with open(LOG_FILE, "a") as f:

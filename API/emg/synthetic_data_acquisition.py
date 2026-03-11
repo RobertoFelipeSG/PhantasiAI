@@ -141,6 +141,7 @@ class SyntheticGanglionData:
             
             # Perform analysis on selected trials
             if self._total_trials == self.next_trial_block:
+                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
                 self._handle_analysis(curr_timestamp)
                 
         # Broadcast event markers

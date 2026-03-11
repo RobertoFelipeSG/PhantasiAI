@@ -24,16 +24,12 @@ class ClientSession:
         self.optimizer = None
         self.stimulator = None
         self.watchdog_feat = None
-        self.watchdog_stim = None
 
     async def cleanup(self):
         '''Clean up resources when client disconnects'''
         if self.watchdog_feat:
             self.watchdog_feat.stop_watching()
             self.watchdog_feat = None
-        if self.watchdog_stim:
-            self.watchdog_stim.stop_watching()
-            self.watchdog_stim = None
         if self.optimizer:
             self.optimizer = None
         if self.ganglion:
