@@ -21,7 +21,7 @@ CONFIG = load_config() # load config settings
 ganglion_instance = None
 
 class SyntheticGanglionData:
-    def __init__(self, websocket, serial_port="serial_port_A", sample_rate=250, num_trials=10, folder_name=None):
+    def __init__(self, websocket, serial_port="serial_port_A", sample_rate=250, num_trials=1, folder_name=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
@@ -37,6 +37,7 @@ class SyntheticGanglionData:
         self._stop_event = threading.Event() # create threading flag for EMG stream
         self._emg_thread = None
         self._session_start_time = None
+        self.connection_status = "pending"
         
         self._num_trials = int(num_trials) # trials per session (inputted by user)
         self.next_trial_block = int(num_trials)
@@ -215,6 +216,7 @@ class SyntheticGanglionData:
         self.board_shim.prepare_session()
         self.board_shim.config_board("n") # Turn on accelerometer
         self.board_shim.start_stream()
+        self.connection_status = "connected"
         logging.info("[Ganglion] Streaming EMG and Accel data...")
 
         self.emg_channels = BoardShim.get_exg_channels(self.board_id)
@@ -262,6 +264,7 @@ class SyntheticGanglionData:
 
         except Exception as e:
             logging.error(f"[Ganglion] Error in EMG thread: {e}", exc_info=True)
+            self.connection_status = "failed"
         
         finally:
             logging.info("[Ganglion] Stopping EMG stream...")
@@ -283,7 +286,8 @@ class SyntheticGanglionData:
         if getattr(self, "_emg_thread", None) is not None and self._emg_thread.is_alive():
             logging.warning("[Ganglion] Attempted to start EMG thread but one is already running.")
             return
-        
+
+        self.connection_status = "pending"
         self._stop_event.clear()
         self._emg_thread = threading.Thread(target=self._stream_emg_thread, args=(loop,))
         self._emg_thread.start()

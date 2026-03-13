@@ -29,20 +29,22 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, mqtt_client, recordings_directory, client_topic):
+    def __init__(self, stimulator, n_iters, n_reps, recordings_directory, mqtt_client, client_topic, on_complete=None):
         self.file_path = None
         self.stimulator = stimulator
         self.mqtt_client = mqtt_client
         self.recordings_directory = recordings_directory
         self.topic = client_topic
+        self.on_complete = on_complete
+        
         self.base_path = Path(__file__).parent
         self.output_file = self.base_path / "stim.txt"
         self.gp_prior_path = self.base_path / "gp_prior.pt"
         self.n_optimizations = 0 # tracks how many optimization runs have been completed
         
         # set configuration parameters
-        self.n_iters = CONFIG.get("iterations")
-        self.n_reps = CONFIG.get("repetitions")
+        self.n_iters = n_iters
+        self.n_reps = n_reps
         self.num_rand = CONFIG.get("num_rand")
         self.kappa = CONFIG.get("kappa")
         self.AF_name = CONFIG.get("AF_name")
@@ -280,10 +282,15 @@ class GPBOOptimizer:
         
         # OPTIMIZATION CHECK: if all repetitions+iterations complete, start new optimization process
         if self.opt_complete:
-            logging.info("[GPBO]: Starting new optimization run.")
             
-            # reset ALL state variables for an optimization run
-            self._initialize_optimization()
+            if self.on_complete:
+                logging.info("[GPBO] Triggering auto-stop from main.py...")
+                self.on_complete()
+                return
+            
+            else:
+                logging.info("[GPBO] Starting new optimization run...")
+                self._initialize_optimization() # reset ALL state variables for an optimization run
         
         # ITERATION CHECK: if this is not the first iteration and stimulation ran successfully, record input->output pair 
         if (self.selected_params is not None) and self.stim_success:
@@ -351,11 +358,6 @@ class GPBOOptimizer:
                 'posteriors': self.gp_history
             }
 
-            # add to CSV with stimulation data
-            df = pd.DataFrame(self.opt_log)
-            file_exists = os.path.isfile(self.stim_data)
-            df.to_csv(self.stim_data, mode='a', index=False, header=not file_exists)
-
             # reset state repetition variables 
             self.selected_params = None
             self.curr_iter = 0
@@ -368,6 +370,10 @@ class GPBOOptimizer:
             if self.curr_rep >= self.n_reps:
                 self.opt_complete = True
                 self.n_optimizations += 1
+
+                # add to CSV with stimulation data
+                df = pd.DataFrame(self.opt_log)
+                df.to_csv(self.stim_data, index=False)
                 
                 # visualize all maps
                 self._visualize_all_maps()

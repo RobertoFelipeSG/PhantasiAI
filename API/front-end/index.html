@@ -361,14 +361,24 @@
                 </div>
                 <div>
                     Trials per Analysis:
-                    <input type="number" id="trialInput" min="1" max="20" step="1" value="10" style="width: 50px;">
+                    <input type="number" id="trialInput" min="1" max="20" step="1" value="1" style="width: 35px;"
+                        onfocus="if(this.value==='1') this.value='';" 
+                        onblur="if(this.value==='') this.value='1';" >
                 </div>
                 <div>
-                    Total Trials:
-                    <input type="number" id="totalTrials" min="30" max="180" step="6" value="90" style="width: 50px;">
+                    Iterations:
+                    <input type="number" id="iters" min="1" max="50" step="1" value="40" style="width: 35px;"
+                        onfocus="if(this.value==='40') this.value='';" 
+                        onblur="if(this.value==='') this.value='40';">
                 </div>
                 <div>
-                    Data Folder [Optional]:
+                    Repetitions:
+                    <input type="number" id="reps" min="1" max="20" step="1" value="10" style="width: 35px;"
+                        onfocus="if(this.value==='10') this.value='';" 
+                        onblur="if(this.value==='') this.value='10';">
+                </div>
+                <div>
+                    Data Folder:
                     <input type="text" id="folderName" value="Auto" style="width: 100px;" 
                         onfocus="if(this.value==='Auto') this.value='';" 
                         onblur="if(this.value==='') this.value='Auto';" >
@@ -449,8 +459,10 @@
         let pendingAccelData = []; // Accel Data Buffer
         let nextEventTargetTime = null;
         let currTrials = 0;
-        const defaultTotalTrials = 90;
-        const defaultNumTrials = 10;
+        const defaultTotalTrials = 401;
+        const defaultNumTrials = 1;
+        const defaultNumIters = 40;
+        const defaultNumReps = 10;
 
         let isStreaming = false;
         let isStopping = false;
@@ -494,9 +506,9 @@
         
                 // DATA COMMUNICATION 
                 ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
                     
                     // Update graph buffers with most recent EMG + Accel data
-                    const data = JSON.parse(event.data);
                     if (data.type === 'emg_data') {
                         data.value.forEach((val, i) => {
                             pendingEmgData.push({ x: data.timestamp[i], y: val });
@@ -530,16 +542,24 @@
 
                     // Handle command responses (success/error feedback)
                     else if (data.status) {
-                        console.log("Server Response:", data);
-                
                         if (data.status === 'error') {
-                            alert("Server Error: " + data.message);
-                            // Force the UI back to idle if start failed
-                            setStreamingState(false, 'Error', 'red');
-                            renderLoopRunning = false;
+                            console.error("Server Error:", data.message);
+                            
+                            if (data.message === "Failed to start EMG stream") {
+                                // Force the UI back to idle if start failed
+                                handleReset();
+                                setStreamingState(false, 'Error', 'red');
+                                renderLoopRunning = false;
+                            }
                         } 
+                        
                         else if (data.status === 'success') {
                             console.log("Command executed successfully:", data.message);
+                            
+                            if (data.message === "EMG streaming stopped") {
+                                // Reset UI once backend has successfully stopped the stream
+                                stopAction();
+                            }
                         }
                     }
                 }
@@ -642,8 +662,11 @@
 
         // ----- TRIAL COUNTER ----- //
         async function updateTrialCountdown(timeRemaining) {
-            const totalTrialsInput = document.getElementById('totalTrials');
-            const totalTrials = totalTrialsInput ? parseFloat(totalTrialsInput.value) : defaultTotalTrials;
+            const itersInput = document.getElementById('iters');
+            const repsInput = document.getElementById('reps');
+            const itersValue = parseInt(itersInput.value) || defaultNumIters;
+            const repsValue = parseInt(repsInput.value) || defaultNumReps;
+            const totalTrials = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
             const display = document.getElementById('trialCounterDisplay');
 
             if (!display) return;
@@ -658,16 +681,6 @@
 
             lastPhase = currentPhase;
             let trialsRemaining = (totalTrials - currTrials);
-
-            // Check for auto-stop if total trials complete
-            if (trialsRemaining <= -3 && isStreaming && !isStopping) {
-                console.log("All trials complete. Auto-stopping...");
-                isStopping = true;
-                await stopStream(); 
-                display.innerText = `Trials Remaining: 0`;
-                isStopping = false;
-                return;
-            }
             
             // Update trial display
             const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
@@ -1009,7 +1022,8 @@
             isStreaming = active;
             const button = document.getElementById('streamBtn');
             const input = document.getElementById('trialInput');
-            const trials = document.getElementById('totalTrials');
+            const iters = document.getElementById('iters');
+            const reps = document.getElementById('reps');
             const boardId = document.getElementById('boardID');
             const serialPort = document.getElementById('serialPort');
             const folderName = document.getElementById('folderName');
@@ -1022,7 +1036,8 @@
             
             // Lock input while active
             if (input) input.disabled = active;
-            if (trials) trials.disabled = active;
+            if (iters) iters.disabled = active;
+            if (reps) reps.disabled = active;
             if (boardId) boardId.disabled = active;
             if (serialPort) serialPort.disabled = active;
             if (folderName) folderName.disabled = active;
@@ -1062,9 +1077,21 @@
             }
             
             const trialInput = document.getElementById('trialInput').value;
-            const numTrials = parseFloat(trialInput);
+            let numTrials = parseFloat(trialInput);
             if (isNaN(numTrials) || numTrials < 1 || numTrials > 20) {
                 numTrials = defaultNumTrials;
+            }
+
+            const itersInput = document.getElementById('iters').value;
+            let numIters = parseFloat(itersInput);
+            if (isNaN(numIters) || numIters < 1 || numIters > 50) {
+                numIters = defaultNumIters;
+            }
+
+            const repsInput = document.getElementById('reps').value;
+            let numReps = parseFloat(repsInput);
+            if (isNaN(numReps) || numReps < 1 || numReps > 20) {
+                numReps = defaultNumReps;
             }
 
             const folderName = document.getElementById('folderName').value;
@@ -1073,9 +1100,10 @@
             // Lock controls before async loop starts and start main countdown
             document.getElementById('streamBtn').disabled = true;
             document.getElementById('trialInput').disabled = true;
+            document.getElementById('iters').disabled = true;
+            document.getElementById('reps').disabled = true;
             document.getElementById('boardID').disabled = true;
             document.getElementById('serialPort').disabled = true;
-            document.getElementById('totalTrials').disabled = true;
             document.getElementById('folderName').disabled = true;
         
             const status = document.getElementById('streamingStatus');
@@ -1091,7 +1119,7 @@
             status.innerText = "Initializing...";
             
             // Send number of trials per session and start stream + recording
-            await startStream(numTrials, useSyntheticData, portToUse, folderToUse);
+            await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse);
         }
         
         function handleReset() {
@@ -1108,9 +1136,10 @@
             document.getElementById('pauseGraphBtn').innerText = 'Pause Graphs';
             document.getElementById('streamBtn').disabled = false; // Enable stream + recording
             document.getElementById('trialInput').disabled = false;
+            document.getElementById('iters').disabled = false;
+            document.getElementById('reps').disabled = false;
             document.getElementById('boardID').disabled = false;
             document.getElementById('serialPort').disabled = false;
-            document.getElementById('totalTrials').disabled = false;
             
             // Clear the synchronized marker countdown display
             const display = document.getElementById('markerCountdownDisplay');
@@ -1150,7 +1179,7 @@
             });
         }
         
-        async function startStream(numTrials, useSyntheticData, portToUse, folderToUse)  {
+        async function startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse)  {
             // If websocket closed/not auto created, attempt connection
             if (!ws || ws.readyState === WebSocket.CLOSED) {
                 connectWebSocket();
@@ -1176,6 +1205,8 @@
                 action: "start_stream",
                 serial_port: portToUse,
                 num_trials: numTrials,
+                num_iters: numIters,
+                num_reps: numReps,
                 synthetic: useSyntheticData,
                 folder_name: folderToUse
             };
@@ -1191,8 +1222,15 @@
             } catch (error) { 
                 console.error(error);
                 setStreamingState(false, 'Error Starting', 'red');
-                alert("Error sending start command: " + error.message);
+                //alert("Error sending start command: " + error.message);
             }
+        }
+        
+        function stopAction() {
+            // Reset UI
+            handleReset();
+            setStreamingState(false, 'Idle', '#333');
+            renderLoopRunning = false;
         }
         
         async function stopStream() {
@@ -1205,16 +1243,12 @@
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ action: "stop_stream" }));
                 }
-
-                // Reset UI
-                handleReset();
-                setStreamingState(false, 'Idle', '#333');
-                renderLoopRunning = false;
             
             } catch (e) {
                 console.error(e);
-                alert("Error stopping");
+                //alert("Error stopping");
                 setStreamingState(true, 'Error Stopping', 'red'); // Revert if failed
+                document.getElementById('streamBtn').disabled = false;
             }
         }
         

@@ -2,6 +2,7 @@ import os
 import asyncio
 import uvicorn
 import json
+import time
 import paho.mqtt.client as mqtt
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -102,10 +103,12 @@ async def handle_start_stream(session, data):
         await session.websocket.send_json({"status": "error", "message": "Stream already running"})
         return
     
-    serial_port = data.get("serial_port", CONFIG.get('default_serial_port'))
-    num_trials = data.get("num_trials", CONFIG.get('num_trials'))
-    is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
     folder_name = data.get("folder_name", None)
+    serial_port = data.get("serial_port", CONFIG.get('default_serial_port'))
+    is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
+    num_trials = data.get("num_trials", CONFIG.get('num_trials'))
+    n_iters = data.get("num_iters", CONFIG.get('iterations'))
+    n_reps = data.get("num_reps", CONFIG.get('repetitions'))
     
     # Retrieve reference of current event loop running API server
     try:
@@ -129,23 +132,40 @@ async def handle_start_stream(session, data):
             num_trials=num_trials,
             folder_name=folder_name)
     
-    client_id = id(session)
+    client_id = id(session) # current session client ID for mqtt handling
+    recordings_directory = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
     
     # Initialize Stimulator and GPBO Optimizer
-    recordings_directory = str(session.ganglion.recorder.session_dir)
-    session.stimulator = Stimulator(mqtt_client, client_topic=f"emg/client/{client_id}")
-    session.optimizer = GPBOOptimizer(session.stimulator, mqtt_client, recordings_directory, client_topic=f"emg/client/{client_id}")
+    def trigger_auto_stop(): # callback function to trigger auto-stop from GPBO
+        logging.info(f"[Main] Auto-stopping...")
+        asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
     
-    # Initialize WatchDog instance (using global MQTT client)
+    session.stimulator = Stimulator(mqtt_client, client_topic=f"emg/client/{client_id}")
+    session.optimizer = GPBOOptimizer(session.stimulator, n_iters, n_reps, recordings_directory,
+                                      mqtt_client, client_topic=f"emg/client/{client_id}",
+                                      on_complete=trigger_auto_stop)
+    
+    # Initialize WatchDog instance
     session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", optimizer=session.optimizer)
     feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
     session.watchdog_feat.start_watching(feat_directory_to_watch)
     
     # Start EMG data thread
     session.ganglion.start(current_loop)
-    
-    logging.info(f"[Main] Started stream for client {client_id}")
-    await session.websocket.send_json({"status": "success", "message": "EMG streaming started"})
+
+    start_time = time.time()
+    while time.time() - start_time < 15:
+        if session.ganglion.connection_status == "connected":
+            await session.websocket.send_json({"status": "success", "message": "EMG streaming started"})
+            return
+        
+        if session.ganglion.connection_status == "failed":
+            break
+
+        await asyncio.sleep(0.1)
+
+    # if no successful connection within 15 seconds, assume failure
+    await session.websocket.send_json({"status": "error", "message": "Failed to start EMG stream"})
 
 async def handle_stop_stream(session):
     '''
