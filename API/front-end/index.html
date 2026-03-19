@@ -457,8 +457,11 @@
         let annotations = [];
         let pendingEmgData = []; // EMG Data Buffer
         let pendingAccelData = []; // Accel Data Buffer
+        let latestTimestamp = null;
         let nextEventTargetTime = null;
         let currTrials = 0;
+        let trialsRemaining = null;
+        let stimSuccess = true; // stores whether stimulation from current trial was successful
         const defaultTotalTrials = 401;
         const defaultNumTrials = 1;
         const defaultNumIters = 40;
@@ -510,24 +513,43 @@
                     
                     // Update graph buffers with most recent EMG + Accel data
                     if (data.type === 'emg_data') {
+                        if (data.timestamp && data.timestamp.length > 0) {
+                            latestTimestamp = data.timestamp[data.timestamp.length - 1];
+                        }
+                        
                         data.value.forEach((val, i) => {
                             pendingEmgData.push({ x: data.timestamp[i], y: val });
                         });
-                    } 
-                    else if (data.type === 'accel_data') {
+
+                        if (pendingEmgData.length > MAX_DATA_POINTS * 2) {
+                            pendingEmgData = pendingEmgData.slice(-MAX_DATA_POINTS);
+                        }
+                    }
+
+                    /*else if (data.type === 'accel_data') {
                         data.value[0].forEach((_, i) => {
                             pendingAccelData.push({ x: data.timestamp[i],
                                                     y_x: data.value[0][i],
                                                     y_y: data.value[1][i],
                                                     y_z: data.value[2][i] });
                         });
-                    }
+                    }*/
                     
                     // Add most recent event markers (vertical lines)
                     else if (data.type === 'event_times') {
                         data.timestamps.forEach(event_time => {
                         updateEventDisplay(event_time);
                         });
+                    }
+                    
+                    // update trial countdown display
+                    else if (data.type === 'stim_failed') {
+                        stimSuccess = false;
+                    }
+                    
+                    else if (data.type === 'trial_completion') {
+                        if (stimSuccess) { updateTrialCountdown(); }
+                        stimSuccess = true; // reset for next trial
                     }
                     
                     // Update marker display and exercise instructions
@@ -629,6 +651,41 @@
             // Auto-scroll to the bottom
             terminal.scrollTop = terminal.scrollHeight;
         }
+
+        // ----- TRIAL COUNTER ----- //
+        function initializeTrialCountdown() {
+            const itersInput = document.getElementById('iters');
+            const repsInput = document.getElementById('reps');
+            const itersValue = parseInt(itersInput.value) || defaultNumIters;
+            const repsValue = parseInt(repsInput.value) || defaultNumReps;
+            const totalTrials = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
+            const display = document.getElementById('trialCounterDisplay');
+
+            if (!display) return;
+
+            trialsRemaining = totalTrials;
+
+            // Update trial display
+            const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
+            if (display.innerText !== newText) {
+                display.innerText = newText;
+            }
+        }
+        
+        function updateTrialCountdown() {
+            const display = document.getElementById('trialCounterDisplay');
+            if (!display) return;
+            
+            // increment trials/decrement countdown if trial complete AND stimulation was successful 
+            currTrials += 1;
+            trialsRemaining -= 1;
+            
+            // Update trial display
+            const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
+            if (display.innerText !== newText) {
+                display.innerText = newText;
+            }
+        }
         
         // ----- REAL-TIME VISUALS ----- //
         function updateTimerVisuals(currentTime) {
@@ -637,7 +694,6 @@
             let timeRemaining = Math.max(0, nextEventTargetTime - currentTime);
             
             updateMarkerCountdown(timeRemaining);
-            updateTrialCountdown(timeRemaining);
             updateMovementGuide(timeRemaining);
         }
           
@@ -659,37 +715,7 @@
                 display.innerText = targetText;
             }
         }
-
-        // ----- TRIAL COUNTER ----- //
-        async function updateTrialCountdown(timeRemaining) {
-            const itersInput = document.getElementById('iters');
-            const repsInput = document.getElementById('reps');
-            const itersValue = parseInt(itersInput.value) || defaultNumIters;
-            const repsValue = parseInt(repsInput.value) || defaultNumReps;
-            const totalTrials = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
-            const display = document.getElementById('trialCounterDisplay');
-
-            if (!display) return;
-
-            let currentPhase = (timeRemaining <= PHASE_CHANGE) ? "REST" : "GO";
-            
-            // Increment trials after switching from GO to REST
-            if (lastPhase === "GO" && currentPhase === "REST") {
-                currTrials += 1;
-                console.log("Trial Complete! Total:", currTrials);
-            }
-
-            lastPhase = currentPhase;
-            let trialsRemaining = (totalTrials - currTrials);
-            
-            // Update trial display
-            const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
-            if (display.innerText !== newText) {
-                display.innerText = newText;
-            }
-        }
-
-                
+          
         // ----- EXERCISE INSTRUCTIONS ----- //
         // Basic go-rest display
         function updateMovementGuide(timeRemaining) {
@@ -773,9 +799,9 @@
                         type: 'linear',
                         min: undefined,
                         max: undefined,
-                        title: { display: true, text: 'Time (s)' },
+                        title: { display: true, text: 'Time (s)', color: '#333' },
                         id: 'x', // reference for annotations 
-                        ticks: { display: true, color: 'black', maxRotation: 0, minRotation: 0, autoSkip: true, maxTicksLimit: 10,
+                        ticks: { display: true, color: '#333', maxRotation: 0, minRotation: 0, autoSkip: true, maxTicksLimit: 10,
                                 callback: function(value) {
                                     const numericValue = parseFloat(this.getLabelForValue(value));
                                     return Number.isFinite(numericValue) ? numericValue.toFixed(1) : this.getLabelForValue(value); }
@@ -838,18 +864,13 @@
             
             if (!isGraphPaused) {
                 batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
-                batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
-
-                if (emgGraph && emgGraph.data && Array.isArray(emgGraph.data.datasets) &&
-                    emgGraph.data.datasets.length > 0 && emgGraph.data.datasets[0].data.length > 0
-                ) {
-                    const lastEmgPoint = emgGraph.data.datasets[0].data[emgGraph.data.datasets[0].data.length - 1];
-                    
-                    if (lastEmgPoint && lastEmgPoint.x !== undefined) {
-                        updateTimerVisuals(lastEmgPoint.x);
-                    }
-                }
+                //batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
             }
+
+            if (latestTimestamp > 0) {
+                updateTimerVisuals(latestTimestamp)
+            }
+
             requestAnimationFrame(renderLoop); // Continue looping
         }
         
@@ -890,8 +911,13 @@
             }
         
             // 5: Marker interval filtering
-            chart.options.plugins.annotation.annotations = annotations.filter(a => 
+            /*chart.options.plugins.annotation.annotations = annotations.filter(a => 
                 a.value >= chart.options.scales.x.min && 
+                a.value <= chart.options.scales.x.max
+            );*/
+            annotations = annotations.filter(a => a.value >= chart.options.scales.x.min);
+
+            chart.options.plugins.annotation.annotations = annotations.filter(a => 
                 a.value <= chart.options.scales.x.max
             );
         
@@ -1129,6 +1155,7 @@
             lastInstructionPhase = "";
             nextEventTargetTime = null;
             currTrials = 0;
+            trialsRemaining = null;
             lastPhase = "";
             isGraphPaused = false;
             resetEMGZoom();
@@ -1215,6 +1242,7 @@
                 // Reset global states and visual elements
                 handleReset();
                 startRenderLoop();
+                initializeTrialCountdown();
 
                 ws.send(JSON.stringify(payload)); // Send start command to server
                 setStreamingState(true, `Active`, 'green'); // update UI

@@ -7,10 +7,9 @@ from pathlib import Path
 from config.connection_manager import logging
 from gpiod.line import Direction, Value
 
-LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
-
 class Stimulator:
-    def __init__(self, mqtt_client, client_topic):
+    def __init__(self, profiler, mqtt_client, client_topic):
+        self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.client_topic = client_topic
 
@@ -62,8 +61,6 @@ class Stimulator:
         # Ensure pin is set LOW at the end
         line_request.set_value(gpio_pin, Value.INACTIVE)
         
-        #logging.info(f"[Square] PWM generation complete!")
-        
         # Release the GPIO line
         line_request.release()
 
@@ -72,12 +69,10 @@ class Stimulator:
         start_time = time()
         
         self._run_stimulation(best_params)
+
+        duration = time() - start_time
+        curr_trial = self.profiler.current_trial
+        self.profiler.log_metric(curr_trial, "stim", duration)
         
-        message= f"[Square] Stimulation completed. Duration: {time() - start_time:.2f} seconds."
-        logging.info(message)
-        
-        try:
-            with open(LOG_FILE, "a") as f:
-                f.write(f"{message}\n")
-        except OSError as e:
-            logging.error(f"Could not write to timing file: {e}")
+        # message= f"[Square] Stimulation completed. Duration: {time() - start_time:.2f} seconds."
+        # logging.info(message)

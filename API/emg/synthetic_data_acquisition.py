@@ -21,10 +21,11 @@ CONFIG = load_config() # load config settings
 ganglion_instance = None
 
 class SyntheticGanglionData:
-    def __init__(self, websocket, serial_port="serial_port_A", sample_rate=250, num_trials=1, folder_name=None):
+    def __init__(self, websocket, profiler, serial_port="serial_port_A", sample_rate=250, num_trials=1, folder_name=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
+        self.profiler = profiler
         self.base_path = Path(__file__).resolve().parent.parent / "data"
         self.base_path.mkdir(parents=True, exist_ok=True)
 
@@ -58,8 +59,9 @@ class SyntheticGanglionData:
         self.board_shim = None
         self.board_id = BoardIds.SYNTHETIC_BOARD
 
-        self.recorder = RealTimeRecorder(sample_rate=self._sample_rate, base_path=self.base_path, folder_name=folder_name)
-        self.feature_extractor = FeatureExtractor(self._sample_rate, self._num_trials == 1, output_path=Path(self.recorder.features_dir))
+        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, base_path=self.base_path, folder_name=folder_name)
+        self.feature_extractor = FeatureExtractor(self._sample_rate, self.profiler, self._num_trials == 1, 
+                                                  output_path=Path(self.recorder.features_dir))
         #self.peak_classifier = PeakClassifier(self.base_path)
 
     def _handle_analysis(self, curr_timestamp: float):
@@ -75,9 +77,11 @@ class SyntheticGanglionData:
         else:
             # Peak detection
             channels = [f"ch{ch + 1} (µV)" for ch in CONFIG.get("selected_channels", [])]
-            features_df = self.feature_extractor.run(analysis_df=analysis_df, 
+            features_df = self.feature_extractor.run(self._total_trials, analysis_df=analysis_df, 
                                                      curr_timestamp=int(curr_timestamp),
                                                      channels=channels)
+            if features_df is None:
+                logging.error("[Ganglion] Skipping optimization + stimulation because no features detected.")
             
             '''
             # Peak Classification
@@ -137,12 +141,19 @@ class SyntheticGanglionData:
             if has_event: 
                 self._total_events += 1
                 logging.info(f"[Ganglion] Recorded {self._total_events} events")               
+            
             if end_trial:
                 self._total_trials += 1
+                self.profiler.start_trial(self._total_trials)
+                
+                trial_data = json.dumps({
+                    "type": "trial_completion"
+                })
+                asyncio.run_coroutine_threadsafe(self.websocket.send_text(trial_data), loop)
+                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
             
             # Perform analysis on selected trials
             if self._total_trials == self.next_trial_block:
-                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
                 self._handle_analysis(curr_timestamp)
                 
         # Broadcast event markers
@@ -159,12 +170,12 @@ class SyntheticGanglionData:
         accel_data = data[self.accel_channels]
 
         self._accel_outlet.push_chunk(accel_data.T.tolist()) # push to LSL
-        json_accel = json.dumps({
+        '''json_accel = json.dumps({
             "type": "accel_data",
             "timestamp": relative_timestamps.tolist(), 
             "value": accel_data.tolist()
         })
-        asyncio.run_coroutine_threadsafe(self.websocket.send_text(json_accel), loop)
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(json_accel), loop)'''
         
         # EMG channel processing
         for ch in self._selected_channels:
@@ -267,7 +278,6 @@ class SyntheticGanglionData:
             self.connection_status = "failed"
         
         finally:
-            logging.info("[Ganglion] Stopping EMG stream...")
             if self.recorder and self.recorder.recording:
                 self.recorder.stop_recording()
                 self.recorder = None

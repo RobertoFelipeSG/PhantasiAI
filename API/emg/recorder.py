@@ -10,15 +10,15 @@ from config.connection_manager import logging
 from config.config_manager import load_config
 
 config = load_config()
-LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, base_path, folder_name=None):
+    def __init__(self, sample_rate, profiler, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
         
+        self.profiler = profiler
         self.base_path = base_path
         self.filename = None
         self._index = 0
@@ -147,12 +147,13 @@ class RealTimeRecorder:
             df['timestamp'] = df['timestamp'].astype(float)
 
             # Calculate analysis window and get data
-            analysis_data = df[(df['timestamp'] > self.min_time) & (df['timestamp'] < max_time)]
+            analysis_data = df[(df['timestamp'] >= self.min_time) & (df['timestamp'] <= max_time)]
 
             last_min = self.min_time
             self.min_time = max_time # Advance minimum timestamp pointer
 
             if analysis_data.empty:
+                logging.error(f"[Recorder] Could not create analysis file")
                 return None
 
             '''# Save df as csv
@@ -161,14 +162,11 @@ class RealTimeRecorder:
             analysis_data.to_csv(output_path, index=False)
             '''
 
-            message = f"[Recorder] Analysis file created for {trial} trials, from {last_min} to {max_time}. Duration: {time.time() - start_time:.2f} seconds."
-            logging.info(message)
+            # message = f"[Recorder] Analysis file created for {trial} trials, from {last_min} to {max_time}. Duration: {time.time() - start_time:.2f} seconds."
+            #logging.info(message)
         
-            try:
-                with open(LOG_FILE, "a") as f:
-                    f.write(f"{message}\n")
-            except OSError as e:
-                logging.error(f"Could not write to timing file: {e}")
+            duration = time.time() - start_time
+            self.profiler.log_metric(trial, "file_create", duration)
 
             return analysis_data
 
@@ -198,14 +196,8 @@ class RealTimeRecorder:
 
             self.recording = True
 
-            message = f"\n[Recorder] Recording started: {self.filename}"
-            logging.info(message)
+            logging.info(f"\n[Recorder] Recording started: {self.filename}")
         
-            try:
-                with open(LOG_FILE, "a") as f:
-                    f.write(f"{message}\n")
-            except OSError as e:
-                logging.error(f"Could not write to timing file: {e}") 
         except Exception as e:
             logging.error(f"[Recorder] Failed to start recording: {e}")
             self.recording = False
@@ -222,6 +214,5 @@ class RealTimeRecorder:
             self.recording = False
             self.next_event_time = 0.0 # Reset marker time on stop
 
-            logging.info("[Recorder] Recording stopped")
         except Exception as e:
             logging.error(f"[Recorder] Failed to stop recording: {e}")

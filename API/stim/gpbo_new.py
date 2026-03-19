@@ -22,16 +22,16 @@ from config.connection_manager import logging
 from config.config_manager import load_config
 
 CONFIG = load_config()
-LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 warnings.filterwarnings("ignore")
 np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, n_iters, n_reps, recordings_directory, mqtt_client, client_topic, on_complete=None):
+    def __init__(self, stimulator, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None):
         self.file_path = None
         self.stimulator = stimulator
+        self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.recordings_directory = recordings_directory
         self.topic = client_topic
@@ -298,7 +298,7 @@ class GPBOOptimizer:
             
             self.curr_iter += 1 # increment iteration
             self.stim_success = False # reset success state
-            logging.info(f"[GPBO] Rep:{self.curr_rep + 1}, Iter:{self.curr_iter} | Response for {self.selected_params}: {last_response.item():.2f}")
+            # logging.info(f"[GPBO] Rep:{self.curr_rep + 1}, Iter:{self.curr_iter} | Response for {self.selected_params}: {last_response.item():.2f}")
 
             # add to dataset
             self.x_train = torch.cat([self.x_train, torch.tensor([self.selected_params]).float()])
@@ -384,7 +384,7 @@ class GPBOOptimizer:
         # SELECT NEXT POINT TO TEST
         # PHASE 1: Broad search (random sampling for n iterations if no GP prior)
         if self.curr_iter < self.num_rand:
-            logging.info(f"[GPBO] Random sampling for first iteration")
+            # logging.info(f"[GPBO] Random sampling for first iteration")
             next_idx = np.random.randint(len(self.X_test))
             self.selected_params = self.X_test[next_idx]
 
@@ -436,26 +436,20 @@ class GPBOOptimizer:
             self.parameter_names[0]: float(self.selected_params[0]),
             self.parameter_names[1]: float(self.selected_params[1])
         }
-        logging.info(f"[GPBO] Next parameters to test: {best_params}")
 
         # store time duration for current optimization process
         self.curr_opt_time = time.time() - start_opt_time
-        message = f"[GPBO] Optimization iteration completed. Duration: {self.curr_opt_time:.2f} seconds."
-        logging.info(message)
-        try:
-            with open(LOG_FILE, "a") as f:
-                f.write(f"{message}\n")
-        except OSError as e:
-            logging.error(f"Could not write to timing file: {e}")
+        curr_trial = self.profiler.current_trial
+        self.profiler.log_metric(curr_trial, "opt_iter", self.curr_opt_time)
 
         try:
             self.stimulator.run(best_params)
             self.stim_success = True
-            logging.info(f"[GPBO] Stimulation successful!")
+            self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
-            logging.error(f"[GPBO] Hardware Error: Cannot access GPIO chip. {e}")
+            logging.error(f"[GPBO] Hardware Stim Error: Cannot access GPIO chip. {e}")
         except KeyError as e:
-            logging.error(f"[GPBO] Parameter Error: Missing key in best_params: {e}")
+            logging.error(f"[GPBO] Parameter Stim Error: Missing key in best_params: {e}")
         except Exception as e:
             logging.error(f"[GPBO] Unexpected error during stimulation: {type(e).__name__}: {e}")
 
@@ -464,12 +458,12 @@ class GPBOOptimizer:
         
         start_time = time.time()
         self._run_optimization(file_path)
+
+        duration = time.time() - start_time
+        curr_trial = self.profiler.current_trial
+        self.profiler.log_metric(curr_trial, "overall_opt_stim", duration)
         
-        message = f"[GPBO] Overall optimization + stimulation completed. Duration: {time.time() - start_time:.2f} seconds."
-        logging.info(message)
-        try:
-            with open(LOG_FILE, "a") as f:
-                f.write(f"{message}\n")
-        except OSError as e:
-            logging.error(f"Could not write to timing file: {e}")
+        # message = f"[GPBO] Overall optimization + stimulation completed. Duration: {time.time() - start_time:.2f} seconds."
+        # logging.info(message)
+        
     

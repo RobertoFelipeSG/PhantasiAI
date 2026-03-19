@@ -13,7 +13,6 @@ from config.connection_manager import logging
 from config.config_manager import load_config
 
 config = load_config()
-LOG_FILE = Path(__file__).parent.parent / "test_timings.txt"
 
 warnings.filterwarnings('ignore')
 
@@ -29,8 +28,9 @@ class FeatureExtractor:
     - Optional tangential acceleration calculation from accelerometer data
     """
     
-    def __init__(self, sample_rate, single_trial_analysis, output_path: Path):
+    def __init__(self, sample_rate, profiler, single_trial_analysis, output_path: Path):
         self.sampling_rate = sample_rate
+        self.profiler = profiler
         self.output_path = output_path
         self.single_trial_analysis = single_trial_analysis
         
@@ -322,7 +322,7 @@ class FeatureExtractor:
         # Create DataFrame from all peak features
         if not all_peak_features:
             logging.warning("[Extractor] No peaks detected in any channel")
-            return None
+            return None # optimization + stimulation will be skipped for this trial
         features_df = pd.DataFrame(all_peak_features)
         
         # Save to features.txt (triggers GPBO)
@@ -338,19 +338,17 @@ class FeatureExtractor:
         
         return features_df
 
-    def run(self, analysis_df: pd.DataFrame, curr_timestamp: int, channels: Optional[List[str]] = None
+    def run(self, curr_trial, analysis_df: pd.DataFrame, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
         start_time = time()
         
         features_df = self._run_feature_extraction(analysis_df, curr_timestamp, channels)
-        message = f"[Extractor] Feature extractor completed. Total peaks: {len(features_df)}. Duration: {time() - start_time:.2f} seconds."
+        # message = f"[Extractor] Feature extractor completed. Total peaks: {len(features_df)}. Duration: {time() - start_time:.2f} seconds."
+        # logging.info(message)
 
-        logging.info(message)
-        
-        try:
-            with open(LOG_FILE, "a") as f:
-                f.write(f"{message}\n")
-        except OSError as e:
-            logging.error(f"Could not write to timing file: {e}")
+        # add to log if feature extraction successful
+        if features_df is not None:
+            duration = time() - start_time
+            self.profiler.log_metric(curr_trial, "feat_extract", duration)
 
         return features_df
