@@ -69,7 +69,7 @@
             height: calc(100vh - 80px); 
         }
 
-        /* Left-hand side  (1/4 of page) */
+        /* Left-hand side */
         #toggleSidebarBtn {
             position: absolute;
             top: 20px;       /* Aligns with header */
@@ -86,10 +86,31 @@
             border: 1px solid var(--color-primary);
             color: var(--color-primary);
         }
+
+        #streamBtn {
+            position: absolute;
+            top: 20px;
+            left: 55px;
+            z-index: 1000;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            color: var(--color-text);
+            border: 1px solid var(--color-primary);
+            padding: 10px 24px;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        #streamBtn:hover {
+            box-shadow: var(--border-glow);
+        }
         
         .sidebar {
-            width: 25%;
-            min-width: 300px;
+            width: 50%;
+            min-width: 200px;
             display: flex;
             flex-direction: column;
             padding: 15px;
@@ -106,9 +127,23 @@
             opacity: 0;
             margin: 0;
         }
+        .sidebar-divider {
+            width: 5px;
+            cursor: col-resize;
+            background: var(--color-primary);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+            opacity: 0.4;
+            transition: opacity 0.15s;
+        }
+        .sidebar-divider:hover,
+        .sidebar-divider.dragging {
+            opacity: 1;
+        }
         
         .controls-bar {
-            height: 50%;
+            height: 30%%;
             margin: 10px 0;
             padding: 15px;
             background-color: var(--bg-card);
@@ -135,35 +170,9 @@
             margin-bottom: 5px;
             color: var(--color-text);
         }
-        
-        .stream-btn-container {
-            margin-top: auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding-top: 5px;
-            padding-bottom: 5px; 
-        }
-        #streamBtn {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-            color: var(--color-text);             
-            border: 1px solid var(--color-primary); 
-            padding: 10px 20px;      
-            font-size: 18px;  
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #streamBtn:hover {
-            box-shadow: var(--border-glow);
-        }
 
         .terminal-container {
-            height: 50%;
+            height: 70%;
             max-width: 100%;
             flex-grow: 0; 
             background-color: var(--bg-card);          
@@ -171,10 +180,62 @@
             border-radius: 5px;
             overflow-y: auto;
             overflow-x: auto;
-            font-size: 12px;
+            font-size: 15px;
             border: 2px solid #333;
             font-family: monospace !important;
             min-height: 200px;
+        }
+        .terminal-wrapper {
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background: var(--bg-card-light);
+            border: 2px solid #333;
+            border-bottom: 1px solid #444;
+            border-radius: 5px 5px 0 0;
+            font-size: 11px;
+            font-family: monospace;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .terminal-container.disabled {
+            opacity: 0.35;
+            pointer-events: none;
+        }
+        #terminalToggleBtn {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            font-size: 10px;
+            font-family: monospace;
+            padding: 2px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            margin: 0;
+        }
+        #terminalToggleBtn:hover {
+            background: var(--color-primary);
+            color: #000;
+        }
+        #terminalToggleBtn.off {
+            border-color: #555;
+            color: #555;
+        }
+        #terminalToggleBtn.off:hover {
+            background: #555;
+            color: #000;
         }
         .log-entry {
             margin-bottom: 4px;
@@ -340,6 +401,7 @@
     <div class="main-container">
         
         <button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
+        <button onclick="handleStreamingClick()" id="streamBtn">Start</button>
         <aside class="sidebar">
             <!-- Controls -->
             <div class="controls-bar">
@@ -387,17 +449,21 @@
                 </div>
                 <div> <span id="markerCountdownDisplay" style="font-weight: bold; color: #666;"></span>
                 </div>
-                <div class="stream-btn-container">
-                    <button onclick="handleStreamingClick()" id="streamBtn">Start</button>
-                </div>
             </div>
 
-            <!-- Chat  -->
-            <div class="terminal-container" id="chatTerminal">
-                <div class="log-entry">[System] Terminal initialized...</div>
+            <!-- Chat Terminal -->
+            <div class="terminal-wrapper">
+                <div class="terminal-header">
+                    <span>⬛ Server Log</span>
+                    <button id="terminalToggleBtn" onclick="toggleTerminal()">ON</button>
+                </div>
+                <div class="terminal-container" id="chatTerminal" style="height: 100%; border-radius: 0 0 5px 5px; border-top: none; margin: 0;">
+                    <div class="log-entry">[System] Terminal initialized...</div>
+                </div>
             </div>
         </aside>
 
+        <div class="sidebar-divider" id="sidebarDivider"></div>
         <main class="content-right">
             <div class="tab">
                 <button class="tablinks" onclick="openTab(event, 'Graphs')" id="defaultOpen">Graphs</button>
@@ -450,7 +516,7 @@
 
     <script>
 
-        // Global variables
+        // Global state variables
         let ws = null;
         let emgGraph = null;
         let accelGraph = null;
@@ -459,17 +525,21 @@
         let pendingAccelData = []; // Accel Data Buffer
         let latestTimestamp = null;
         let nextEventTargetTime = null;
-        let currTrials = 0;
+        let totalTrials = null;
         let trialsRemaining = null;
         let stimSuccess = true; // stores whether stimulation from current trial was successful
+        let isStreaming = false;
+        let isStopping = false;
+        let renderLoopRunning = false
+        
+        // Constants
         const defaultTotalTrials = 401;
         const defaultNumTrials = 1;
         const defaultNumIters = 40;
         const defaultNumReps = 10;
 
-        let isStreaming = false;
-        let isStopping = false;
-        let renderLoopRunning = false
+        // Side panel variables
+        let terminalEnabled = true;
         
         // Instructions
         const PHASE_CHANGE = 3.0;
@@ -548,7 +618,7 @@
                     }
                     
                     else if (data.type === 'trial_completion') {
-                        if (stimSuccess) { updateTrialCountdown(); }
+                        if (stimSuccess) { updateTrialCountdown(data.total_trials); }
                         stimSuccess = true; // reset for next trial
                     }
                     
@@ -632,25 +702,87 @@
 
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
-            const btn = document.getElementById('toggleSidebarBtn');
-            
-            // Toggle the class
-            sidebar.classList.toggle('hidden');
-            
-            // Resize graphs if they are currently visible
+
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                sidebar.style.width    = '50%';
+                sidebar.style.minWidth = 'unset';
+            } else {
+                sidebar.classList.add('hidden');
+            }
+
             window.dispatchEvent(new Event('resize'));
         }
         
         // ----- CHAT WINDOW ----- //
-        function addLog(message) {
+        function toggleTerminal() {
+            terminalEnabled = !terminalEnabled;
+            const btn      = document.getElementById('terminalToggleBtn');
             const terminal = document.getElementById('chatTerminal');
-            
-            // Add new message to the bottom
-            terminal.innerHTML += `<div class="log-entry">${message}</div>`;
-            
-            // Auto-scroll to the bottom
+
+            if (terminalEnabled) {
+                terminal.style.display = 'block';
+                btn.textContent = 'ON';
+                btn.classList.remove('off');
+                addLog('[System] Terminal resumed.');
+            } else {
+                terminal.style.display = 'none';
+                btn.textContent = 'OFF';
+                btn.classList.add('off');
+            }
+        }
+
+        function addLog(message) {
+            if (!terminalEnabled) return; // zero DOM work when off
+
+            const terminal = document.getElementById('chatTerminal');
+
+            // Cap entries to prevent unbounded DOM growth
+            const entries = terminal.querySelectorAll('.log-entry');
+            if (entries.length > 200) {
+                for (let i = 0; i < 50; i++) entries[i].remove();
+            }
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = message;
+            terminal.appendChild(entry);
             terminal.scrollTop = terminal.scrollHeight;
         }
+
+        // ----- SIDEBAR RESIZE ----- //
+        (() => {
+            const divider = document.getElementById('sidebarDivider');
+            const sidebar = document.querySelector('.sidebar');
+            let dragging  = false;
+
+            divider.addEventListener('mousedown', e => {
+                dragging = true;
+                divider.classList.add('dragging');
+                document.body.style.cursor     = 'col-resize';
+                document.body.style.userSelect = 'none';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', e => {
+                if (!dragging) return;
+                const containerLeft = sidebar.parentElement.getBoundingClientRect().left;
+                let newWidth = e.clientX - containerLeft;
+                // Clamp between 200px and 60% of viewport
+                newWidth = Math.max(200, Math.min(window.innerWidth * 0.6, newWidth));
+                sidebar.style.width    = newWidth + 'px';
+                sidebar.style.minWidth = 'unset';
+                window.dispatchEvent(new Event('resize')); // reflow charts
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (!dragging) return;
+                dragging = false;
+                divider.classList.remove('dragging');
+                document.body.style.cursor     = '';
+                document.body.style.userSelect = '';
+            });
+        })();
 
         // ----- TRIAL COUNTER ----- //
         function initializeTrialCountdown() {
@@ -658,11 +790,12 @@
             const repsInput = document.getElementById('reps');
             const itersValue = parseInt(itersInput.value) || defaultNumIters;
             const repsValue = parseInt(repsInput.value) || defaultNumReps;
-            const totalTrials = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
+            const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
             const display = document.getElementById('trialCounterDisplay');
 
             if (!display) return;
 
+            totalTrials = totalTrialsInput // update the totalTrials global variable ONCE (at initialization)
             trialsRemaining = totalTrials;
 
             // Update trial display
@@ -672,13 +805,12 @@
             }
         }
         
-        function updateTrialCountdown() {
+        function updateTrialCountdown(trialsComplete) {
             const display = document.getElementById('trialCounterDisplay');
             if (!display) return;
             
-            // increment trials/decrement countdown if trial complete AND stimulation was successful 
-            currTrials += 1;
-            trialsRemaining -= 1;
+            // subtract total trials if trial complete AND stimulation was successful 
+            trialsRemaining = totalTrials - trialsComplete;
             
             // Update trial display
             const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
@@ -1154,7 +1286,7 @@
             pendingAccelData.length = 0;
             lastInstructionPhase = "";
             nextEventTargetTime = null;
-            currTrials = 0;
+            totalTrials = null;
             trialsRemaining = null;
             lastPhase = "";
             isGraphPaused = false;

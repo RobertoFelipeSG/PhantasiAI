@@ -3,6 +3,7 @@ import asyncio
 import uvicorn
 import json
 import time
+import threading
 import paho.mqtt.client as mqtt
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -14,6 +15,7 @@ from pathlib import Path
 from config.connection_manager import manager, logging
 from config.config_manager import load_config
 
+from config.session_profiler import SessionProfiler
 from emg.data_acquisition import GanglionData
 from emg.synthetic_data_acquisition import SyntheticGanglionData
 from stim.change_detector import WatchDog
@@ -99,8 +101,6 @@ async def handle_start_stream(session, data):
     '''
     Initializes Ganglion and Watchdog for client session
     '''
-    client_id = id(session) # current session client ID for mqtt handling
-    profiler = session.profiler # current session profiler to store timing metrics
     
     if session.ganglion and session.ganglion._emg_thread.is_alive(): 
         await session.websocket.send_json({"status": "error", "message": "Stream already running"})
@@ -119,11 +119,19 @@ async def handle_start_stream(session, data):
     except RuntimeError:
         current_loop = asyncio.get_event_loop()
     
+    client_id = id(session) # current session client ID for mqtt handling
+    shared_dorsi_flag = threading.Event()
+
+    # Create session profiler
+    session.profiler = SessionProfiler()
+    profiler = session.profiler # current session profiler to store timing metrics
+    
     # Initialize Ganglion instance
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(
             websocket=session.websocket,
             profiler=profiler,
+            dorsi_flag=shared_dorsi_flag,
             serial_port=serial_port,
             sample_rate=250, 
             num_trials=num_trials,
@@ -133,6 +141,7 @@ async def handle_start_stream(session, data):
         session.ganglion = GanglionData(
             websocket=session.websocket,
             profiler=profiler,
+            dorsi_flag=shared_dorsi_flag,
             serial_port=serial_port,
             sample_rate=200, 
             num_trials=num_trials,
@@ -146,12 +155,13 @@ async def handle_start_stream(session, data):
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
     
     session.stimulator = Stimulator(profiler, mqtt_client, client_topic=f"emg/client/{client_id}")
-    session.optimizer = GPBOOptimizer(session.stimulator, n_iters, n_reps, session.session_dir, profiler,
-                                      mqtt_client, client_topic=f"emg/client/{client_id}",
+    session.optimizer = GPBOOptimizer(session.stimulator, shared_dorsi_flag, n_iters, n_reps, 
+                                      session.session_dir, profiler, mqtt_client, 
+                                      client_topic=f"emg/client/{client_id}",
                                       on_complete=trigger_auto_stop)
     
     # Initialize WatchDog instance
-    session.watchdog_feat = WatchDog(mqtt_client, client_topic=f"emg/client/{client_id}", 
+    session.watchdog_feat = WatchDog(profiler, mqtt_client, client_topic=f"emg/client/{client_id}", 
                                      optimizer=session.optimizer)
     feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
     session.watchdog_feat.start_watching(feat_directory_to_watch)
@@ -182,6 +192,7 @@ async def handle_stop_stream(session):
         session.watchdog_feat = None
     
     if session.optimizer:
+        session.optimizer.handle_stop()
         session.optimizer = None
 
     if session.stimulator:

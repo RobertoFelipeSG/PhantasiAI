@@ -4,8 +4,12 @@ import sys
 import gpiod
 from time import sleep, time
 from pathlib import Path
-from config.connection_manager import logging
 from gpiod.line import Direction, Value
+
+from config.connection_manager import logging
+from config.config_manager import load_config
+
+CONFIG = load_config()
 
 class Stimulator:
     def __init__(self, profiler, mqtt_client, client_topic):
@@ -13,15 +17,19 @@ class Stimulator:
         self.mqtt_client = mqtt_client
         self.client_topic = client_topic
 
+        self.gpio_chip = CONFIG.get("gpio_chip")
+        self.gpio_pin = CONFIG.get("gpio_pin")
+        self.duration = CONFIG.get("duration")
+
     def _run_stimulation(self, best_params):
         ''' Runs parameter generation for GPIO square stimulation '''       
         # Define GPIO pin (BCM numbering)
-        GPIO_CHIP = "/dev/gpiochip4"
+        GPIO_CHIP = self.gpio_chip
 
         # Open GPIO chip and request the line
         chip = gpiod.Chip(GPIO_CHIP)
-        gpio_pin = 12
-        duration = 3
+        gpio_pin = self.gpio_pin
+        duration = self.duration
         
         # Define frequency (Hz) and duty cycle (0-1)
         dutycycle = best_params.get('dutycycle')
@@ -64,14 +72,13 @@ class Stimulator:
         # Release the GPIO line
         line_request.release()
 
-    def run(self, best_params):
+    def run(self, best_params, curr_trial):
         #logging.info("[Square] Starting stimulation process...")
         start_time = time()
         
         self._run_stimulation(best_params)
 
         duration = time() - start_time
-        curr_trial = self.profiler.current_trial
         self.profiler.log_metric(curr_trial, "stim", duration)
         
         # message= f"[Square] Stimulation completed. Duration: {time() - start_time:.2f} seconds."

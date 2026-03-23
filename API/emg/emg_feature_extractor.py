@@ -12,7 +12,7 @@ from scipy.signal import find_peaks, hilbert
 from config.connection_manager import logging
 from config.config_manager import load_config
 
-config = load_config()
+CONFIG = load_config()
 
 warnings.filterwarnings('ignore')
 
@@ -34,10 +34,10 @@ class FeatureExtractor:
         self.output_path = output_path
         self.single_trial_analysis = single_trial_analysis
         
-        self.height_percentile = config.get("height_percentile")
-        self.min_distance = config.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
-        self.lowpass_cutoff = min(config.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
-        self.window_duration = config.get("marker_interval") # window of feature extraction (changed from 3 to 1 minutes)
+        self.height_percentile = CONFIG.get("height_percentile")
+        self.min_distance = CONFIG.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
+        self.lowpass_cutoff = min(CONFIG.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
+        self.window_duration = CONFIG.get("marker_interval") # window of feature extraction (changed from 3 to 1 minutes)
         self.window_samples = int(self.window_duration * self.sampling_rate) 
 
         # if we are doing ONE dorsiflexion per analysis/extraction, CSV logic is slightly different (for space efficiency)

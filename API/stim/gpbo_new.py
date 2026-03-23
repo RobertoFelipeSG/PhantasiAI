@@ -28,10 +28,11 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None):
+    def __init__(self, stimulator, dorsi_flag, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None):
         self.file_path = None
         self.stimulator = stimulator
         self.profiler = profiler
+        self.dorsi_flag = dorsi_flag
         self.mqtt_client = mqtt_client
         self.recordings_directory = recordings_directory
         self.topic = client_topic
@@ -49,8 +50,8 @@ class GPBOOptimizer:
         self.kappa = CONFIG.get("kappa")
         self.AF_name = CONFIG.get("AF_name")
         self.noise_level = CONFIG.get("noise_level")
-        self.parameter_names = ['dutycycle', 'frequency']
-        self.feature_names = ['max_amplitude']
+        self.parameter_names = CONFIG.get("parameters")
+        self.feature_names = CONFIG.get("features")
 
         # initialize overall optimizations directory
         self.opt_dir = os.path.join(str(self.recordings_directory), "optimizations")
@@ -217,13 +218,7 @@ class GPBOOptimizer:
             self._visualize_maps(rep_idx, rep_data['tested_params'], rep_data['converged_coord'],
                                  final_mean, final_var) 
 
-        message = f"[GPBO] Visualizations complete. Duration: {time.time() - start_time:.2f} seconds."
-        logging.info(message)
-        try:
-            with open(LOG_FILE, "a") as f:
-                f.write(f"{message}\n")
-        except OSError as e:
-            logging.error(f"Could not write to timing file: {e}")
+        logging.info(f"[GPBO] Visualizations complete. Duration: {time.time() - start_time:.2f} seconds.")
     
     def _get_response(self):
         '''
@@ -276,8 +271,9 @@ class GPBOOptimizer:
         
         return torch.tensor([resp], dtype=torch.float32)
 
-    def _run_optimization(self, file_path):
+    def _run_optimization(self, file_path, curr_trial):
         start_opt_time = time.time() # start timer for current optimization iteration
+        self.dorsi_flag.clear() # reset dorsiflexion flag to trigger stimulation
         self.file_path = file_path
         
         # OPTIMIZATION CHECK: if all repetitions+iterations complete, start new optimization process
@@ -439,11 +435,14 @@ class GPBOOptimizer:
 
         # store time duration for current optimization process
         self.curr_opt_time = time.time() - start_opt_time
-        curr_trial = self.profiler.current_trial
         self.profiler.log_metric(curr_trial, "opt_iter", self.curr_opt_time)
 
+        logging.info("[GPBO] Optimization done, waiting for event marker to start stimulation...")
+        self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
+
+        self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
         try:
-            self.stimulator.run(best_params)
+            self.stimulator.run(best_params, curr_trial)
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
@@ -453,17 +452,22 @@ class GPBOOptimizer:
         except Exception as e:
             logging.error(f"[GPBO] Unexpected error during stimulation: {type(e).__name__}: {e}")
 
-    def run(self, file_path):
+    def run(self, file_path, curr_trial):
         #logging.info("[GPBO] Starting Bayesian optimization...")
         
         start_time = time.time()
-        self._run_optimization(file_path)
+        self._run_optimization(file_path, curr_trial)
 
         duration = time.time() - start_time
-        curr_trial = self.profiler.current_trial
         self.profiler.log_metric(curr_trial, "overall_opt_stim", duration)
+    
+        logging.info(f"[GPBO] Overall optimization + stimulation completed. Duration: {duration:.2f} seconds.")
+
+    def handle_stop(self):
+        ''' Backup to save optimization data in case of sudden stop '''
         
-        # message = f"[GPBO] Overall optimization + stimulation completed. Duration: {time.time() - start_time:.2f} seconds."
-        # logging.info(message)
-        
+        # add to CSV with stimulation data
+        df = pd.DataFrame(self.opt_log)
+        filepath = os.path.join(self.opt_dir, f"stimulations_backup.csv")
+        df.to_csv(filepath, index=False)
     

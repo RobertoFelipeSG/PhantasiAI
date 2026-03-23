@@ -38,6 +38,7 @@ DEFAULT_CONFIG = {
     "height_percentile": 98,
     "min_distance": 3,
     "feature_cutoff_freq": 80,
+    "features": ['max_amplitude'],
 
     # GPBO
     "is_calibrated": False,
@@ -47,8 +48,14 @@ DEFAULT_CONFIG = {
     "kappa": 3.0, 
     "AF_name": "NEI", # "NEI", "EI", "UBC"
     "noise_level": 0.05,
+    "parameters" : ['dutycycle', 'frequency'],
     "dutycycles": [0.1, 0.3, 0.5, 0.7, 0.9],
-    "frequencies": [20, 30, 40, 50, 60]
+    "frequencies": [20, 30, 40, 50, 60],
+
+    # stimulator
+    "gpio_chip": "/dev/gpiochip4",
+    "gpio_pin": 12,
+    "duration": 2.5
 }
 
 def load_config():

@@ -22,11 +22,12 @@ CONFIG = load_config() # load config settings
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 
 class GanglionData:
-    def __init__(self, websocket, profiler, serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None):
+    def __init__(self, websocket, profiler, dorsi_flag, serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
         self.profiler = profiler
+        self.dorsi_flag = dorsi_flag
         self.base_path = Path(__file__).resolve().parent.parent / "data"
         self.base_path.mkdir(parents=True, exist_ok=True)
         
@@ -66,7 +67,8 @@ class GanglionData:
         self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
         self._all_channels = self.emg_channels + self.accel_channels
 
-        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, base_path=self.base_path, folder_name=folder_name)
+        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, self.dorsi_flag, 
+                                         base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate, self.profiler, self._num_trials == 1, 
                                                   output_path=Path(self.recorder.features_dir))
         #self.peak_classifier = PeakClassifier(self.base_path)
@@ -123,6 +125,16 @@ class GanglionData:
             "target_timestamp": float(next_event_time)
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(marker_data), loop)
+
+    def _broadcast_trials(self, loop):
+        '''Helper to broadcast trial completion to frontend'''
+        curr_total_trials = float(self._total_trials)
+        
+        trial_data = json.dumps({
+            "type": "trial_completion",
+            "total_trials": curr_total_trials
+        })
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(trial_data), loop)
             
     def _process_data(self, loop):
         '''Complete data processing for current chunk '''
@@ -148,17 +160,16 @@ class GanglionData:
             
             if has_event: 
                 self._total_events += 1
-                logging.info(f"[Ganglion] Recorded {self._total_events} events")
+                #logging.info(f"[Ganglion] Recorded {self._total_events} events")
             
             if end_trial:
                 self._total_trials += 1
-                self.profiler.start_trial(self._total_trials)
                 
-                trial_data = json.dumps({
-                    "type": "trial_completion"
-                })
-                asyncio.run_coroutine_threadsafe(self.websocket.send_text(trial_data), loop)
-                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
+                self.profiler.start_trial(self._total_trials)
+                logging.info(f"[Ganglion] End of trial {self._total_trials} detected")
+                
+                self._broadcast_trials(loop)
+                #logging.info(f"[Ganglion] Trial {self._total_trials} complete")
             
             # Perform analysis on selected trials
             if self._total_trials == self.next_trial_block:

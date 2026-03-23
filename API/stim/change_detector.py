@@ -12,7 +12,8 @@ class ChangeHandler(FileSystemEventHandler):
     Runs GPBO script if change in content is detected in features.txt file
     '''
 
-    def __init__(self, mqtt_client, client_topic, optimizer):
+    def __init__(self, profiler, mqtt_client, client_topic, optimizer):
+        self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.topic = client_topic
         self.optimizer = optimizer
@@ -20,7 +21,7 @@ class ChangeHandler(FileSystemEventHandler):
         self.last_hash = None
         self.is_running = False
         self.last_runtime = 0
-        self.debounce_interval = 1.0 # prevents debounce checks (1s after optimization starts and 1s after stimulation ends
+        self.debounce_interval = 0.5 # prevents debounce checks (1s after optimization starts and 1s after stimulation ends
 
     def _get_file_hash(self, filepath): 
         '''
@@ -45,6 +46,7 @@ class ChangeHandler(FileSystemEventHandler):
         # Ensure previous optimization is complete
         if self.is_running:
             logging.info(f"[WatchDog] Change detected but previous optimization still running. Skipping GPBO...")
+            return
         
         # Debounce check
         current_time = time.time()
@@ -62,28 +64,30 @@ class ChangeHandler(FileSystemEventHandler):
         try:
             # State updates (if content is new)
             self.is_running = True
-            logging.info(f"[WatchDog] Valid change detected in {event.src_path}. Triggering GPBO...")
+            curr_trial = self.profiler.current_trial # get the current trial as soon as valid change detected
+            logging.info(f"[WatchDog] Valid change detected in {event.src_path} for trial {curr_trial}. Triggering GPBO...")
             
             self.last_hash = new_hash
             self.last_runtime = current_time
         
             self.mqtt_client.publish(f"{self.topic}/GPBO/start", "on")
             
-            self.optimizer.run(event.src_path)
+            self.optimizer.run(event.src_path, curr_trial)
         except ValueError as e:
             logging.error(f"[WatchDog] GPBO aborted due to bad data: {e}")
         except Exception as e:
             logging.error(f"[WatchDog] Error running GPBO: {e}", exc_info=True)
         finally:
-            self.last_runtime = current_time # ensures new optimization does not occur within 1s after stimulation is complete
+            self.last_hash = self._get_file_hash(event.src_path) # ensures last file hash represents full features.txt file
             self.is_running = False # ensures new optimization only occurs once current + stimulation is complete
 
 class WatchDog:
     '''
     Detect change in specified folder
     '''
-    def __init__(self, mqtt_client, client_topic, optimizer):
+    def __init__(self, profiler, mqtt_client, client_topic, optimizer):
         self.observer = None
+        self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.topic = client_topic
         self.optimizer = optimizer
@@ -92,7 +96,7 @@ class WatchDog:
         if self.observer: self.stop_watching()
 
         self.observer = Observer()
-        handler = ChangeHandler(self.mqtt_client, self.topic, self.optimizer)
+        handler = ChangeHandler(self.profiler, self.mqtt_client, self.topic, self.optimizer)
         self.observer.schedule(handler, path=directory_path, recursive=False)
         self.observer.start()
 

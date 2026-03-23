@@ -9,15 +9,16 @@ from pathlib import Path
 from config.connection_manager import logging
 from config.config_manager import load_config
 
-config = load_config()
+CONFIG = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, profiler, base_path, folder_name=None):
+    def __init__(self, sample_rate, profiler, dorsi_flag, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
         
+        self.dorsi_flag = dorsi_flag
         self.profiler = profiler
         self.base_path = base_path
         self.filename = None
@@ -41,15 +42,15 @@ class RealTimeRecorder:
         #os.makedirs(self.classification_dir, exist_ok=True)
         
         self._sample_rate = sample_rate
-        self._buffer_seconds = config.get("recorder_buffer_seconds")
+        self._buffer_seconds = CONFIG.get("recorder_buffer_seconds")
         self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session         
         self._buffer = deque(maxlen=self._buffer_len)
         self._buffer_header = None
 
-        self.emg_channel_count = config.get("num_emg_ch") 
-        self.accel_channel_count = config.get("num_accel_ch") 
+        self.emg_channel_count = CONFIG.get("num_emg_ch") 
+        self.accel_channel_count = CONFIG.get("num_accel_ch") 
         
-        self.marker_interval = config.get("marker_interval") # event every x seconds
+        self.marker_interval = CONFIG.get("marker_interval") # event every x seconds
         self.next_event_time = self.marker_interval // 2 # first marker occurs at half of an interval
         self.next_trial_time = self.marker_interval
         self.min_time = 0.0 # starting timestamp pointer for analysis DataFrame
@@ -62,6 +63,9 @@ class RealTimeRecorder:
     def _mark_event(self, timestamp):
         event_flag = 0
         if timestamp >= self.next_event_time:
+            logging.info(f"[Recorder] Event detected")
+            self.dorsi_flag.set()
+            
             event_flag = 1
             self._event_times.append(timestamp)
             self.event_times_buffer.append(timestamp)
