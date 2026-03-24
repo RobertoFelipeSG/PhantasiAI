@@ -36,10 +36,13 @@
             margin: 0; 
             padding: 0;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             background: var(--bg-dark);
             color: var(--color-text);
+        }
+
+        #appWrapper {
+            flex-direction: column;
+            height: 100vh;
         }
         
         h1 { 
@@ -66,7 +69,7 @@
         .main-container {
             display: flex;
             flex: 1; 
-            height: calc(100vh - 80px); 
+            overflow: hidden;
         }
 
         /* Left-hand side */
@@ -118,7 +121,8 @@
             gap: 10px;
             transition: all 0.3s ease-in-out;
             overflow: hidden;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
         }
         .sidebar.hidden {
             width: 0 !important;
@@ -127,30 +131,17 @@
             opacity: 0;
             margin: 0;
         }
-        .sidebar-divider {
-            width: 5px;
-            cursor: col-resize;
-            background: var(--color-primary);
-            flex-shrink: 0;
-            position: relative;
-            z-index: 10;
-            opacity: 0.4;
-            transition: opacity 0.15s;
-        }
-        .sidebar-divider:hover,
-        .sidebar-divider.dragging {
-            opacity: 1;
-        }
         
         .controls-bar {
-            height: 30%%;
             margin: 10px 0;
             padding: 15px;
             background-color: var(--bg-card);
             border-radius: 5px;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px 20px;
             text-align: left;
             font-size: 16px;
             overflow-y: auto;
@@ -172,7 +163,7 @@
         }
 
         .terminal-container {
-            height: 70%;
+            height: 75%;
             max-width: 100%;
             flex-grow: 0; 
             background-color: var(--bg-card);          
@@ -186,7 +177,7 @@
             min-height: 200px;
         }
         .terminal-wrapper {
-            height: 50%;
+            height: 75%;
             display: flex;
             flex-direction: column;
             min-height: 200px;
@@ -391,11 +382,84 @@
         .dots-container.resting .dot-wrapper.active .dot-circle {
             background-color: var(--color-rest) !important;
         }
+
+        /* ---- MODE SELECT SCREEN ---- */
+        #modeSelect {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+        #modeSelect h1 {
+            margin: 0;
+            font-size: clamp(28px, 6vw, 56px);
+        }
+        #modeSelect .subtitle {
+            font-size: clamp(13px, 2vw, 18px);
+            color: #888;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .mode-buttons {
+            display: flex;
+            gap: 24px;
+            margin-top: 10px;
+        }
+        .mode-btn {
+            padding: 16px 44px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.15s;
+            margin: 0;
+        }
+        .mode-btn:hover {
+            box-shadow: var(--border-glow);
+            transform: translateY(-2px);
+        }
+        .mode-btn.experimenter {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            border: 1px solid var(--color-primary);
+            color: #fff;
+        }
+        .mode-btn.developer {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: #fff;
+        }
+        .mode-btn.developer:hover {
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        /* Main app hidden until mode chosen */
+        #appWrapper { display: none; flex-direction: column; height: 100vh; }
     </style>
     
 </head>
 
 <body>
+
+    <!-- Mode Selection Screen -->
+    <div id="modeSelect">
+        <h1>PhantasiAI Dashboard</h1>
+        <p class="subtitle">Please choose a mode...</p>
+        <div class="mode-buttons">
+            <button class="mode-btn developer" onclick="selectMode('developer')">Developer</button>
+            <button class="mode-btn experimenter" onclick="selectMode('experimenter')">Experimenter</button>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until mode chosen) -->
+    <div id="appWrapper">
     <h1>PhantasiAI Dashboard</h1>
 
     <div class="main-container">
@@ -407,33 +471,33 @@
             <div class="controls-bar">
                 <div class="controls-header">Controls</div>
                 <div id="websocketStatus">WS Status: Disconnected</div>
-                <div>
+                <div id="boardIDRow">
                     Board ID:
                     <select id="boardID">
                         <option value="Ganglion" selected>Ganglion</option>
                         <option value="Synthetic">Synthetic</option>
                     </select>
                 </div>
-                <div>
+                <div id="serialPortRow">
                     Serial Port:
                     <select id="serialPort">
                         <option value="PortA" selected>Port A</option>
                         <option value="PortB">Port B</option>
                     </select>
                 </div>
-                <div>
+                <div id="trialInputRow">
                     Trials per Analysis:
                     <input type="number" id="trialInput" min="1" max="20" step="1" value="1" style="width: 35px;"
                         onfocus="if(this.value==='1') this.value='';" 
                         onblur="if(this.value==='') this.value='1';" >
                 </div>
-                <div>
+                <div id="itersRow">
                     Iterations:
                     <input type="number" id="iters" min="1" max="50" step="1" value="40" style="width: 35px;"
                         onfocus="if(this.value==='40') this.value='';" 
                         onblur="if(this.value==='') this.value='40';">
                 </div>
-                <div>
+                <div id="repsRow">
                     Repetitions:
                     <input type="number" id="reps" min="1" max="20" step="1" value="10" style="width: 35px;"
                         onfocus="if(this.value==='10') this.value='';" 
@@ -447,7 +511,7 @@
                 </div>
                 <div> Streaming Status: <span id="streamingStatus">Idle</span> 
                 </div>
-                <div> <span id="markerCountdownDisplay" style="font-weight: bold; color: #666;"></span>
+                <div id="markerRow"> <span id="markerCountdownDisplay" style="font-weight: bold; color: #666;"></span>
                 </div>
             </div>
 
@@ -463,7 +527,6 @@
             </div>
         </aside>
 
-        <div class="sidebar-divider" id="sidebarDivider"></div>
         <main class="content-right">
             <div class="tab">
                 <button class="tablinks" onclick="openTab(event, 'Graphs')" id="defaultOpen">Graphs</button>
@@ -514,23 +577,33 @@
         </main>
     </div>
 
+    </div><!-- end appWrapper -->
+
     <script>
 
-        // Global state variables
+        // --- Global Variables --- //
+        // webpage vars
         let ws = null;
+        let currentMode = 'developer';
+        
+        // graph vars
         let emgGraph = null;
         let accelGraph = null;
         let annotations = [];
         let pendingEmgData = []; // EMG Data Buffer
         let pendingAccelData = []; // Accel Data Buffer
+        
+        // trial vars (for real-time visuals)
         let latestTimestamp = null;
         let nextEventTargetTime = null;
         let totalTrials = null;
         let trialsRemaining = null;
+        
+        // state vars 
         let stimSuccess = true; // stores whether stimulation from current trial was successful
         let isStreaming = false;
         let isStopping = false;
-        let renderLoopRunning = false
+        let renderLoopRunning = false // for all visuals (graphs + instructions)
         
         // Constants
         const defaultTotalTrials = 401;
@@ -547,20 +620,56 @@
         let lastInstructionPhase = ""; // stores instruction + active dot
         
         // Graph configuration
+        const ACCEL_ENABLED = false; 
         const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
-        const WINDOW_SIZE = 5; // Controls x-axis window size (seconds)
+        const WINDOW_SIZE = 6; // Controls x-axis window size (seconds)
         let SAMPLE_RATE = 200; // Default sample rate (for Ganglion)
         let MAX_DATA_POINTS = WINDOW_SIZE * SAMPLE_RATE; // Limit data for scrolling graph
         let isGraphPaused = false; // tracks whether the graphs are paused or not
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Setup UI 
-            initGraphs();
-            setStreamingState(false, 'Idle');
-            document.getElementById("defaultOpen").click()
-
-            connectWebSocket(); // Setup client connection
+            // App initializes only after mode is selected (see selectMode())
         });
+
+        // ----- MODE SELECTION ----- //
+        function selectMode(mode) {
+            currentMode = mode;
+            
+            // Hide the mode screen, show the app
+            document.getElementById('modeSelect').style.display = 'none';
+            const app = document.getElementById('appWrapper');
+            app.style.display = 'flex';
+
+            if (mode === 'experimenter') {
+                // Hide the tab bar and Graphs entirely
+                document.querySelector('.tab').style.display = 'none';
+                document.getElementById('Graphs').style.display = 'none';
+
+                // Show Instructions directly (no tab click needed)
+                document.getElementById('Instructions').style.display = 'flex';
+
+                // Set sidebar width and hide the terminal
+                document.querySelector('.sidebar').style.width = '15%';
+                document.querySelector('.sidebar').style.minWidth = 'unset';
+                document.querySelector('.terminal-wrapper').style.display = 'none';
+                terminalEnabled = false;
+
+                // Hide developer-only controls (keep: WS Status, Folder Name, Streaming Status)
+                const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'markerRow'];
+                hideIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+            } else {
+                // Developer mode
+                document.getElementById("defaultOpen").click();
+                initGraphs();
+            }
+
+            // Common init for both modes
+            setStreamingState(false, 'Idle');
+            connectWebSocket();
+        }
         
         // ----- FRONTEND CONNECTION TO SERVER (via WebSocket) ----- //
         function connectWebSocket() {
@@ -574,7 +683,9 @@
                 ws = new WebSocket(wsUrl);
         
                 ws.onopen = () => {
-                    document.getElementById('websocketStatus').innerText = "WS Status: Connected";
+                    const status = document.getElementById('websocketStatus');
+                    status.innerText = "WS Status: Connected";
+                    status.style.color = "var(--color-raise)";
                 }
         
                 // DATA COMMUNICATION 
@@ -586,24 +697,25 @@
                         if (data.timestamp && data.timestamp.length > 0) {
                             latestTimestamp = data.timestamp[data.timestamp.length - 1];
                         }
-                        
-                        data.value.forEach((val, i) => {
-                            pendingEmgData.push({ x: data.timestamp[i], y: val });
-                        });
 
-                        if (pendingEmgData.length > MAX_DATA_POINTS * 2) {
-                            pendingEmgData = pendingEmgData.slice(-MAX_DATA_POINTS);
+                        if (currentMode === 'developer') {
+                            data.value.forEach((val, i) => {
+                                pendingEmgData.push({ x: data.timestamp[i], y: val });
+                            });
+                            if (pendingEmgData.length > MAX_DATA_POINTS * 2) {
+                                pendingEmgData = pendingEmgData.slice(-MAX_DATA_POINTS);
+                            }
                         }
                     }
 
-                    /*else if (data.type === 'accel_data') {
+                    else if (ACCEL_ENABLED && data.type === 'accel_data') {
                         data.value[0].forEach((_, i) => {
                             pendingAccelData.push({ x: data.timestamp[i],
                                                     y_x: data.value[0][i],
                                                     y_y: data.value[1][i],
                                                     y_z: data.value[2][i] });
                         });
-                    }*/
+                    }
                     
                     // Add most recent event markers (vertical lines)
                     else if (data.type === 'event_times') {
@@ -638,9 +750,14 @@
                             console.error("Server Error:", data.message);
                             
                             if (data.message === "Failed to start EMG stream") {
+                                // show side panel if hidden
+                                const sidebar = document.querySelector('.sidebar');
+                                sidebar.classList.remove('hidden');
+                                window.dispatchEvent(new Event('resize'));
+                                
                                 // Force the UI back to idle if start failed
                                 handleReset();
-                                setStreamingState(false, 'Error', 'red');
+                                setStreamingState(false, 'Error: Unable to connect to board', 'red');
                                 renderLoopRunning = false;
                             }
                         } 
@@ -648,7 +765,19 @@
                         else if (data.status === 'success') {
                             console.log("Command executed successfully:", data.message);
                             
-                            if (data.message === "EMG streaming stopped") {
+                            if (data.message === "EMG streaming started") {
+                                setStreamingState(true, 'Active', 'green'); // update streaming state
+                                initializeTrialCountdown(); // start trial countdown
+
+                                // hide side panel if in experimenter mode
+                                if (currentMode === 'experimenter') {
+                                    const sidebar = document.querySelector('.sidebar');
+                                    sidebar.classList.add('hidden');
+                                    window.dispatchEvent(new Event('resize'));
+                                }
+                            }
+                            
+                            else if (data.message === "EMG streaming stopped") {
                                 // Reset UI once backend has successfully stopped the stream
                                 stopAction();
                             }
@@ -659,16 +788,20 @@
                 ws.onclose = async (event) => {
                     console.warn("WebSocket Error:", event);
                     await stopStream(); // auto stop if WS disconnects
-                    setStreamingState(false, "Disconnected", "red");
-                    document.getElementById('websocketStatus').innerText = "WS Status: Disconnected";
+                    setStreamingState(false, "Websocket Disconnected", "red");
+                    const status = document.getElementById('websocketStatus');
+                    status.innerText = "WS Status: Disconnected";
+                    status.style.color = "var(--color-lower)";
                     ws = null;
                 };
         
                 ws.onerror = async (error) => {
                     console.error("WebSocket Error:", error);
                     await stopStream(); // auto stop if WS error
-                    setStreamingState(false, "Connection Error", "red");
-                    document.getElementById('websocketStatus').innerText = "WS Status: Connection Error";
+                    setStreamingState(false, "Websocket Connection Error", "red");
+                    const status = document.getElementById('websocketStatus');
+                    status.innerText = "WS Status: Connection Error";
+                    status.style.color = "var(--color-hold)";
                     ws = null;
                 }
             } catch (e) {
@@ -705,8 +838,6 @@
 
             if (sidebar.classList.contains('hidden')) {
                 sidebar.classList.remove('hidden');
-                sidebar.style.width    = '50%';
-                sidebar.style.minWidth = 'unset';
             } else {
                 sidebar.classList.add('hidden');
             }
@@ -749,40 +880,6 @@
             terminal.appendChild(entry);
             terminal.scrollTop = terminal.scrollHeight;
         }
-
-        // ----- SIDEBAR RESIZE ----- //
-        (() => {
-            const divider = document.getElementById('sidebarDivider');
-            const sidebar = document.querySelector('.sidebar');
-            let dragging  = false;
-
-            divider.addEventListener('mousedown', e => {
-                dragging = true;
-                divider.classList.add('dragging');
-                document.body.style.cursor     = 'col-resize';
-                document.body.style.userSelect = 'none';
-                e.preventDefault();
-            });
-
-            document.addEventListener('mousemove', e => {
-                if (!dragging) return;
-                const containerLeft = sidebar.parentElement.getBoundingClientRect().left;
-                let newWidth = e.clientX - containerLeft;
-                // Clamp between 200px and 60% of viewport
-                newWidth = Math.max(200, Math.min(window.innerWidth * 0.6, newWidth));
-                sidebar.style.width    = newWidth + 'px';
-                sidebar.style.minWidth = 'unset';
-                window.dispatchEvent(new Event('resize')); // reflow charts
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (!dragging) return;
-                dragging = false;
-                divider.classList.remove('dragging');
-                document.body.style.cursor     = '';
-                document.body.style.userSelect = '';
-            });
-        })();
 
         // ----- TRIAL COUNTER ----- //
         function initializeTrialCountdown() {
@@ -838,10 +935,10 @@
              
             if (display.innerText !== targetText) {
                 if (timeRemaining < PHASE_CHANGE) { // Detect rest period
-                    display.style.color = 'blue'; 
+                    display.style.color = "var(--color-rest)"; 
                 } 
                 else {// Detect event marker (movement begins)
-                    display.style.color = 'green';
+                    display.style.color = "var(--color-raise)";
                 }
 
                 display.innerText = targetText;
@@ -994,9 +1091,9 @@
         function renderLoop() {
             if (!renderLoopRunning) return;
             
-            if (!isGraphPaused) {
+            if (!isGraphPaused && currentMode === 'developer') {
                 batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
-                //batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
+                batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
             }
 
             if (latestTimestamp > 0) {
@@ -1043,10 +1140,6 @@
             }
         
             // 5: Marker interval filtering
-            /*chart.options.plugins.annotation.annotations = annotations.filter(a => 
-                a.value >= chart.options.scales.x.min && 
-                a.value <= chart.options.scales.x.max
-            );*/
             annotations = annotations.filter(a => a.value >= chart.options.scales.x.min);
 
             chart.options.plugins.annotation.annotations = annotations.filter(a => 
@@ -1086,12 +1179,6 @@
         function togglePauseGraph() {
             isGraphPaused = !isGraphPaused;
             document.getElementById('pauseGraphBtn').innerText = isGraphPaused ? 'Resume Graphs' : 'Pause Graphs';
-            
-            // If resumed, force update both graphs immediately
-            if (!isGraphPaused) {
-                redrawEMGGraph();
-                redrawAccelGraph();
-            }
         }
         
         // Zoom control functions
@@ -1274,8 +1361,6 @@
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
             
-            status.innerText = "Initializing...";
-            
             // Send number of trials per session and start stream + recording
             await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse);
         }
@@ -1374,14 +1459,13 @@
                 // Reset global states and visual elements
                 handleReset();
                 startRenderLoop();
-                initializeTrialCountdown();
 
                 ws.send(JSON.stringify(payload)); // Send start command to server
-                setStreamingState(true, `Active`, 'green'); // update UI
+                setStreamingState(true, `Connecting to board...`, 'orange'); // update UI
             
             } catch (error) { 
                 console.error(error);
-                setStreamingState(false, 'Error Starting', 'red');
+                setStreamingState(false, 'Error sending start command', 'red');
                 //alert("Error sending start command: " + error.message);
             }
         }
@@ -1394,6 +1478,11 @@
         }
         
         async function stopStream() {
+            // Show sidebar if hidden
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('hidden');
+            window.dispatchEvent(new Event('resize'));
+            
             try {
                 // Lock button briefly
                 document.getElementById('streamBtn').disabled = true; 
