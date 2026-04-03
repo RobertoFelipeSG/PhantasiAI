@@ -1,5 +1,10 @@
 # Web connection
-host_IPv4: "0.0.0.0" # "10.42.0.1" #
+host_IPv4: "0.0.0.0"       # allows RPi to be reached from any network
+heartbeat_settings:        # server ping interval, heartbeat timeout
+  connected: [3, 6]
+  pending: [10, 30]
+  failed: [10, 30]
+  none: [10, 30]
 
 # Board setup
 is_synthetic: false
@@ -7,7 +12,7 @@ num_trials: 1
 default_serial_port: "/dev/ttyACM0"
 serial_port_A: "/dev/ttyACM0"
 serial_port_B: ""
-mac_address: null          # YAML uses 'null' for Python's None
+mac_address: "2C:CF:67:E2:E9:AC"          # YAML uses 'null' for Python's None
 num_emg_ch: 1
 num_accel_ch: 3
 selected_channels: [0]
@@ -15,6 +20,7 @@ selected_channels: [0]
 # Data processing
 data_acq_buffer_seconds: 2
 num_points: 40
+board_data_timeout: 1.0
 
 # EMG signal filterings
 cutoff_freq: 50

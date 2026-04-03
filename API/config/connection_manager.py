@@ -2,6 +2,7 @@ import logging
 import asyncio
 import json
 import time
+import queue
 from datetime import datetime
 from typing import List, Optional
 from fastapi import WebSocket
@@ -22,6 +23,7 @@ class ClientSession:
     def __init__(self, websocket: WebSocket):
         '''Initialize single client connection'''
         self.websocket = websocket
+        self.last_client_pong = time.time()
         self.session_dir = None
         self.ganglion = None
         self.optimizer = None
@@ -30,21 +32,38 @@ class ClientSession:
         self.profiler = None
 
     async def cleanup(self):
-        '''Clean up resources when client disconnects'''
+        '''
+        Clean up resources when client disconnects
+        '''
         if self.watchdog_feat:
+            logging.warning("[Manager] Watchdog found. Cleaning up resource.")
             self.watchdog_feat.stop_watching()
             self.watchdog_feat = None
+        
         if self.stimulator:
+            logging.warning("[Manager] Stimulator found. Cleaning up resource")
             self.stimulator = None
+        
         if self.optimizer:
+            logging.warning("[Manager] Optimizer found. Cleaning up resource")
+            # create optimization data backup incase of sudden disconnection
+            self.optimizer.handle_stop()
             self.optimizer = None
-        if self.session_dir:
-            self.session_dir = None
+        
         if self.ganglion:
+            logging.warning("[Manager] Ganglion found. Cleaning up resource")
             self.ganglion.stop()
             self.ganglion = None
+        
         if self.profiler:
+            logging.warning("[Manager] Profiler found. Cleaning up resource")
+            # create timing metrics data backup incase of sudden disconnection
+            if self.session_dir: 
+                self.profiler.save_as_csv(Path(self.session_dir))
             self.profiler = None
+        
+        if self.session_dir:
+            self.session_dir = None
 
 class ConnectionManager:
     def __init__(self):
@@ -66,7 +85,14 @@ class ConnectionManager:
         if websocket in self.active_connections:
             await self.active_connections[websocket].cleanup()
             del self.active_connections[websocket]
-            logging.info("[Manager] Client disconnected.")
+
+            try:
+                await websocket.close(code=1000)
+                logging.info(f"[Manager] Websocket closed succesfully")
+            except Exception as e:
+                logging.error(f"[Manager] Error closing websocket manually: {e}")
+
+            logging.info(f"[Manager] Client disconnected. Total connections: {len(self.active_connections)}")
 
     def get_session(self, websocket: WebSocket) -> Optional[ClientSession]:
         return self.active_connections.get(websocket)
@@ -91,28 +117,13 @@ class WebSocketLogHandler(logging.Handler):
     def __init__(self, ws_manager):
         super().__init__()
         self.manager = ws_manager
+        self.log_queue = queue.Queue()
 
     def emit(self, record):
         try:
             log_entry = self.format(record)
-            
-            payload = json.dumps({
-                "type": "server_log", 
-                "message": log_entry
-            })
-            
-            try:
-                # 1: Schedule on the CURRENT loop (main thread)
-                loop = asyncio.get_running_loop()
-                loop.create_task(self.manager.broadcast(payload))
-            except RuntimeError:
-                # 2: If we are in a background thread, use the stored main_loop
-                if self.manager.main_loop and self.manager.main_loop.is_running():
-                    asyncio.run_coroutine_threadsafe(
-                        self.manager.broadcast(payload), 
-                        self.manager.main_loop
-                    )
-                
+            payload = json.dumps({"type": "server_log", "message": log_entry})
+            self.log_queue.put(payload)
         except Exception:
             self.handleError(record)
 

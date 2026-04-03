@@ -18,7 +18,6 @@ class SessionProfiler:
             "feat_extract": None,
             "opt_iter": None,
             "stim": None,
-            "overall_opt_stim": None,
             "_trial_end_time": time.time() 
         }
 
@@ -43,7 +42,6 @@ class SessionProfiler:
             
         filepath = base_path / "timings.csv"
         
-        # Define the exact columns you asked for
         fieldnames = [
             "trial_num",
             "overall_process",
@@ -51,7 +49,6 @@ class SessionProfiler:
             "feat_extract",
             "opt_iter",
             "stim",
-            "overall_opt_stim",
         ]
 
         try:

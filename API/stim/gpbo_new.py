@@ -454,14 +454,7 @@ class GPBOOptimizer:
 
     def run(self, file_path, curr_trial):
         #logging.info("[GPBO] Starting Bayesian optimization...")
-        
-        start_time = time.time()
         self._run_optimization(file_path, curr_trial)
-
-        duration = time.time() - start_time
-        self.profiler.log_metric(curr_trial, "overall_opt_stim", duration)
-    
-        logging.info(f"[GPBO] Overall optimization + stimulation completed. Duration: {duration:.2f} seconds.")
 
     def handle_stop(self):
         ''' Backup to save optimization data in case of sudden stop '''

@@ -10,6 +10,11 @@ CONFIG_PATH = CONFIG_DIR / "config.yaml"
 DEFAULT_CONFIG = {
     # web connection
     "host_IPv4": "0.0.0.0",
+    "heartbeat_settings": {
+        "connected": (3, 6),
+        "pending": (10, 30),
+        "failed": (10, 30),
+        "none": (10, 30) },
     
     # board setup
     "is_synthetic": False,
@@ -25,6 +30,7 @@ DEFAULT_CONFIG = {
     # data processing
     "data_acq_buffer_seconds": 2,
     "num_points": 40,
+    "board_data_timeout": 1.0,
     
     # EMG signal filterings
     "cutoff_freq": 50,

@@ -586,6 +586,16 @@
         let ws = null;
         let currentMode = 'developer';
         
+        let serverRestarting = false;
+        let heartbeat = null;
+        let pongReceived = true;
+        const IDLE_PING_INTERVAL = 10000;
+        const ACTIVE_PING_INTERVAL = 3000;
+        let CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL; // intial heartbeat = 10s (until board connects)
+        const IDLE_PING_TIMEOUT = 30000;
+        const ACTIVE_PING_TIMEOUT = 6000;
+        let CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT;
+        
         // graph vars
         let emgGraph = null;
         let accelGraph = null;
@@ -672,6 +682,24 @@
         }
         
         // ----- FRONTEND CONNECTION TO SERVER (via WebSocket) ----- //
+        function scheduleNextPing() {
+            if (heartbeat) clearTimeout(heartbeat);
+
+            heartbeat = setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ action: "client_ping" }));
+            
+                    pingTimeout = setTimeout(() => {
+                        console.warn("Server pong timeout! Closing connection.");
+                        pongReceived = false;
+                        ws.close(); 
+                    }, CLIENT_PING_TIMEOUT);
+                }
+
+                scheduleNextPing(); // recursively schedule next ping
+            }, CLIENT_PING_INTERVAL);
+        }
+        
         function connectWebSocket() {
             if (ws && ws.readyState === WebSocket.OPEN) return;
         
@@ -686,11 +714,30 @@
                     const status = document.getElementById('websocketStatus');
                     status.innerText = "WS Status: Connected";
                     status.style.color = "var(--color-raise)";
+                
+                    CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL;
+                    CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT;
+                    scheduleNextPing();
                 }
-        
+                
                 // DATA COMMUNICATION 
                 ws.onmessage = (event) => {
                     const data = JSON.parse(event.data);
+                    
+                    // Heartbeat ping/pong logic: acknowledge server's pong response
+                    if (data.type === "server_pong") {
+                        console.info("Server pong response received");
+                        pongReceived = true;
+                        if (pingTimeout) clearTimeout(pingTimeout);
+                        return;
+                    }
+
+                    // Heartbeat ping/pong logic: respond to server's ping
+                    if (data.type === "server_ping") {
+                        console.info("Responding to server's ping");
+                        ws.send(JSON.stringify({action: "client_pong"}));
+                        return;
+                    }
                     
                     // Update graph buffers with most recent EMG + Accel data
                     if (data.type === 'emg_data') {
@@ -709,19 +756,23 @@
                     }
 
                     else if (ACCEL_ENABLED && data.type === 'accel_data') {
-                        data.value[0].forEach((_, i) => {
-                            pendingAccelData.push({ x: data.timestamp[i],
-                                                    y_x: data.value[0][i],
-                                                    y_y: data.value[1][i],
-                                                    y_z: data.value[2][i] });
-                        });
+                        if (currentMode === 'developer') {
+                            data.value[0].forEach((_, i) => {
+                                pendingAccelData.push({ x: data.timestamp[i],
+                                                        y_x: data.value[0][i],
+                                                        y_y: data.value[1][i],
+                                                        y_z: data.value[2][i] });
+                            });
+                        }
                     }
                     
                     // Add most recent event markers (vertical lines)
                     else if (data.type === 'event_times') {
-                        data.timestamps.forEach(event_time => {
-                        updateEventDisplay(event_time);
-                        });
+                        if (currentMode === 'developer') {
+                            data.timestamps.forEach(event_time => {
+                            updateEventDisplay(event_time);
+                            });
+                        }
                     }
                     
                     // update trial countdown display
@@ -749,16 +800,43 @@
                         if (data.status === 'error') {
                             console.error("Server Error:", data.message);
                             
+                            // show side panel if hidden
+                            const sidebar = document.querySelector('.sidebar');
+                            sidebar.classList.remove('hidden');
+                            window.dispatchEvent(new Event('resize'));
+
+                            // reset UI if failure
+                            handleReset();
+                            renderLoopRunning = false;
+                            
                             if (data.message === "Failed to start EMG stream") {
-                                // show side panel if hidden
-                                const sidebar = document.querySelector('.sidebar');
-                                sidebar.classList.remove('hidden');
-                                window.dispatchEvent(new Event('resize'));
-                                
-                                // Force the UI back to idle if start failed
-                                handleReset();
-                                setStreamingState(false, 'Error: Unable to connect to board', 'red');
-                                renderLoopRunning = false;
+                                setStreamingState(false, 'Failed to start stream within 20 seconds', 'red');
+                            }
+
+                            if (data.message === "Unexpected error in ws loop") {
+                                setStreamingState(false, 'Unexpected error', 'red');
+                            }
+
+                            if (data.type === "board_already_in_use") {
+                                setStreamingState(false, 'Board already in use. Restarting server, please wait...', 'red');
+                                serverRestarting = true;
+                            }
+
+                            if (data.type === "port_already_in_use") {
+                                setStreamingState(false, 'Port already in use. Restarting server, please wait...', 'red');
+                                serverRestarting = true;
+                            }
+                            
+                            if (data.type === "general_brainflow_error") {
+                                setStreamingState(false, data.message, 'red');
+                            }
+                            
+                            if (data.type === "data_timeout") {
+                                setStreamingState(false, 'Stream data timeout error, check board connection', 'red');
+                            }
+
+                            if (data.type === "general_EMG_error") {
+                                setStreamingState(false, data.message, 'red');
                             }
                         } 
                         
@@ -786,22 +864,34 @@
                 }
         
                 ws.onclose = async (event) => {
-                    console.warn("WebSocket Error:", event);
-                    await stopStream(); // auto stop if WS disconnects
-                    setStreamingState(false, "Websocket Disconnected", "red");
+                    console.warn("WebSocket Disconnected:", event);
+                    if (heartbeat) clearTimeout(heartbeat);
+                    
+                    // Show sidebar if hidden
+                    const sidebar = document.querySelector('.sidebar');
+                    sidebar.classList.remove('hidden');
+                    window.dispatchEvent(new Event('resize'));
+                    
+                    // Reset UI and update streaming state
+                    stopAction();
                     const status = document.getElementById('websocketStatus');
-                    status.innerText = "WS Status: Disconnected";
                     status.style.color = "var(--color-lower)";
+                    if (serverRestarting) { status.innerText = "WS Status: Server Restarting, please refresh page"; }
+                    else if (!pongReceived) { status.innerText = "WS Status: Connection Error"; }
+                    else { status.innerText = "WS Status: Server Shutdown"; }
+                    
                     ws = null;
                 };
         
                 ws.onerror = async (error) => {
                     console.error("WebSocket Error:", error);
-                    await stopStream(); // auto stop if WS error
-                    setStreamingState(false, "Websocket Connection Error", "red");
+                    
+                    // Reset UI and update streaming state
+                    stopAction();
                     const status = document.getElementById('websocketStatus');
                     status.innerText = "WS Status: Connection Error";
                     status.style.color = "var(--color-hold)";
+                    
                     ws = null;
                 }
             } catch (e) {
@@ -1291,6 +1381,18 @@
                 status.innerText = statusMessage;
                 status.style.color = color;
             }
+
+            // Update heartbeat interval + timeout
+            if (isStreaming) { 
+                CLIENT_PING_INTERVAL = ACTIVE_PING_INTERVAL; 
+                CLIENT_PING_TIMEOUT = ACTIVE_PING_TIMEOUT; 
+            }
+            else { 
+                CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL; 
+                CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; 
+            }
+
+            scheduleNextPing();
         }
         
         // Main Sreaming Logic //
@@ -1367,6 +1469,8 @@
         
         function handleReset() {
             // Reset ALL Buffers and States
+            CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL;
+            CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT;
             pendingEmgData.length = 0;
             pendingAccelData.length = 0;
             lastInstructionPhase = "";
@@ -1461,7 +1565,7 @@
                 startRenderLoop();
 
                 ws.send(JSON.stringify(payload)); // Send start command to server
-                setStreamingState(true, `Connecting to board...`, 'orange'); // update UI
+                setStreamingState(false, 'Connecting to board...', 'orange'); // update UI
             
             } catch (error) { 
                 console.error(error);
@@ -1477,7 +1581,7 @@
             renderLoopRunning = false;
         }
         
-        async function stopStream() {
+        async function stopStream() { 
             // Show sidebar if hidden
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.remove('hidden');
@@ -1495,7 +1599,6 @@
             
             } catch (e) {
                 console.error(e);
-                //alert("Error stopping");
                 setStreamingState(true, 'Error Stopping', 'red'); // Revert if failed
                 document.getElementById('streamBtn').disabled = false;
             }

@@ -21,12 +21,13 @@ CONFIG = load_config() # load config settings
 ganglion_instance = None
 
 class SyntheticGanglionData:
-    def __init__(self, websocket, profiler, dorsi_flag, serial_port="serial_port_A", sample_rate=250, num_trials=1, folder_name=None):
+    def __init__(self, websocket, profiler, dorsi_flag, serial_port="serial_port_A", sample_rate=250, num_trials=1, folder_name=None, on_error=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
         self.profiler = profiler
         self.dorsi_flag = dorsi_flag
+        self.on_error = on_error
         self.base_path = Path(__file__).resolve().parent.parent / "data"
         self.base_path.mkdir(parents=True, exist_ok=True)
 
@@ -286,6 +287,16 @@ class SyntheticGanglionData:
 
         except Exception as e:
             logging.error(f"[Ganglion] Error in EMG thread: {e}", exc_info=True)
+
+            # if board was connected, error occured during streaming
+            if self.connection_status == "connected": 
+                if hasattr(self, 'websocket') and hasattr(self, 'on_error'):
+                    message = {"status": "error", "message": "EMG thread error"}
+                    asyncio.run_coroutine_threadsafe(self.websocket.send_json(message), loop)
+    
+                    if self.on_error:
+                        self.on_error()
+
             self.connection_status = "failed"
         
         finally:
@@ -301,7 +312,7 @@ class SyntheticGanglionData:
                     self.board_shim.release_session()
                 except Exception as e:
                     logging.warning(f"[Ganglion] Error during board release: {e}")
-            logging.info("[Ganglion] Session released.")
+            #logging.info("[Ganglion] Session released.")
     
     def start(self, loop):
         if getattr(self, "_emg_thread", None) is not None and self._emg_thread.is_alive():

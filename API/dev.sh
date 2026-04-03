@@ -12,4 +12,4 @@ else
 fi
 
 echo "Starting PhantasiAI..."
-python3 main.py
+exec ./venv/bin/python3 main.py
