@@ -195,7 +195,7 @@ class GanglionData:
         self._accel_outlet.push_chunk(accel_data.T.tolist()) # push to LSL
         '''json_accel = json.dumps({
             "type": "accel_data",
-CLIENT_PING_INTERVAL = 20000;CLIENT_PING_INTERVAL = 20000;            "timestamp": relative_timestamps.tolist(),
+            "timestamp": relative_timestamps.tolist(),
             "value": accel_data.tolist()
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(json_accel), loop)'''
