@@ -183,6 +183,7 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         hb_stop.set()
         hb_task.cancel()
+        await handle_stop_stream(session)
         await manager.disconnect(websocket)
 
 async def handle_start_stream(session, data):
