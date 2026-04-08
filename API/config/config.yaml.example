@@ -10,7 +10,7 @@ heartbeat_settings:        # server ping interval, heartbeat timeout
 is_synthetic: false
 num_trials: 1
 default_serial_port: "/dev/ttyACM0"
-serial_port_A: "/dev/ttyACM0"
+serial_port_A: "/dev/ttyACM0"             # default serial port
 serial_port_B: ""
 mac_address: "2C:CF:67:E2:E9:AC"          # YAML uses 'null' for Python's None
 num_emg_ch: 1

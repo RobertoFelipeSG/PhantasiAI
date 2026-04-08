@@ -21,12 +21,10 @@ Thumbs.db
 
 # Ignore all recording, classification, and stimulation files
 data/
-stim/stim.txt
 stim/extras/
 
 # Ignore personal settings
 config/config.yaml
 
 # Ignore testing logs
-test_timings.txt
 config/testing_logs.txt
