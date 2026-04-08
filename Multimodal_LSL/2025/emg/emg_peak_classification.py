@@ -8,7 +8,10 @@ and classifies the data using multiple ML models with cross-validation for model
 
 The peak_analysis_results.csv file contains:
 - Time: Timestamp of the highest peak in each trial
-- fwEMG 3: Amplitude of the highest peak
+- EMG: Amplitude of the highest peak
+- Min_Peak_Amplitude: Minimum peak amplitude in the trial
+- Mean_Frequency: Mean frequency of the EMG signal
+- Median_Frequency: Median frequency of the EMG signal
 - Subject: Subject identifier (S01-S07)
 - MVC: MVC percentage (10, 25, 50)
 - Trial: Trial number (1, 2, 3)
@@ -24,7 +27,12 @@ from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.linear_model import LogisticRegression
-from xgboost import XGBClassifier
+try:
+    from xgboost import XGBClassifier
+    XGBOOST_AVAILABLE = True
+except ImportError:
+    XGBOOST_AVAILABLE = False
+    print("XGBoost not available. Install with: pip install xgboost")
 import time
 from pathlib import Path
 import warnings
@@ -55,18 +63,26 @@ def find_latest_peak_results():
     return results_file
 
 def create_features(df):
-    """Create features from the peak analysis results."""
+    """Create enhanced features from the peak analysis results."""
     features = []
     labels = []
     
     # Group by Subject, MVC, and Trial to get one sample per trial
     for (subject, mvc, trial), group in df.groupby(['Subject', 'MVC', 'Trial']):
         if len(group) > 0:
-            # Use only the highest peak amplitude as the feature
-            peak_amplitude = group['fwEMG 3'].max()
+            # Extract enhanced features
+            peak_amplitude = group['EMG'].max()  # Maximum peak amplitude
+            min_peak_amplitude = group['Min_Peak_Amplitude'].iloc[0]  # Minimum peak amplitude
+            mean_frequency = group['Mean_Frequency'].iloc[0]  # Mean frequency
+            median_frequency = group['Median_Frequency'].iloc[0]  # Median frequency
             
-            # Create feature vector (only peak amplitude)
-            feature_vector = [peak_amplitude]
+            # Create feature vector with all 4 features
+            feature_vector = [
+                peak_amplitude,
+                min_peak_amplitude,
+                mean_frequency,
+                median_frequency
+            ]
             
             features.append(feature_vector)
             labels.append(mvc)
@@ -110,7 +126,25 @@ def cross_validate_model(model, X_train_scaled, y_train, model_name):
         'avg_fit_time': avg_fit_time
     }
 
-def evaluate_best_model_on_test_set(best_model, X_train_scaled, X_test_scaled, y_train, y_test, model_name, label_encoder):
+def analyze_feature_importance(model, feature_names, model_name):
+    """Analyze feature importance for tree-based models."""
+    if hasattr(model, 'feature_importances_'):
+        importances = model.feature_importances_
+        print(f"\n{model_name} Feature Importance:")
+        for i, (name, importance) in enumerate(zip(feature_names, importances)):
+            print(f"  {name}: {importance:.4f}")
+        return importances
+    elif hasattr(model, 'coef_'):
+        coefficients = np.abs(model.coef_[0])  # Take absolute values
+        print(f"\n{model_name} Feature Coefficients (absolute):")
+        for i, (name, coef) in enumerate(zip(feature_names, coefficients)):
+            print(f"  {name}: {coef:.4f}")
+        return coefficients
+    else:
+        print(f"\n{model_name} does not provide feature importance information.")
+        return None
+
+def evaluate_best_model_on_test_set(best_model, X_train_scaled, X_test_scaled, y_train, y_test, model_name, label_encoder, feature_names):
     """Evaluate the best model on the test set."""
     print(f"\n* Final Evaluation on Test Set *")
     
@@ -131,9 +165,17 @@ def evaluate_best_model_on_test_set(best_model, X_train_scaled, X_test_scaled, y
     print(f"Test F1 Score: {test_f1:.4f}")
     print(f"Training Time: {training_time:.2f}s")
     
+    # Analyze feature importance
+    analyze_feature_importance(best_model, feature_names, model_name)
+    
     # Convert predictions back to original labels for reporting
     y_test_original = label_encoder.inverse_transform(y_test)
     y_pred_original = label_encoder.inverse_transform(y_pred)
+    
+    # Print confusion matrix
+    print(f"\nConfusion Matrix:")
+    cm = confusion_matrix(y_test_original, y_pred_original, labels=label_encoder.classes_)
+    print(cm)
     
     # Print detailed classification report
     print(f"\nDetailed Classification Report:")
@@ -143,7 +185,8 @@ def evaluate_best_model_on_test_set(best_model, X_train_scaled, X_test_scaled, y
         'test_accuracy': test_accuracy,
         'test_f1': test_f1,
         'training_time': training_time,
-        'predictions': y_pred
+        'predictions': y_pred,
+        'confusion_matrix': cm
     }
 
 def main():
@@ -173,6 +216,23 @@ def main():
     print(f"MVC levels: {sorted(df['MVC'].unique())}")
     print(f"Trials: {sorted(df['Trial'].unique())}")
     
+    # Show feature statistics
+    print(f"\n=== Feature Statistics ===")
+    feature_cols = ['EMG', 'Min_Peak_Amplitude', 'Mean_Frequency', 'Median_Frequency']
+    for col in feature_cols:
+        if col in df.columns:
+            print(f"{col}:")
+            print(f"  Mean: {df[col].mean():.4f}")
+            print(f"  Std:  {df[col].std():.4f}")
+            print(f"  Min:  {df[col].min():.4f}")
+            print(f"  Max:  {df[col].max():.4f}")
+    
+    # Show class distribution
+    print(f"\n=== Class Distribution ===")
+    class_counts = df['MVC'].value_counts().sort_index()
+    for mvc, count in class_counts.items():
+        print(f"MVC {mvc}%: {count} samples ({count/len(df)*100:.1f}%)")
+    
     # Create features and labels
     print("\n=== Feature Engineering ===")
     X, y = create_features(df)
@@ -181,7 +241,7 @@ def main():
     print(f"Labels shape: {y.shape}")
     print(f"Unique labels: {sorted(np.unique(y))}")
     
-    feature_names = ['Peak_Amplitude']
+    feature_names = ['Peak_Amplitude', 'Min_Peak_Amplitude', 'Mean_Frequency', 'Median_Frequency']
     print(f"Feature names: {feature_names}")
     
     # Check for NaN values in features
@@ -239,15 +299,20 @@ def main():
     print(f"\nTest set class distribution:")
     print(pd.Series(y_test).value_counts().sort_index())
     
-    # Define models
+    # Define models with optimized parameters
     models = {
-        "SVM": SVC(kernel='rbf', random_state=42),
-        "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "SVM": SVC(kernel='rbf', C=1.0, gamma='scale', random_state=42),
+        "Random Forest": RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42),
         "LDA": LinearDiscriminantAnalysis(),
-        "KNN": KNeighborsClassifier(n_neighbors=5),
-        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
-        "XGBoost": XGBClassifier(random_state=42)
+        "KNN": KNeighborsClassifier(n_neighbors=7, weights='distance'),
+        "Logistic Regression": LogisticRegression(max_iter=1000, C=1.0, random_state=42)
     }
+    
+    # Add XGBoost if available
+    if XGBOOST_AVAILABLE:
+        models["XGBoost"] = XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=42)
+    else:
+        print("XGBoost not available - skipping XGBoost model")
     
     # Cross-validation for model selection
     print("\n" + "=" * 60)
@@ -272,8 +337,20 @@ def main():
     print("=" * 60)
     
     final_results = evaluate_best_model_on_test_set(
-        best_model, X_train_scaled, X_test_scaled, y_train, y_test, best_model_name, label_encoder
+        best_model, X_train_scaled, X_test_scaled, y_train, y_test, best_model_name, label_encoder, feature_names
     )
+    
+    # Model comparison summary
+    print("\n" + "=" * 60)
+    print("Model Comparison Summary")
+    print("=" * 60)
+    print(f"{'Model':<20} {'CV Acc':<10} {'CV F1':<10} {'Test Acc':<10} {'Test F1':<10}")
+    print("-" * 60)
+    
+    for name, results in cv_results.items():
+        test_acc = final_results['test_accuracy'] if name == best_model_name else "N/A"
+        test_f1 = final_results['test_f1'] if name == best_model_name else "N/A"
+        print(f"{name:<20} {results['test_accuracy']:<10.4f} {results['test_f1']:<10.4f} {test_acc:<10} {test_f1:<10}")
     
     # Summary
     print("\n" + "=" * 60)
@@ -284,6 +361,14 @@ def main():
     print(f"Best model: {best_model_name}")
     print(f"Final test accuracy: {final_results['test_accuracy']:.4f}")
     print(f"Final test F1: {final_results['test_f1']:.4f}")
+    
+    # Save results
+    print(f"\n=== Results Summary ===")
+    print(f"Best performing model: {best_model_name}")
+    print(f"Cross-validation accuracy: {cv_results[best_model_name]['test_accuracy']:.4f}")
+    print(f"Cross-validation F1: {cv_results[best_model_name]['test_f1']:.4f}")
+    print(f"Test set accuracy: {final_results['test_accuracy']:.4f}")
+    print(f"Test set F1: {final_results['test_f1']:.4f}")
 
 if __name__ == "__main__":
     main()

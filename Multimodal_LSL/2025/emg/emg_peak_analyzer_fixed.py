@@ -57,7 +57,12 @@ class EMGPeakAnalyzerFixed:
         print(f"Available columns: {self.df_emg.columns.tolist()}")
         
         # Handle different possible column names for EMG data
-        if 'fwEMG 3' in self.df_emg.columns:
+        if 'EMG' in self.df_emg.columns:
+            # New master dataset format
+            emg_signal = self.df_emg['EMG'].dropna().values
+            time_vector = self.df_emg['Time'].iloc[:len(emg_signal)].values
+            print(f"Using 'EMG' column for EMG data")
+        elif 'fwEMG 3' in self.df_emg.columns:
             # Combined dataset format
             emg_signal = self.df_emg['fwEMG 3'].dropna().values
             time_vector = self.df_emg['Time'].iloc[:len(emg_signal)].values
@@ -104,25 +109,58 @@ class EMGPeakAnalyzerFixed:
         """Detect peaks in the filtered EMG signal."""
         start_idx = 0
         stop_idx = self.raw_filtered.n_times
-        data, self.times = self.raw_filtered[:, start_idx:stop_idx]
+        data, mne_times = self.raw_filtered[:, start_idx:stop_idx]
+        
+        # Use the original time vector from the CSV file, not MNE's internal time
+        self.times = self.time_vector
         
         # Remove DC offset
         data_centered = data.squeeze() - data.squeeze().mean()
         
-        # Calculate height threshold
-        height_threshold = np.percentile(np.abs(data_centered), self.height_percentile)
+        # Extract envelope using Hilbert transform
+        from scipy.signal import hilbert
+        analytic_signal = hilbert(data_centered)
+        envelope = np.abs(analytic_signal)
+        print(f"Extracted signal envelope using Hilbert transform")
+        
+        # Resample envelope to 200Hz
+        from scipy import signal
+        target_sampling_rate = 200
+        current_sampling_rate = self.sampling_rate
+        
+        # Calculate resampling factor
+        resample_factor = target_sampling_rate / current_sampling_rate
+        new_length = int(len(envelope) * resample_factor)
+        
+        # Resample the envelope
+        envelope_resampled = signal.resample(envelope, new_length)
+        
+        # Create new time vector for resampled signal
+        original_duration = self.times[-1] - self.times[0]
+        resampled_times = np.linspace(self.times[0], self.times[-1], new_length)
+        
+        print(f"Resampled envelope from {current_sampling_rate}Hz to {target_sampling_rate}Hz")
+        print(f"Original length: {len(envelope)}, Resampled length: {len(envelope_resampled)}")
+        
+        # Store resampled data for later use
+        self.envelope_resampled = envelope_resampled
+        self.resampled_times = resampled_times
+        self.resampled_sampling_rate = target_sampling_rate
+        
+        # Calculate height threshold on resampled envelope
+        height_threshold = np.percentile(envelope_resampled, self.height_percentile)
         print(f"Height threshold (percentile {self.height_percentile}): {height_threshold:.4f} µV")
         
-        # Detect peaks (only positive peaks)
+        # Detect peaks in the resampled envelope
         self.peaks, properties = find_peaks(
-            data_centered,  # Use original signal to detect only positive peaks
+            envelope_resampled,  # Use resampled envelope for peak detection
             height=height_threshold,
-            distance=int(self.min_distance * self.sampling_rate)
+            distance=int(self.min_distance * target_sampling_rate)  # Adjust distance for new sampling rate
         )
         
-        print(f"Detected {len(self.peaks)} peaks")
+        print(f"Detected {len(self.peaks)} peaks in resampled envelope")
         if len(self.peaks) > 0:
-            peak_amplitudes = data_centered[self.peaks]  # Use actual peak values (not absolute)
+            peak_amplitudes = envelope_resampled[self.peaks]  # Use envelope values
             print(f"Peak amplitudes range: {peak_amplitudes.min():.4f} to {peak_amplitudes.max():.4f} µV")
 
     def _save_results(self):
@@ -152,15 +190,15 @@ class EMGPeakAnalyzerFixed:
             if len(self.peaks) > 0:
                 f.write(f"\nPeak details:\n")
                 for i, peak_idx in enumerate(self.peaks):
-                    peak_time = self.times[peak_idx]
-                    peak_amplitude = self.raw_filtered.get_data().squeeze()[peak_idx]
+                    peak_time = self.resampled_times[peak_idx]
+                    peak_amplitude = self.envelope_resampled[peak_idx]
                     f.write(f"Peak {i+1}: Time={peak_time:.3f}s, Amplitude={peak_amplitude:.4f}µV\n")
         
         print(f"[PeakAnalyzer] Results saved to: {relative_output_path}")
 
     def _plot(self):
         """Plot the EMG signal with detected peaks."""
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10), layout="constrained")
+        fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(15, 12), layout="constrained")
         
         # Plot original signal
         ax1.plot(self.time_vector, self.emg_signal, label='Original EMG Signal', alpha=0.7)
@@ -170,33 +208,41 @@ class EMGPeakAnalyzerFixed:
         ax1.legend()
         ax1.grid(True, alpha=0.3)
         
-        # Plot filtered signal with peaks
+        # Plot filtered and centered signal
         data_centered = self.raw_filtered.get_data().squeeze() - self.raw_filtered.get_data().squeeze().mean()
         ax2.plot(self.times, data_centered, label='Filtered EMG (centered)', alpha=0.7)
+        ax2.set_xlabel("Time (s)")
+        ax2.set_ylabel("Amplitude (µV)")
+        ax2.set_title("Filtered and Centered EMG Signal")
+        ax2.legend()
+        ax2.grid(True, alpha=0.3)
+        
+        # Plot resampled envelope with peaks
+        ax3.plot(self.resampled_times, self.envelope_resampled, label='Resampled Envelope (200Hz)', alpha=0.7, color='orange')
         
         if len(self.peaks) > 0:
-            peak_times = self.times[self.peaks]
-            peak_amplitudes = data_centered[self.peaks]
+            peak_times = self.resampled_times[self.peaks]
+            peak_amplitudes = self.envelope_resampled[self.peaks]
             
             # Plot all peaks
-            ax2.scatter(peak_times, peak_amplitudes, color='red', s=50, alpha=0.8, label='Detected Peaks')
+            ax3.scatter(peak_times, peak_amplitudes, color='red', s=50, alpha=0.8, label='Detected Peaks')
             
             # Highlight the highest peak
-            max_peak_idx = np.argmax(peak_amplitudes)  # Find the highest positive peak
-            ax2.scatter(peak_times[max_peak_idx], peak_amplitudes[max_peak_idx], 
+            max_peak_idx = np.argmax(peak_amplitudes)
+            ax3.scatter(peak_times[max_peak_idx], peak_amplitudes[max_peak_idx], 
                        color='green', s=100, marker='*', edgecolors='black', linewidth=2,
                        label=f'Highest Peak: {peak_amplitudes[max_peak_idx]:.3f}µV')
             
             # Add peak count to title
-            title = f"Filtered EMG Signal with {len(self.peaks)} Peaks"
+            title = f"Resampled Envelope with {len(self.peaks)} Peaks"
         else:
-            title = "Filtered EMG Signal (No Peaks Detected)"
+            title = "Resampled Envelope (No Peaks Detected)"
         
-        ax2.set_xlabel("Time (s)")
-        ax2.set_ylabel("Amplitude (µV)")
-        ax2.set_title(title)
-        ax2.legend()
-        ax2.grid(True, alpha=0.3)
+        ax3.set_xlabel("Time (s)")
+        ax3.set_ylabel("Amplitude (µV)")
+        ax3.set_title(title)
+        ax3.legend()
+        ax3.grid(True, alpha=0.3)
         
         plt.tight_layout()
         plt.show()
@@ -230,11 +276,11 @@ class EMGPeakAnalyzerFixed:
 
         # Return results with peak times and amplitudes
         if len(self.peaks) > 0:
-            peak_times = self.times[self.peaks]
-            peak_amplitudes = self.raw_filtered.get_data().squeeze()[self.peaks]
+            peak_times = self.resampled_times[self.peaks]
+            peak_amplitudes = self.envelope_resampled[self.peaks]
             
             # Find the highest peak
-            max_peak_idx = np.argmax(peak_amplitudes)  # Find the highest positive peak
+            max_peak_idx = np.argmax(peak_amplitudes)
             highest_peak_time = peak_times[max_peak_idx]
             highest_peak_amplitude = peak_amplitudes[max_peak_idx]
         else:

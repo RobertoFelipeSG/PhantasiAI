@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont
 import platform
-from emg_peak_analyzer import EMGPeakAnalyzer 
+from emg_peak_classifier import EMGPeakClassifier 
 from batch_peak_analysis import BatchPeakAnalyzer
 import os
 import sys
@@ -142,27 +142,56 @@ def run_single_file_analysis():
 
     print(f"Selected file: {file_path}")
 
-    sampling_rate = 220
+    sampling_rate = 10000  # Updated to 10kHz to match training database
     height_percentile = 98
     min_distance = 3  
 
-    analyzer = EMGPeakAnalyzer(
+    # Try to find a trained LDA model
+    model_path = None
+    possible_model_paths = [
+        Path(__file__).parent / "lda_model.pkl",
+        Path(__file__).parent.parent / "dataset" / "batch_peak_analysis_20250814_105200" / "lda_model.pkl"
+    ]
+    
+    for path in possible_model_paths:
+        if path.exists():
+            model_path = str(path)
+            print(f"Found LDA model: {model_path}")
+            break
+    
+    if not model_path:
+        print("Warning: No LDA model found. Classification will be skipped.")
+
+    analyzer = EMGPeakClassifier(
         csv_path=file_path,
+        model_path=model_path,
         sampling_rate=sampling_rate,
         height_percentile=height_percentile,
         min_distance=min_distance
     )
 
-    results = analyzer.run(show_plots=False, save_results=True)
+    results = analyzer.run(show_plots=False, save_results=True, classify_peaks=True)
 
     print("Analysis Complete")
     print(f"Detected {results['num_peaks']} peaks")
     print(f"Duration: {results['signal_duration']:.2f} seconds")
+    
+    if results.get('classifications'):
+        print(f"Classified {len(results['classifications'])} peaks")
+        # Show classification summary
+        class_counts = {}
+        for result in results['classifications']:
+            cls = result['predicted_class']
+            class_counts[cls] = class_counts.get(cls, 0) + 1
+        
+        print("Classification summary:")
+        for cls, count in sorted(class_counts.items()):
+            print(f"  {cls}% MVC: {count} peaks")
 
 def run_batch_analysis():
     """Run batch analysis on the combined dataset."""
     # Check if default dataset exists
-    default_dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex.csv"
+    default_dataset_path = Path(__file__).parent.parent / "dataset" / "combined_emg_dorsiflex_master.csv"
     
     if default_dataset_path.exists():
         print(f"Found default dataset: {default_dataset_path}")

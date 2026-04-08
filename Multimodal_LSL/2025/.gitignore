@@ -7,5 +7,6 @@ peak_verification_plots/
 # Large dataset files
 dataset/combined_emg_dorsiflex.csv
 *.csv
+Multimodal_LSL/2025/dataset/
 
 
