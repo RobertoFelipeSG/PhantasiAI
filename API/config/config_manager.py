@@ -47,7 +47,6 @@ DEFAULT_CONFIG = {
     "features": ['max_amplitude'],
 
     # GPBO
-    "is_calibrated": False,
     "iterations": 40,
     "repetitions": 10,
     "num_rand": 1,
@@ -61,7 +60,10 @@ DEFAULT_CONFIG = {
     # stimulator
     "gpio_chip": "/dev/gpiochip4",
     "gpio_pin": 12,
-    "duration": 2.5
+    "duration": 2.5,
+
+    # calibrator
+    "n_calb_reps": 10
 }
 
 def load_config():

@@ -22,6 +22,8 @@ Thumbs.db
 # Ignore all recording, classification, and stimulation files
 data/
 stim/extras/
+calibrate/calibrations/
+calibrate/ground_truth.csv
 
 # Ignore personal settings
 config/config.yaml

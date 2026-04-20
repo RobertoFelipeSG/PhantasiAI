@@ -455,6 +455,7 @@
         <div class="mode-buttons">
             <button class="mode-btn developer" onclick="selectMode('developer')">Developer</button>
             <button class="mode-btn experimenter" onclick="selectMode('experimenter')">Experimenter</button>
+            <button class="mode-btn developer" onclick="selectMode('calibrator')">Calibrator</button>
         </div>
     </div>
 
@@ -513,6 +514,12 @@
                 </div>
                 <div id="markerRow"> <span id="markerCountdownDisplay" style="font-weight: bold; color: #666;"></span>
                 </div>
+            </div>
+
+            <!-- Generate Ground Truth Feature -->
+            <div class="controls-bar" id="gtButtonRow">
+                <button id="generateGTBtn" onclick="handleGenerateGT()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); ">Generate Ground Truth</button>
+                <div id="gtStatusMessage" style="margin-top: 10px; font-size: 14px;"></div>
             </div>
 
             <!-- Chat Terminal -->
@@ -617,8 +624,10 @@
         
         // Constants
         const defaultTotalTrials = 401;
+        const defaultCalbTotalTrials = 251
         const defaultNumTrials = 1;
         const defaultNumIters = 40;
+        const defaultCalbNumIters = 25;
         const defaultNumReps = 10;
 
         // Side panel variables
@@ -670,6 +679,34 @@
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
                 });
+            
+            } else if (mode === 'calibrator') {
+                // Hide the tab bar and Graphs entirely 
+                document.querySelector('.tab').style.display = 'none';
+                document.getElementById('Graphs').style.display = 'none';
+ 
+                // Show Instructions directly (no tab click needed)
+                document.getElementById('Instructions').style.display = 'flex';
+ 
+                // Set sidebar width and hide the terminal (same as experimenter)
+                document.querySelector('.sidebar').style.width = '15%';
+                document.querySelector('.sidebar').style.minWidth = 'unset';
+                document.querySelector('.terminal-wrapper').style.display = 'none';
+                terminalEnabled = false;
+ 
+                // Hide specific controls (keep: WS Status, Board ID, Repetitions, Folder Name, Streaming Status)
+                const hideIds = ['serialPortRow', 'trialInputRow', 'itersRow', 'markerRow'];
+                hideIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+ 
+                // Set default iterations for calibrator mode
+                document.getElementById('iters').value = defaultCalbNumIters;
+
+                // Hide Ground Truth button until calibration complete
+                document.getElementById('gtButtonRow').style.display = 'none';
+            
             } else {
                 // Developer mode
                 document.getElementById("defaultOpen").click();
@@ -677,6 +714,7 @@
             }
 
             // Common init for both modes
+            document.getElementById('gtButtonRow').style.display = 'none'; // Hide ground truth feature (only appears after calibration complete)
             setStreamingState(false, 'Idle');
             connectWebSocket();
         }
@@ -691,6 +729,9 @@
             
                     pingTimeout = setTimeout(() => {
                         console.warn("Server pong timeout! Closing connection.");
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ action: "hb_timeout" }));
+                        }
                         pongReceived = false;
                         ws.close(); 
                     }, CLIENT_PING_TIMEOUT);
@@ -838,6 +879,20 @@
                             if (data.type === "general_EMG_error") {
                                 setStreamingState(false, data.message, 'red');
                             }
+
+                            // error handling if ground truth generation failed
+                            if (data.message === "Failed to generate ground truth") {
+                                const gtStatusMsg = document.getElementById('gtStatusMessage');
+                                const gtBtn = document.getElementById('generateGTBtn');
+                                
+                                gtStatusMsg.innerText = "Error! Could not generate ground truth";
+                                gtStatusMsg.style.color = 'var(--color-hold)'; // Red
+                                
+                                // Re-enable button so user can try again
+                                gtBtn.disabled = false;
+                                gtBtn.style.cursor = 'pointer';
+                                gtBtn.style.opacity = '1';
+                            }
                         } 
                         
                         else if (data.status === 'success') {
@@ -848,16 +903,39 @@
                                 initializeTrialCountdown(); // start trial countdown
 
                                 // hide side panel if in experimenter mode
-                                if (currentMode === 'experimenter') {
+                                if (currentMode === 'experimenter' || currentMode === 'calibrator') {
                                     const sidebar = document.querySelector('.sidebar');
                                     sidebar.classList.add('hidden');
                                     window.dispatchEvent(new Event('resize'));
                                 }
+
+                                // hide ground truth generation button (for calibrator mode)
+                                document.getElementById('gtButtonRow').style.display = 'none';
+                                document.getElementById('gtStatusMessage').innerText = "";
                             }
                             
                             else if (data.message === "EMG streaming stopped") {
                                 // Reset UI once backend has successfully stopped the stream
                                 stopAction();
+                            }
+
+                            else if (data.message === "Calibration complete") {
+                                // Enable the Generate Ground Truth button
+                                if (currentMode === 'calibrator') {
+                                    document.getElementById('gtButtonRow').style.display = 'block';
+                                }
+                            }
+
+                            else if (data.message === "Ground truth generated") {
+                                // Show success message if ground truth generated
+                                const gtStatusMsg = document.getElementById('gtStatusMessage');
+                                gtStatusMsg.innerText = "Success! Please proceed to experimenter mode";
+                                gtStatusMsg.style.color = 'var(--color-raise)'; // Green
+
+                                const gtBtn = document.getElementById('generateGTBtn');
+                                gtBtn.disabled = false;
+                                gtBtn.style.cursor = 'pointer';
+                                gtBtn.style.opacity = '1';
                             }
                         }
                     }
@@ -975,9 +1053,9 @@
         function initializeTrialCountdown() {
             const itersInput = document.getElementById('iters');
             const repsInput = document.getElementById('reps');
-            const itersValue = parseInt(itersInput.value) || defaultNumIters;
+            const itersValue = parseInt(itersInput.value) || (currentMode === 'calibrator' ? defaultCalbNumIters : defaultNumIters);
             const repsValue = parseInt(repsInput.value) || defaultNumReps;
-            const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : defaultTotalTrials;
+            const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
             const display = document.getElementById('trialCounterDisplay');
 
             if (!display) return;
@@ -1384,15 +1462,41 @@
 
             // Update heartbeat interval + timeout
             if (isStreaming) { 
+                console.info("Setting pings to active mode")
                 CLIENT_PING_INTERVAL = ACTIVE_PING_INTERVAL; 
                 CLIENT_PING_TIMEOUT = ACTIVE_PING_TIMEOUT; 
             }
             else { 
+                console.info("Setting pings to idle mode")
                 CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL; 
                 CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; 
             }
 
             scheduleNextPing();
+        }
+        
+        // Ground truth generator function //
+        function handleGenerateGT() {
+            // Disable button and show "Generating..." message
+            const gtBtn = document.getElementById('generateGTBtn');
+            const gtStatusMsg = document.getElementById('gtStatusMessage');
+            
+            gtBtn.disabled = true;
+            gtBtn.style.cursor = 'not-allowed';
+            gtBtn.style.opacity = '0.5';
+            gtStatusMsg.innerText = "Generating...";
+            gtStatusMsg.style.color = '#e65100'; // Orange
+ 
+            // Send generate ground truth command to backend
+            const payload = {
+                action: "generate_gt",
+                mode: "individual"
+            };
+ 
+            // Send gt generation command to server
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify(payload));
+            }
         }
         
         // Main Sreaming Logic //
@@ -1432,7 +1536,7 @@
             const itersInput = document.getElementById('iters').value;
             let numIters = parseFloat(itersInput);
             if (isNaN(numIters) || numIters < 1 || numIters > 50) {
-                numIters = defaultNumIters;
+                numIters = currentMode === 'calibrator' ? defaultCalbNumIters : defaultNumIters;
             }
 
             const repsInput = document.getElementById('reps').value;
@@ -1550,7 +1654,7 @@
 
             // Prepare backend command payload
             const payload = {
-                action: "start_stream",
+                action: currentMode === 'calibrator' ? "start_calibration" : "start_stream",
                 serial_port: portToUse,
                 num_trials: numTrials,
                 num_iters: numIters,
@@ -1591,6 +1695,12 @@
                 // Lock button briefly
                 document.getElementById('streamBtn').disabled = true; 
                 document.getElementById('streamingStatus').innerText = "Stopping...";
+
+                // Set ping interval/timeout to idle mode
+                console.info("Setting pings to idle mode")
+                CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL; 
+                CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; 
+                scheduleNextPing();
                 
                 // Send stop command to server
                 if (ws && ws.readyState === WebSocket.OPEN) {

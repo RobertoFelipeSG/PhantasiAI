@@ -28,7 +28,7 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, dorsi_flag, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None):
+    def __init__(self, stimulator, dorsi_flag, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
         self.file_path = None
         self.stimulator = stimulator
         self.profiler = profiler
@@ -37,10 +37,14 @@ class GPBOOptimizer:
         self.recordings_directory = recordings_directory
         self.topic = client_topic
         self.on_complete = on_complete
+        self.on_stim_fail = on_stim_fail
         
-        self.base_path = Path(__file__).parent
-        self.output_file = self.base_path / "stim.txt"
-        self.gp_prior_path = self.base_path / "gp_prior.pt"
+        # get ground truth/calibration data 
+        parent_base_path = Path(__file__).parent.parent
+        self.calb_dir = os.path.join(str(parent_base_path), "calibrate")
+        os.makedirs(self.calb_dir, exist_ok=True)
+        self.gt_path = os.path.join(str(self.calb_dir), "ground_truth.csv")
+        
         self.n_optimizations = 0 # tracks how many optimization runs have been completed
         
         # set configuration parameters
@@ -68,6 +72,9 @@ class GPBOOptimizer:
         self.curr_iter = 0 # tracks how many iterations completed 
         self.curr_rep = 0 # tracks how many repetitions completed 
         self.opt_complete = False
+        self.data_saved = False
+        self.visuals_complete = False
+        self.model_evals_complete = False
         self.history = {} # stores data, gp, and converged params of final iteration for each rep
         
         # state variables for current repetition, one iteration
@@ -86,8 +93,6 @@ class GPBOOptimizer:
         # initialize the search grid (bc it's gonna be the same everytime)
         self.dutycycles = np.array(CONFIG.get("dutycycles"))
         self.frequencies = np.array(CONFIG.get("frequencies"))
-        self.n_dim = 2 # num of stimulation parameters
-        self.n_val = 5 # num of options per parameter
         self.X_test, self.X_test_norm, self.bounds_discrete = self._initialize_input_grid()
         self._visualize_initial_maps()
     
@@ -220,6 +225,99 @@ class GPBOOptimizer:
 
         logging.info(f"[GPBO] Visualizations complete. Duration: {time.time() - start_time:.2f} seconds.")
     
+    def _visualize_evals(self, rep_idx, p_explore_list, p_exploit_list):
+        ''' 
+        Visualizes the evolution of the exploration and exploitation metrics for one repetition
+        '''
+        iters = list(range(1, self.n_iters + 1))
+        
+        plt.figure(figsize=(8, 5))
+        plt.plot(iters, p_explore_list, label='Exploration', marker='o', linestyle='--')
+        plt.plot(iters, p_exploit_list, label='Exploitation', marker='x', linestyle='-')
+        
+        plt.title(f"Performance Evolution: Repetition {rep_idx}")
+        plt.xlabel("Iteration")
+        plt.ylabel("Efficacy Ratio")
+        plt.ylim(0, 1.1)
+        plt.grid(True, alpha=0.3)
+        plt.legend()
+        
+        # Save the figure in the maps directory
+        filename = f"performance_{rep_idx}.png"
+        output_path = os.path.join(self.maps_dir, filename)
+        plt.tight_layout()
+        plt.savefig(output_path)
+        plt.close()
+        
+    def _perform_model_eval(self):
+        '''
+        Calculates the exploration and exploitation metrics for each query to evaluate the model
+        This is ran after all repetitions are complete
+        '''
+        # load ground truth data and get optimum
+        if not os.path.exists(self.gt_path):
+            logging.warning("[GPBO] Evaluation skipped: ground_truth.csv not found")
+            return
+        gt_df = pd.read_csv(self.gt_path)
+        
+        if len(gt_df) != (len(self.dutycycles) * len(self.frequencies)):
+            logging.warning("[GPBO] Ground truth table does not match stimulation parameter options")
+            return
+        gt_max_val = gt_df['max_amplitude'].max()
+
+        all_eval_data = []
+
+        # iter through history to get posterior means and tested parameters for each repetition
+        for rep_idx, rep_data in self.history.items():
+            posteriors = rep_data['posteriors']
+            tested_params = rep_data['tested_params']
+            
+            p_explore_list = []
+            p_exploit_list = []
+
+            # iter through the posterior mean in ascending order
+            for iter_idx in sorted(posteriors.keys()):
+                
+                # calculate exploration metric: efficacy of predicted optimum
+                pred_means = posteriors[iter_idx]['mean']
+                pred_opt_idx = np.argmax(pred_means)
+                pred_opt_params = self.X_test[pred_opt_idx]
+
+                pred_max_val = gt_df[
+                    np.isclose(gt_df['dutycycle'], pred_opt_params[0]) & 
+                    np.isclose(gt_df['frequency'], pred_opt_params[1])
+                ]['max_amplitude'].values[0]
+                p_explore = pred_max_val / gt_max_val
+                p_explore_list.append(p_explore)
+
+                # calculate exploitation metric: efficacy of queried parameters
+                # note: iter_idx starts at 1; tested_params starts at 0
+                if (iter_idx - 1) < len(tested_params):
+                    queried_params = tested_params[iter_idx - 1]
+                    queried_val = gt_df[
+                        np.isclose(gt_df['dutycycle'], float(queried_params[0])) & 
+                        np.isclose(gt_df['frequency'], float(queried_params[1]))
+                    ]['max_amplitude'].values[0]
+                    p_exploit = queried_val / gt_max_val
+                else:
+                    p_exploit = None # avoids index error
+                p_exploit_list.append(p_exploit)
+                    
+                all_eval_data.append({
+                    'rep': rep_idx,
+                    'iter': iter_idx,
+                    'p_explore': p_explore,
+                    'p_exploit': p_exploit
+                })
+
+            # create plots to visualize performance metrics over iterations
+            self._visualize_evals(rep_idx, p_explore_list, p_exploit_list)
+
+        # save evaluations to CSV
+        eval_df = pd.DataFrame(all_eval_data)
+        eval_path = os.path.join(self.opt_dir, f"model_evals_{self.n_optimizations}.csv")
+        eval_df.to_csv(eval_path, index=False)
+                    
     def _get_response(self):
         '''
         Calculates the mean value of each feature across the N analysis trials from features.txt
@@ -370,9 +468,21 @@ class GPBOOptimizer:
                 # add to CSV with stimulation data
                 df = pd.DataFrame(self.opt_log)
                 df.to_csv(self.stim_data, index=False)
+                self.data_saved = True
                 
                 # visualize all maps
-                self._visualize_all_maps()
+                try: 
+                    self._visualize_all_maps()
+                    self.visuals_complete = True
+                except Exception as e:
+                    logging.error(f"[GPBO] Visualization error: {e}")
+
+                # evaluate model: perform exploration/exploitation evaluation
+                try:
+                    self._perform_model_eval()
+                    self.model_evals_complete = True
+                except Exception as e:
+                    logging.error(f"[GPBO] Model evaluation error: {e}")
                 
                 logging.info("[GPBO] All repetitions completed and maps generated!")
                 return
@@ -437,7 +547,9 @@ class GPBOOptimizer:
         self.curr_opt_time = time.time() - start_opt_time
         self.profiler.log_metric(curr_trial, "opt_iter", self.curr_opt_time)
 
-        logging.info("[GPBO] Optimization done, waiting for event marker to start stimulation...")
+        dutycycle = best_params.get('dutycycle')
+        frequency = best_params.get('frequency')
+        logging.info(f"[GPBO] Optimization done: FREQUENCY: {frequency}; DUTYCYCLE: {dutycycle}, waiting for event marker to start stimulation...")
         self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
 
         self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
@@ -447,20 +559,41 @@ class GPBOOptimizer:
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
             logging.error(f"[GPBO] Hardware Stim Error: Cannot access GPIO chip. {e}")
+            if self.on_stim_fail: self.on_stim_fail()
         except KeyError as e:
             logging.error(f"[GPBO] Parameter Stim Error: Missing key in best_params: {e}")
+            if self.on_stim_fail: self.on_stim_fail()
         except Exception as e:
             logging.error(f"[GPBO] Unexpected error during stimulation: {type(e).__name__}: {e}")
+            if self.on_stim_fail: self.on_stim_fail()
 
     def run(self, file_path, curr_trial):
         #logging.info("[GPBO] Starting Bayesian optimization...")
         self._run_optimization(file_path, curr_trial)
 
     def handle_stop(self):
-        ''' Backup to save optimization data in case of sudden stop '''
+        ''' 
+        Backup to save optimization data for current optimization run 
+        (in case of sudden stop) 
+        '''
         
         # add to CSV with stimulation data
-        df = pd.DataFrame(self.opt_log)
-        filepath = os.path.join(self.opt_dir, f"stimulations_backup.csv")
-        df.to_csv(filepath, index=False)
+        if not self.data_saved:
+            df = pd.DataFrame(self.opt_log)
+            filepath = os.path.join(self.opt_dir, f"stimulations_backup.csv")
+            df.to_csv(filepath, index=False)
+
+        # visualize all maps
+        if not self.visuals_complete:
+            try: 
+                self._visualize_all_maps()
+            except Exception as e:
+                logging.error(f"[GPBO] Visualization error: {e}")
+
+        # evaluate model: perform exploration/exploitation evaluation
+        if not self.model_evals_complete:
+            try:
+                self._perform_model_eval()
+            except Exception as e:
+                logging.error(f"[GPBO] Model evaluation error: {e}")
     

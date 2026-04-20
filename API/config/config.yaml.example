@@ -12,7 +12,7 @@ num_trials: 1
 default_serial_port: "/dev/ttyACM0"
 serial_port_A: "/dev/ttyACM0"             # default serial port
 serial_port_B: ""
-mac_address: "2C:CF:67:E2:E9:AC"          # YAML uses 'null' for Python's None
+mac_address: null          # YAML uses 'null' for Python's None
 num_emg_ch: 1
 num_accel_ch: 3
 selected_channels: [0]
@@ -37,7 +37,6 @@ feature_cutoff_freq: 80
 features: ['max_amplitude']
 
 # GPBO 
-is_calibrated: false
 iterations: 40
 repetitions: 10
 num_rand: 1
@@ -52,3 +51,6 @@ frequencies: [20, 30, 40, 50, 60]
 gpio_chip: "/dev/gpiochip4"
 gpio_pin: 12
 duration: 2.5
+
+# calibrator
+n_calb_reps: 10

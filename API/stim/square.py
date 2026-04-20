@@ -35,11 +35,9 @@ class Stimulator:
         dutycycle = best_params.get('dutycycle')
         frequency = best_params.get('frequency')
         
-        logging.info(f"[Square] New stimulation values: frequency: {frequency}, dutycycle: {dutycycle}")
-        
         total_cycles = int(duration*frequency)
         period = 1/frequency
-        on_time = period * (dutycycle/100)
+        on_time = period * (dutycycle)
         off_time = period - on_time
         #print(f"[Square]: {chip}")
     
@@ -55,22 +53,22 @@ class Stimulator:
         )
         line_request.set_value(gpio_pin, Value.ACTIVE)
         
-        for cycle in range(total_cycles):
-            # Set pin HIGH
-            if on_time > 0:  # Only set high if duty cycle > 0
-                line_request.set_value(gpio_pin, Value.ACTIVE)
-                sleep(on_time)
-            
-            # Set pin LOW
-            if off_time > 0:  # Only set low if duty cycle < 100
-                line_request.set_value(gpio_pin, Value.INACTIVE)
-                sleep(off_time)
+        logging.info(f"[Square] Stimulating at frequency: {frequency}, dutycycle: {dutycycle}")
+        try:
+            for cycle in range(total_cycles):
+                # Set pin HIGH
+                if on_time > 0:  # Only set high if duty cycle > 0
+                    line_request.set_value(gpio_pin, Value.ACTIVE)
+                    sleep(on_time)
+                
+                # Set pin LOW
+                if off_time > 0:  # Only set low if duty cycle < 100
+                    line_request.set_value(gpio_pin, Value.INACTIVE)
+                    sleep(off_time)
         
-        # Ensure pin is set LOW at the end
-        line_request.set_value(gpio_pin, Value.INACTIVE)
-        
-        # Release the GPIO line
-        line_request.release()
+        finally:
+            line_request.set_value(gpio_pin, Value.INACTIVE) # Ensure pin is set LOW at the end
+            line_request.release() # Release the GPIO line
 
     def run(self, best_params, curr_trial):
         #logging.info("[Square] Starting stimulation process...")

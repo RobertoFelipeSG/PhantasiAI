@@ -6,7 +6,7 @@ To use (FOLLOW IN-ORDER):
 2. Connect to Internet
 3. In PhantasiAI/API/: Create virtual environment and install requirements: pip install -r requirements.txt
 4. In PhantasiAI/API/config/: Create config.yaml file (use config.yaml.example as template)
-    a. Configure default_serial_port, serial_port_A, selected_channels, gpio_pin, gpio_chip
+    a. Configure default_serial_port, serial_port_A, mac_address, selected_channels, gpio_pin, gpio_chip
 5. In device home directory: Create setup_phantasiai.sh file (use setup_phantasiai.sh.example as template)
     a. Configure [ACCESS_POINT]
     b. run setup script and reboot RPi

@@ -6,6 +6,7 @@ import queue
 from datetime import datetime
 from typing import List, Optional
 from fastapi import WebSocket
+from starlette.websockets import WebSocketState
 from pathlib import Path
 
 log_path = Path(__file__).parent / "testing_logs.txt"
@@ -24,21 +25,23 @@ class ClientSession:
         '''Initialize single client connection'''
         self.websocket = websocket
         self.last_client_pong = time.time()
+        self.gt_generator = None
         self.session_dir = None
         self.ganglion = None
         self.optimizer = None
         self.stimulator = None
-        self.watchdog_feat = None
+        self.calibrator = None
+        self.watchdog = None
         self.profiler = None
 
     async def cleanup(self):
         '''
         Clean up resources when client disconnects
         '''
-        if self.watchdog_feat:
+        if self.watchdog:
             logging.warning("[Manager] Watchdog found. Cleaning up resource.")
-            self.watchdog_feat.stop_watching()
-            self.watchdog_feat = None
+            self.watchdog.stop_watching()
+            self.watchdog = None
         
         if self.stimulator:
             logging.warning("[Manager] Stimulator found. Cleaning up resource")
@@ -46,9 +49,13 @@ class ClientSession:
         
         if self.optimizer:
             logging.warning("[Manager] Optimizer found. Cleaning up resource")
-            # create optimization data backup incase of sudden disconnection
             self.optimizer.handle_stop()
             self.optimizer = None
+
+        if self.calibrator:
+            logging.warning("[Manager] Optimizer found. Cleaning up resource")
+            self.calibrator.handle_stop()
+            self.calibrator = None
         
         if self.ganglion:
             logging.warning("[Manager] Ganglion found. Cleaning up resource")
@@ -64,6 +71,9 @@ class ClientSession:
         
         if self.session_dir:
             self.session_dir = None
+
+        if self.gt_generator:
+            self.gt_generator = None
 
 class ConnectionManager:
     def __init__(self):
@@ -86,11 +96,12 @@ class ConnectionManager:
             await self.active_connections[websocket].cleanup()
             del self.active_connections[websocket]
 
-            try:
-                await websocket.close(code=1000)
-                logging.info(f"[Manager] Websocket closed succesfully")
-            except Exception as e:
-                logging.error(f"[Manager] Error closing websocket manually: {e}")
+            if websocket.client_state != WebSocketState.DISCONNECTED:
+                try:
+                    await websocket.close(code=1000)
+                    logging.info(f"[Manager] Websocket closed succesfully")
+                except Exception as e:
+                    logging.error(f"[Manager] Error closing websocket manually: {e}")
 
             logging.info(f"[Manager] Client disconnected. Total connections: {len(self.active_connections)}")
 

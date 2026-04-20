@@ -20,9 +20,12 @@ from config.config_manager import load_config
 from config.session_profiler import SessionProfiler
 from emg.data_acquisition import GanglionData
 from emg.synthetic_data_acquisition import SyntheticGanglionData
-from stim.change_detector import WatchDog
+from stim.opt_change_detector import WatchDogOpt
 from stim.gpbo_new import GPBOOptimizer
 from stim.square import Stimulator
+from calibrate.calb_change_detector import WatchDogCalb
+from calibrate.calibrator import Calibrator
+from calibrate.create_gt import GTGenerator
 
 mqtt_client = None
 CONFIG = load_config()
@@ -57,8 +60,8 @@ async def lifespan(app: FastAPI):
     for ws in list(manager.active_connections.keys()):
         session = manager.active_connections[ws]
         
-        if session.watchdog_feat:
-            session.watchdog_feat.stop_watching()
+        if session.watchdog:
+            session.watchdog.stop_watching()
         if session.optimizer:
             session.optimizer.handle_stop()
         if session.ganglion:
@@ -156,17 +159,23 @@ async def websocket_endpoint(websocket: WebSocket):
                 command_data = json.loads(data)
                 action = command_data.get("action")
                 
-                if action == "start_stream":
+                if action == "start_calibration":
+                    await handle_start_calibration(session, command_data)
+                elif action == "generate_gt":
+                    await handle_gt_generation(session, command_data)
+                elif action == "start_stream":
                     await handle_start_stream(session, command_data)
                 elif action == "stop_stream":
                     await handle_stop_stream(session)
                 elif action == "client_ping":
-                    logging.info("[SENDING CLIENT PING]")
+                    #logging.info("[SENDING CLIENT PING]")
                     await websocket.send_json({"type": "server_pong"})
                 elif action == "client_pong": # received heartbeat response
-                    logging.info("[RECEIVED CLIENT PONG]")
+                    #logging.info("[RECEIVED CLIENT PONG]")
                     session.last_client_pong = time.time()
                     continue
+                elif action == "hb_timeout":
+                    logging.warning("[Main] Disconnection from client side due to heartbeat timeout")
 
             except json.JSONDecodeError:
                 logging.error("[Main] Received invalid JSON over WebSocket")
@@ -174,7 +183,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         logging.warning("[Main] WebSocket has disconnected")
     except Exception as e:
-        logging.error(f"[Main] Unexpected error in WebSocket loop: {e}")
+        logging.exception(f"[Main] Unexpected error in WebSocket loop: {e}")
         try:
             await websocket.send_json({"status": "error", "message": "Unexpected error in ws loop"})
         except Exception:
@@ -186,11 +195,104 @@ async def websocket_endpoint(websocket: WebSocket):
         await handle_stop_stream(session)
         await manager.disconnect(websocket)
 
+async def handle_start_calibration(session, data):
+    '''
+    Initializes all objects for client calibration (streaming+stimulation) session
+    NOTE: This function is only used for calibration sessions
+    '''
+    if session.ganglion and session.ganglion._emg_thread.is_alive(): 
+        await session.websocket.send_json({"status": "error", "message": "Stream already running"})
+        return
+
+    folder_name = data.get("folder_name", None)
+    serial_port = data.get("serial_port", CONFIG.get('default_serial_port'))
+    is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
+    num_trials = data.get("num_trials", CONFIG.get('num_trials'))
+    n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
+    
+    # Retrieve reference of current event loop running API server
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        current_loop = asyncio.get_event_loop()
+    
+    shared_dorsi_flag = threading.Event()
+
+    # Create session profiler
+    session.profiler = SessionProfiler()
+    profiler = session.profiler # current session profiler to store timing metrics
+
+    # Initialize Ganglion instance
+    def trigger_stream_stop(): # callback function to trigger stream stop in case of board error
+        asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
+    
+    if is_synthetic: 
+        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials,
+                                                 folder_name=folder_name, on_error=trigger_stream_stop)
+    else: 
+        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials,
+                                        folder_name=folder_name, on_error=trigger_stream_stop)
+
+    session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
+
+    # Initialize Calibrator
+    def trigger_auto_stop(): # callback function to trigger auto-stop from Calibrator
+        asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
+    def handle_stim_failed(): # callback function to notify frontend of stimulation failure
+        asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
+
+    session.calibrator = Calibrator(profiler, shared_dorsi_flag, n_reps, session.session_dir,
+                                    folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
+
+    # Initialize calibration WatchDog instance
+    session.watchdog = WatchDogCalb(profiler, calibrator=session.calibrator)
+    directory_to_watch = str(session.ganglion.recorder.features_dir)
+    session.watchdog.start_watching(directory_to_watch)
+    
+    # Start EMG data thread
+    session.ganglion.start(current_loop)
+
+    # Attempt to start stream for 20 seconds
+    start_time = time.time()
+    while time.time() - start_time < 20:
+        if session.ganglion.connection_status == "connected":
+            await session.websocket.send_json({"status": "success", "message": "EMG streaming started"})
+            return
+        
+        if session.ganglion.connection_status == "failed":
+            # error message handled within ganglion object 
+            return 
+
+        await asyncio.sleep(0.1)
+
+    # if no successful connection within 20 seconds, assume failure
+    await session.websocket.send_json({"status": "error", "message": "Failed to start EMG stream"})
+
+async def handle_gt_generation(session, data):
+    '''
+    Initializes GTGenerator object and creates ground truth table
+    Executes gt generation function in a separate thread to prevent API blocking
+    '''
+    gt_type = data.get("gt_type", "individual")
+    session.gt_generator = GTGenerator(gt_type)
+
+    loop = asyncio.get_running_loop()
+    status = await loop.run_in_executor(None, session.gt_generator.run)
+    
+    if status:
+        await session.websocket.send_json({"status": "success", "message": "Ground truth generated"})
+    else: 
+        await session.websocket.send_json({"status": "error", "message": "Failed to generate ground truth"})
+
+    session.gt_generator = None
+
 async def handle_start_stream(session, data):
     '''
     Initializes all objects for client streaming session
+    NOTE: This function is only used for optimization sessions
     '''
-    
     if session.ganglion and session.ganglion._emg_thread.is_alive(): 
         await session.websocket.send_json({"status": "error", "message": "Stream already running"})
         return
@@ -206,7 +308,8 @@ async def handle_start_stream(session, data):
     try:
         current_loop = asyncio.get_running_loop()
     except RuntimeError:
-        current_loop = asyncio.get_event_loop()
+        logging.warning("[Main] No running event loop")
+        return
     
     client_id = id(session) # current session client ID for mqtt handling
     shared_dorsi_flag = threading.Event()
@@ -220,45 +323,33 @@ async def handle_start_stream(session, data):
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
     
     if is_synthetic: 
-        session.ganglion = SyntheticGanglionData(
-            websocket=session.websocket,
-            profiler=profiler,
-            dorsi_flag=shared_dorsi_flag,
-            serial_port=serial_port,
-            sample_rate=250, 
-            num_trials=num_trials,
-            folder_name=folder_name,
-            on_error=trigger_stream_stop
-        )
+        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials,
+                                                 folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
-        session.ganglion = GanglionData(
-            websocket=session.websocket,
-            profiler=profiler,
-            dorsi_flag=shared_dorsi_flag,
-            serial_port=serial_port,
-            sample_rate=200, 
-            num_trials=num_trials,
-            folder_name=folder_name,
-            on_error=trigger_stream_stop
-        )
+        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials,
+                                        folder_name=folder_name, on_error=trigger_stream_stop)
     
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
     
     # Initialize Stimulator and GPBO Optimizer
     def trigger_auto_stop(): # callback function to trigger auto-stop from GPBO
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
+    def handle_stim_failed(): # callback function to notify frontend of stimulation failure
+        asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
     
     session.stimulator = Stimulator(profiler, mqtt_client, client_topic=f"emg/client/{client_id}")
     session.optimizer = GPBOOptimizer(session.stimulator, shared_dorsi_flag, n_iters, n_reps, 
                                       session.session_dir, profiler, mqtt_client, 
                                       client_topic=f"emg/client/{client_id}",
-                                      on_complete=trigger_auto_stop)
+                                      on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
     
-    # Initialize WatchDog instance
-    session.watchdog_feat = WatchDog(profiler, mqtt_client, client_topic=f"emg/client/{client_id}", 
+    # Initialize optimization WatchDog instance
+    session.watchdog = WatchDogOpt(profiler, mqtt_client, client_topic=f"emg/client/{client_id}", 
                                      optimizer=session.optimizer)
-    feat_directory_to_watch = str(session.ganglion.recorder.features_dir)
-    session.watchdog_feat.start_watching(feat_directory_to_watch)
+    directory_to_watch = str(session.ganglion.recorder.features_dir)
+    session.watchdog.start_watching(directory_to_watch)
     
     # Start EMG data thread
     session.ganglion.start(current_loop)
@@ -271,7 +362,7 @@ async def handle_start_stream(session, data):
             return
         
         if session.ganglion.connection_status == "failed":
-            # specific error handled within ganglion object
+            # error message handled within ganglion object 
             return 
 
         await asyncio.sleep(0.1)
@@ -282,10 +373,12 @@ async def handle_start_stream(session, data):
 async def handle_stop_stream(session):
     '''
     Stop Ganglion data thread, Watchdog system, Optimizer and Stimulator for client session
+    Cleanup of all objects for client session 
+    NOTE: This function is used can be used for either optimization sessions or a calibration sessions
     '''
-    if session.watchdog_feat:
-        session.watchdog_feat.stop_watching()
-        session.watchdog_feat = None
+    if session.watchdog:
+        session.watchdog.stop_watching()
+        session.watchdog = None
     
     if session.optimizer:
         session.optimizer.handle_stop()
@@ -293,21 +386,36 @@ async def handle_stop_stream(session):
 
     if session.stimulator:
         session.stimulator = None
+
+    if session.calibrator:
+        session.calibrator.handle_stop()
+        if session.calibrator.data_saved:
+            try:
+                await session.websocket.send_json({"status": "success", "message": "Calibration complete"})
+            except (WebSocketDisconnect, RuntimeError):
+                pass
+        session.calibrator = None
     
     if session.ganglion:
         session.ganglion.stop()
         session.ganglion = None
         
-        if session.profiler: # export timings once everything has shutdown
+        if session.profiler: # export timings once everything has shutdown 
             if session.session_dir:
                 session.profiler.save_as_csv(Path(session.session_dir))
                 session.session_dir = None
             session.profiler = None
         
-        logging.info(f"[Main] Stopped stream for client {id(session)}")
-        await session.websocket.send_json({"status": "success", "message": "EMG streaming stopped"})
+        logging.info(f"[Main] Stopped stream/handled cleanup for client {id(session)}")
+        try:
+            await session.websocket.send_json({"status": "success", "message": "EMG streaming stopped"})
+        except (WebSocketDisconnect, RuntimeError):
+            pass
     else:
-        await session.websocket.send_json({"status": "error", "message": "No active stream to stop"})
+        try:
+            await session.websocket.send_json({"status": "error", "message": "No active stream to stop"})
+        except (WebSocketDisconnect, RuntimeError):
+            pass
 
 if __name__ == "__main__":
     logging.info("[Main] Starting FastAPI server")
