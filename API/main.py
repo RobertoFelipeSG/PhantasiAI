@@ -278,8 +278,12 @@ async def handle_gt_generation(session, data):
     gt_type = data.get("gt_type", "individual")
     session.gt_generator = GTGenerator(gt_type)
 
-    loop = asyncio.get_running_loop()
-    status = await loop.run_in_executor(None, session.gt_generator.run)
+    try:
+        loop = asyncio.get_running_loop()
+        status = await loop.run_in_executor(None, session.gt_generator.run)
+    except RuntimeError:
+        logging.warning("[Main] Executing gt generation in main FastAPI event loop")
+        status = session.gt_generator.run()
     
     if status:
         await session.websocket.send_json({"status": "success", "message": "Ground truth generated"})
@@ -381,14 +385,24 @@ async def handle_stop_stream(session):
         session.watchdog = None
     
     if session.optimizer:
-        session.optimizer.handle_stop()
+        try: 
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, session.optimizer.handle_stop)
+        except RuntimeError:
+            logging.warning("[Main] Executing optimizer stop in main FastAPI event loop")
+            session.optimizer.handle_stop()
         session.optimizer = None
 
     if session.stimulator:
         session.stimulator = None
 
     if session.calibrator:
-        session.calibrator.handle_stop()
+        try: 
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, session.calibrator.handle_stop)
+        except RuntimeError:
+            logging.warning("[Main] Executing calibrator stop in main FastAPI event loop")
+            session.calibrator.handle_stop()
         if session.calibrator.data_saved:
             try:
                 await session.websocket.send_json({"status": "success", "message": "Calibration complete"})
@@ -402,7 +416,12 @@ async def handle_stop_stream(session):
         
         if session.profiler: # export timings once everything has shutdown 
             if session.session_dir:
-                session.profiler.save_as_csv(Path(session.session_dir))
+                try: 
+                    loop = asyncio.get_running_loop()
+                    await loop.run_in_executor(None, session.profiler.save_as_csv, Path(session.session_dir))
+                except RuntimeError:
+                    logging.warning("[Main] Executing calibrator stop in main FastAPI event loop")
+                    session.profiler.save_as_csv(Path(session.session_dir))
                 session.session_dir = None
             session.profiler = None
         

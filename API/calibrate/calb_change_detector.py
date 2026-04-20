@@ -9,7 +9,7 @@ from config.connection_manager import logging
 class ChangeHandler(FileSystemEventHandler):
     '''
     Handles change detection from WatchDog observing
-    Runs GPBO script if change in content is detected in features.txt file
+    Runs Calibrator script if change in content is detected in features.txt file
     '''
 
     def __init__(self, profiler, calibrator):

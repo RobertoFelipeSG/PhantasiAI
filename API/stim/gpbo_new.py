@@ -5,10 +5,11 @@ import warnings
 import time
 import os
 import csv
+import threading
 from pathlib import Path
 
 import matplotlib
-matplotlib.use('Agg') # ensures matplotlib works in no GUI mode (avoids tkinter error)
+matplotlib.use('Agg') # ensures matplotlib works in an non-interactive backend
 import matplotlib.pyplot as plt
 
 from botorch.models import SingleTaskGP
@@ -30,6 +31,7 @@ torch.manual_seed(42)
 class GPBOOptimizer:
     def __init__(self, stimulator, dorsi_flag, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
         self.file_path = None
+        self.plot_lock = threading.Lock()
         self.stimulator = stimulator
         self.profiler = profiler
         self.dorsi_flag = dorsi_flag
@@ -125,35 +127,36 @@ class GPBOOptimizer:
         '''
         Creates the initial Estimated Mean Map and Uncertainty Plot
         '''
-        grid_shape = (len(self.dutycycles), len(self.frequencies))
-        estimated_map_0 = np.zeros(grid_shape).T # transpose
-        uncertainty_0 = np.ones(grid_shape).T # transpose
-
-        fig, axes = plt.subplots(1, 2, figsize=(10,4))
-        extent = [(self.dutycycles.min() - 0.1), (self.dutycycles.max() + 0.1), 
-                  (self.frequencies.min() - 5), (self.frequencies.max() + 5)]
+        with self.plot_lock:
+            grid_shape = (len(self.dutycycles), len(self.frequencies))
+            estimated_map_0 = np.zeros(grid_shape).T # transpose
+            uncertainty_0 = np.ones(grid_shape).T # transpose
     
-        # plot estimated map
-        im0 = axes[0].imshow(estimated_map_0, origin='lower', extent=extent, 
-                             aspect='auto', cmap='Reds', vmin=-1, vmax=1)
-        axes[0].set_title("Estimated Map (Prior)")
-        axes[0].set_xlabel("Duty Cycle")
-        axes[0].set_ylabel("Frequency")
-    
-        # plot uncertainty
-        im1 = axes[1].imshow(uncertainty_0, origin='lower', extent=extent, 
-                             aspect='auto', cmap='Reds', vmin=0, vmax=1)
-        axes[1].set_title("Uncertainty (Prior)")
-        axes[1].set_xlabel("Duty Cycle")
-    
-        plt.colorbar(im0, ax=axes[0])
-        plt.colorbar(im1, ax=axes[1])
+            fig, axes = plt.subplots(1, 2, figsize=(10,4))
+            extent = [(self.dutycycles.min() - 0.1), (self.dutycycles.max() + 0.1), 
+                      (self.frequencies.min() - 5), (self.frequencies.max() + 5)]
         
-        filename = f"grids_prior.png"
-        output_path = os.path.join(self.maps_dir, filename)
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
+            # plot estimated map
+            im0 = axes[0].imshow(estimated_map_0, origin='lower', extent=extent, 
+                                 aspect='auto', cmap='Reds', vmin=-1, vmax=1)
+            axes[0].set_title("Estimated Map (Prior)")
+            axes[0].set_xlabel("Duty Cycle")
+            axes[0].set_ylabel("Frequency")
+        
+            # plot uncertainty
+            im1 = axes[1].imshow(uncertainty_0, origin='lower', extent=extent, 
+                                 aspect='auto', cmap='Reds', vmin=0, vmax=1)
+            axes[1].set_title("Uncertainty (Prior)")
+            axes[1].set_xlabel("Duty Cycle")
+        
+            plt.colorbar(im0, ax=axes[0])
+            plt.colorbar(im1, ax=axes[1])
+            
+            filename = f"grids_prior.png"
+            output_path = os.path.join(self.maps_dir, filename)
+            plt.tight_layout()
+            plt.savefig(output_path)
+            plt.close()
 
         logging.info(f"[GPBO] Prior visualization saved.")
         
@@ -162,47 +165,48 @@ class GPBOOptimizer:
         '''
         Creates the Estimated Mean Map and Uncertainty plot for each iteration
         '''
-        # reshape 1D arrays back to 2D (dutycycle x frequency) and transpose
-        grid_shape = (len(self.dutycycles), len(self.frequencies))
-        estimated_map_2d = estimated_map.reshape(grid_shape).T
-        uncertainty_2d = uncertainty.reshape(grid_shape).T
-
-        # plotting
-        fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-        extent = [(self.dutycycles.min() - 0.1), (self.dutycycles.max() + 0.1), 
-                  (self.frequencies.min() - 5), (self.frequencies.max() + 5)]
-        
-        # plot estimated mean maps
-        plt1 = axes[0].imshow(estimated_map_2d, origin='lower', extent=extent, aspect='auto', cmap='Reds')
-        axes[0].set_title(f"Estimated Map: Rep {repetition}")
-        axes[0].set_xlabel("Duty Cycle")
-        axes[0].set_ylabel("Frequency")
-
-        # overlay tested points
-        if len(tested_params) > 0:
-            # previously tested points in black
-            axes[0].scatter(tested_params[:, 0].numpy(), 
-                            tested_params[:, 1].numpy(), 
-                            c='black', s=60, zorder=4)
-        if converged_coord is not None:
-            axes[0].scatter(converged_coord[0], converged_coord[1], 
-                        c='gold', marker='*', s=100, zorder=5)
-
-        # plot uncertainty
-        plt2 = axes[1].imshow(uncertainty_2d, origin='lower', extent=extent, aspect='auto', cmap='Reds')
-        axes[1].set_title(f"Uncertainty: Rep {repetition}")
-        axes[1].set_xlabel("Duty Cycle")
-        
-        plt.colorbar(plt1, ax=axes[0], fraction=0.046, pad=0.04)
-        plt.colorbar(plt2, ax=axes[1], fraction=0.046, pad=0.04)
-        
-        filename = f"grids_rep_{repetition}.png"
-        output_path = os.path.join(self.maps_dir, filename)
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
-
-        #logging.info(f"[GPBO] Repetition {repetition} visualization saved.")
+        with self.plot_lock:
+            # reshape 1D arrays back to 2D (dutycycle x frequency) and transpose
+            grid_shape = (len(self.dutycycles), len(self.frequencies))
+            estimated_map_2d = estimated_map.reshape(grid_shape).T
+            uncertainty_2d = uncertainty.reshape(grid_shape).T
+    
+            # plotting
+            fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+            extent = [(self.dutycycles.min() - 0.1), (self.dutycycles.max() + 0.1), 
+                      (self.frequencies.min() - 5), (self.frequencies.max() + 5)]
+            
+            # plot estimated mean maps
+            plt1 = axes[0].imshow(estimated_map_2d, origin='lower', extent=extent, aspect='auto', cmap='Reds')
+            axes[0].set_title(f"Estimated Map: Rep {repetition}")
+            axes[0].set_xlabel("Duty Cycle")
+            axes[0].set_ylabel("Frequency")
+    
+            # overlay tested points
+            if len(tested_params) > 0:
+                # previously tested points in black
+                axes[0].scatter(tested_params[:, 0].numpy(), 
+                                tested_params[:, 1].numpy(), 
+                                c='black', s=60, zorder=4)
+            if converged_coord is not None:
+                axes[0].scatter(converged_coord[0], converged_coord[1], 
+                            c='gold', marker='*', s=100, zorder=5)
+    
+            # plot uncertainty
+            plt2 = axes[1].imshow(uncertainty_2d, origin='lower', extent=extent, aspect='auto', cmap='Reds')
+            axes[1].set_title(f"Uncertainty: Rep {repetition}")
+            axes[1].set_xlabel("Duty Cycle")
+            
+            plt.colorbar(plt1, ax=axes[0], fraction=0.046, pad=0.04)
+            plt.colorbar(plt2, ax=axes[1], fraction=0.046, pad=0.04)
+            
+            filename = f"grids_rep_{repetition}.png"
+            output_path = os.path.join(self.maps_dir, filename)
+            plt.tight_layout()
+            plt.savefig(output_path)
+            plt.close()
+    
+            #logging.info(f"[GPBO] Repetition {repetition} visualization saved.")
 
     def _visualize_all_maps(self):
         '''
@@ -231,29 +235,33 @@ class GPBOOptimizer:
         '''
         iters = list(range(1, self.n_iters + 1))
         
-        plt.figure(figsize=(8, 5))
-        plt.plot(iters, p_explore_list, label='Exploration', marker='o', linestyle='--')
-        plt.plot(iters, p_exploit_list, label='Exploitation', marker='x', linestyle='-')
+        with self.plot_lock:
         
-        plt.title(f"Performance Evolution: Repetition {rep_idx}")
-        plt.xlabel("Iteration")
-        plt.ylabel("Efficacy Ratio")
-        plt.ylim(0, 1.1)
-        plt.grid(True, alpha=0.3)
-        plt.legend()
-        
-        # Save the figure in the maps directory
-        filename = f"performance_{rep_idx}.png"
-        output_path = os.path.join(self.maps_dir, filename)
-        plt.tight_layout()
-        plt.savefig(output_path)
-        plt.close()
+            plt.figure(figsize=(8, 5))
+            plt.plot(iters, p_explore_list, label='Exploration', marker='o', linestyle='--')
+            plt.plot(iters, p_exploit_list, label='Exploitation', marker='x', linestyle='-')
+            
+            plt.title(f"Performance Evolution: Repetition {rep_idx}")
+            plt.xlabel("Iteration")
+            plt.ylabel("Efficacy Ratio")
+            plt.ylim(0, 1.1)
+            plt.grid(True, alpha=0.3)
+            plt.legend()
+            
+            # Save the figure in the maps directory
+            filename = f"performance_{rep_idx}.png"
+            output_path = os.path.join(self.maps_dir, filename)
+            plt.tight_layout()
+            plt.savefig(output_path)
+            plt.close()
         
     def _perform_model_eval(self):
         '''
         Calculates the exploration and exploitation metrics for each query to evaluate the model
         This is ran after all repetitions are complete
         '''
+        start_time = time.time()
+        
         # load ground truth data and get optimum
         if not os.path.exists(self.gt_path):
             logging.warning("[GPBO] Evaluation skipped: ground_truth.csv not found")
@@ -317,6 +325,8 @@ class GPBOOptimizer:
         eval_df = pd.DataFrame(all_eval_data)
         eval_path = os.path.join(self.opt_dir, f"model_evals_{self.n_optimizations}.csv")
         eval_df.to_csv(eval_path, index=False)
+
+        logging.info(f"[GPBO] Evaluations complete. Duration: {time.time() - start_time:.2f} seconds.")
                     
     def _get_response(self):
         '''
