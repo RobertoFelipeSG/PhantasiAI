@@ -237,13 +237,14 @@ async def handle_start_calibration(session, data):
 
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
 
-    # Initialize Calibrator
+    # Initialize Calibrator and Stimulator
     def trigger_auto_stop(): # callback function to trigger auto-stop from Calibrator
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
     def handle_stim_failed(): # callback function to notify frontend of stimulation failure
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
 
-    session.calibrator = Calibrator(profiler, shared_dorsi_flag, n_reps, session.session_dir,
+    session.stimulator = Stimulator(profiler)
+    session.calibrator = Calibrator(session.stimulator, profiler, shared_dorsi_flag, n_reps, session.session_dir,
                                     folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
 
     # Initialize calibration WatchDog instance
@@ -393,9 +394,6 @@ async def handle_stop_stream(session):
             session.optimizer.handle_stop()
         session.optimizer = None
 
-    if session.stimulator:
-        session.stimulator = None
-
     if session.calibrator:
         try: 
             loop = asyncio.get_running_loop()
@@ -409,6 +407,9 @@ async def handle_stop_stream(session):
             except (WebSocketDisconnect, RuntimeError):
                 pass
         session.calibrator = None
+
+    if session.stimulator:
+        session.stimulator = None
     
     if session.ganglion:
         session.ganglion.stop()

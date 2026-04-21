@@ -12,7 +12,7 @@ from config.config_manager import load_config
 CONFIG = load_config()
 
 class Stimulator:
-    def __init__(self, profiler, mqtt_client, client_topic):
+    def __init__(self, profiler, mqtt_client=None, client_topic=None):
         self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.client_topic = client_topic

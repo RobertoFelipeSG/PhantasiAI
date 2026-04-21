@@ -18,6 +18,7 @@ class SessionProfiler:
             "file_create": None,
             "feat_extract": None,
             "opt_iter": None,
+            "calib": None,
             "stim": None,
             "_trial_end_time": time.time() 
         }
@@ -52,6 +53,7 @@ class SessionProfiler:
             "file_create",
             "feat_extract",
             "opt_iter",
+            "calib",
             "stim",
         ]
 

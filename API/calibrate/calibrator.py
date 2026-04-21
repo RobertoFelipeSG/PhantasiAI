@@ -14,7 +14,8 @@ from config.config_manager import load_config
 CONFIG = load_config()
 
 class Calibrator:
-    def __init__(self, profiler, dorsi_flag, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
+    def __init__(self, stimulator, profiler, dorsi_flag, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
+        self.stimulator = stimulator
         self.profiler = profiler
         self.dorsi_flag = dorsi_flag
         self.n_reps = n_reps
@@ -23,12 +24,8 @@ class Calibrator:
         self.on_complete = on_complete
         self.on_stim_fail = on_stim_fail
 
-        # define gpio variables 
-        self.gpio_chip = CONFIG.get("gpio_chip")
-        self.gpio_pin = CONFIG.get("gpio_pin")
-        self.duration = CONFIG.get("duration")
-
         # define parameter combinations and stimulation array
+        self.parameter_names = CONFIG.get("parameters")
         dutycycles = CONFIG.get("dutycycles")
         frequencies = CONFIG.get("frequencies")
         self.total_reps = len(dutycycles) * len(frequencies) * self.n_reps
@@ -82,59 +79,6 @@ class Calibrator:
 
         self.calb_log.append(rep_data)
     
-    def _run_stimulation(self):
-        ''' Runs parameter generation for GPIO square stimulation '''   
-        # Define GPIO pin (BCM numbering)
-        GPIO_CHIP = self.gpio_chip
-
-        # Open GPIO chip and request the line
-        chip = gpiod.Chip(GPIO_CHIP)
-        gpio_pin = self.gpio_pin
-        duration = self.duration
-        
-        # Define frequency (Hz) and duty cycle (0-1)
-        dutycycle, frequency = self.param_combos[self.curr_reps]
-        self.selected_params = [dutycycle, frequency]
-        
-        total_cycles = int(duration*frequency)
-        period = 1/frequency
-        on_time = period * (dutycycle)
-        off_time = period - on_time
-        #print(f"[Square]: {chip}")
-    
-        self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
-
-        self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
-        logging.info(f"[Calibrator] Stimulating at frequency: {frequency}, dutycycle: {dutycycle}")
-        
-        line_request = gpiod.request_lines(
-            GPIO_CHIP,
-            consumer="pwm_generator",
-            config={
-                gpio_pin: gpiod.LineSettings(
-                    direction=Direction.OUTPUT,
-                    output_value=Value.INACTIVE
-                )
-            }
-        )
-        line_request.set_value(gpio_pin, Value.ACTIVE)
-        
-        try:
-            for cycle in range(total_cycles):
-                # Set pin HIGH
-                if on_time > 0:  # Only set high if duty cycle > 0
-                    line_request.set_value(gpio_pin, Value.ACTIVE)
-                    sleep(on_time)
-                
-                # Set pin LOW
-                if off_time > 0:  # Only set low if duty cycle < 100
-                    line_request.set_value(gpio_pin, Value.INACTIVE)
-                    sleep(off_time)
-        
-        finally:
-            line_request.set_value(gpio_pin, Value.INACTIVE) # Ensure pin is set LOW at the end
-            line_request.release() # Release the GPIO line
-    
     def _run_calibration(self, file_path, curr_trial):
         ''' 
         Runs one calibration rep once signal processing complete (feature extraction)
@@ -169,8 +113,17 @@ class Calibrator:
             return 
         
         # run next stimulation trial
+        self.selected_params = self.param_combos[self.curr_reps]
+        best_params = {
+            self.parameter_names[0]: float(self.selected_params[0]),
+            self.parameter_names[1]: float(self.selected_params[1])
+        }
+        
+        self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
+
+        self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
         try:
-            self._run_stimulation()
+            self.stimulator.run(best_params, curr_trial)
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
@@ -189,7 +142,7 @@ class Calibrator:
         self._run_calibration(file_path, curr_trial)
 
         duration = time() - start_time
-        self.profiler.log_metric(curr_trial, "stim", duration)
+        self.profiler.log_metric(curr_trial, "calib", duration)
 
     def handle_stop(self):
         ''' 
