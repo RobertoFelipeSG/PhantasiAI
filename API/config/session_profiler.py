@@ -8,6 +8,7 @@ class SessionProfiler:
     def __init__(self):
         self.trials = {}
         self.current_trial = 0
+        self.timings_saved = False
 
     def start_trial(self, trial_num):
         '''Initialize new trial dictionary for current trial'''
@@ -37,6 +38,9 @@ class SessionProfiler:
 
     def save_as_csv(self, base_path: Path):
         """Converts dict to CSV file at end of the session"""
+        if self.timings_saved:
+            return # timings have already been saved
+        
         if not self.trials:
             return # Nothing to export
             
@@ -61,5 +65,6 @@ class SessionProfiler:
                     for field in fieldnames[1:]: 
                         row[field] = metrics.get(field, "ERROR") # if no time, process unsuccesful
                     writer.writerow(row)
+            self.timings_saved = True
         except OSError as e:
             logging.info(f"[Profiler] Could not save session timing metrics: {e}")

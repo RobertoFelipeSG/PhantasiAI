@@ -255,7 +255,7 @@ class GPBOOptimizer:
             plt.savefig(output_path)
             plt.close()
         
-    def _perform_model_eval(self):
+    def _perform_model_eval(self, backup=False):
         '''
         Calculates the exploration and exploitation metrics for each query to evaluate the model
         This is ran after all repetitions are complete
@@ -323,7 +323,8 @@ class GPBOOptimizer:
 
         # save evaluations to CSV
         eval_df = pd.DataFrame(all_eval_data)
-        eval_path = os.path.join(self.opt_dir, f"model_evals_{self.n_optimizations}.csv")
+        if backup: eval_path = os.path.join(self.opt_dir, f"model_evals_backup.csv")
+        else: eval_path = os.path.join(self.opt_dir, f"model_evals_{self.n_optimizations}.csv")
         eval_df.to_csv(eval_path, index=False)
 
         logging.info(f"[GPBO] Evaluations complete. Duration: {time.time() - start_time:.2f} seconds.")
@@ -603,7 +604,7 @@ class GPBOOptimizer:
         # evaluate model: perform exploration/exploitation evaluation
         if not self.model_evals_complete:
             try:
-                self._perform_model_eval()
+                self._perform_model_eval(backup=True)
             except Exception as e:
                 logging.error(f"[GPBO] Model evaluation error: {e}")
     
