@@ -63,7 +63,7 @@ DEFAULT_CONFIG = {
     "duration": 2.5,
 
     # calibrator
-    "n_calb_reps": 10
+    "n_calb_reps": 3
 }
 
 def load_config():

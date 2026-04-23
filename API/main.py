@@ -8,6 +8,7 @@ import time
 import threading
 import paho.mqtt.client as mqtt
 
+from starlette.websockets import WebSocketState
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -131,7 +132,7 @@ async def _heartbeat(websocket: WebSocket, session, stop_event: asyncio.Event):
         try:
             await websocket.send_json({"type": "server_ping"})
         except Exception as e:
-            logging.warning("[Main] Failed to send ping: {e}")
+            logging.warning(f"[Main] Failed to send ping: {e}")
             await handle_stop_stream(session)
             await manager.disconnect(websocket)
             return
@@ -150,6 +151,10 @@ async def websocket_endpoint(websocket: WebSocket):
     
     try:
         while True:
+            if websocket.client_state == WebSocketState.DISCONNECTED:
+                logging.warning("[Main] WebSocket closed by background task. Exiting loop...")
+                break
+            
             try: # wait for messages 
                 data = await asyncio.wait_for(websocket.receive_text(), timeout=15.0)
             except asyncio.TimeoutError:
@@ -186,7 +191,7 @@ async def websocket_endpoint(websocket: WebSocket):
         logging.exception(f"[Main] Unexpected error in WebSocket loop: {e}")
         try:
             await websocket.send_json({"status": "error", "message": "Unexpected error in ws loop"})
-        except Exception:
+        except RuntimeError:
             pass
     
     finally:
@@ -281,7 +286,7 @@ async def handle_gt_generation(session, data):
 
     try:
         loop = asyncio.get_running_loop()
-        status = await loop.run_in_executor(None, session.gt_generator.run)
+        status, error = await loop.run_in_executor(None, session.gt_generator.run)
     except RuntimeError:
         logging.warning("[Main] Executing gt generation in main FastAPI event loop")
         status = session.gt_generator.run()
@@ -289,7 +294,7 @@ async def handle_gt_generation(session, data):
     if status:
         await session.websocket.send_json({"status": "success", "message": "Ground truth generated"})
     else: 
-        await session.websocket.send_json({"status": "error", "message": "Failed to generate ground truth"})
+        await session.websocket.send_json({"status": "error", "type": "GT generation failed", "message": error})
 
     session.gt_generator = None
 
@@ -368,12 +373,14 @@ async def handle_start_stream(session, data):
         
         if session.ganglion.connection_status == "failed":
             # error message handled within ganglion object 
+            session.watchdog.stop_watching()
             return 
 
         await asyncio.sleep(0.1)
 
     # if no successful connection within 20 seconds, assume failure
     await session.websocket.send_json({"status": "error", "message": "Failed to start EMG stream"})
+    session.watchdog.stop_watching()
     
 async def handle_stop_stream(session):
     '''

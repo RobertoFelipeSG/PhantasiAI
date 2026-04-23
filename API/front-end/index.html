@@ -277,6 +277,11 @@
             background-color: var(--bg-card);
             border-bottom: 2px solid var(--color-primary);
         }
+        .tab button.session-status {
+            cursor: default;
+            pointer-events: none;
+            opacity: 1;
+        }
 
         .tabcontent {
             display: none;
@@ -440,6 +445,16 @@
             background: rgba(0, 212, 255, 0.08);
         }
 
+        /* Transition from mode select -> main app*/
+        #modeSelect, #appWrapper { 
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+        .fade-out {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
         /* Main app hidden until mode chosen */
         #appWrapper { display: none; flex-direction: column; height: 100vh; }
     </style>
@@ -460,7 +475,7 @@
     </div>
 
     <!-- Main App (hidden until mode chosen) -->
-    <div id="appWrapper">
+    <div id="appWrapper" style="display: none; opacity: 0;">
     <h1>PhantasiAI Dashboard</h1>
 
     <div class="main-container">
@@ -536,8 +551,9 @@
 
         <main class="content-right">
             <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'Graphs')" id="defaultOpen">Graphs</button>
-                <button class="tablinks" onclick="openTab(event, 'Instructions')">Real-Time Guide</button>
+                <button class="tablinks" onclick="openTab(event, 'Graphs')" id="graphsTab">Graphs</button>
+                <button class="tablinks" onclick="openTab(event, 'Instructions')" id="instructionsTab">Real-Time Guide</button>
+                <button class="tablinks session-status" onclick="openTab(event, 'SessionStatus')" id="sessionStatusTab"></button>
             </div>
             
             <!-- Graphs -->
@@ -580,7 +596,14 @@
                     <div id="dot-right" class="dot-wrapper"><div class="dot-circle"></div></div>
                 </div>
                 <div id="trialCounterDisplay" class="trial-counter">Trials Remaining: --</div>
-            </div>            
+            </div>  
+
+            <!-- Session Status -->
+            <div id="SessionStatus" class="tabcontent" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
+                <div id="sessionStatusMessage" style="font-size: clamp(24px, 4vw, 48px); font-weight: 600; color: var(--color-primary); padding: 40px; line-height: 1.6;">
+                    Please press "START" to begin session
+                </div>
+            </div>
         </main>
     </div>
 
@@ -595,6 +618,7 @@
         
         let serverRestarting = false;
         let heartbeat = null;
+        let pingTimeout = null;
         let pongReceived = true;
         const IDLE_PING_INTERVAL = 10000;
         const ACTIVE_PING_INTERVAL = 3000;
@@ -620,15 +644,17 @@
         let stimSuccess = true; // stores whether stimulation from current trial was successful
         let isStreaming = false;
         let isStopping = false;
-        let renderLoopRunning = false // for all visuals (graphs + instructions)
+        let renderLoopRunning = false; // for all visuals (graphs + instructions)
+        let allTrialsCompleted = false;
         
         // Constants
         const defaultTotalTrials = 401;
-        const defaultCalbTotalTrials = 251
+        const defaultCalbTotalTrials = 75
         const defaultNumTrials = 1;
         const defaultNumIters = 40;
         const defaultCalbNumIters = 25;
         const defaultNumReps = 10;
+        const defaultCalbNumReps = 3;
 
         // Side panel variables
         let terminalEnabled = true;
@@ -653,70 +679,80 @@
         // ----- MODE SELECTION ----- //
         function selectMode(mode) {
             currentMode = mode;
+            const modeSelect = document.getElementById('modeSelect');
+            const appWrapper = document.getElementById('appWrapper');
             
-            // Hide the mode screen, show the app
-            document.getElementById('modeSelect').style.display = 'none';
-            const app = document.getElementById('appWrapper');
-            app.style.display = 'flex';
+            // Hide the mode screen, show the app using fade transition
+            modeSelect.classList.add('fade-out');
+            setTimeout(() => {
+                modeSelect.style.display = 'none';
+                appWrapper.style.display = 'flex';
+                appWrapper.style.opacity = '0';
 
-            if (mode === 'experimenter') {
-                // Hide the tab bar and Graphs entirely
-                document.querySelector('.tab').style.display = 'none';
-                document.getElementById('Graphs').style.display = 'none';
+                if (mode === 'experimenter') {
+                    // Hide the tab bar and Graphs entirely
+                    document.querySelector('.tab').style.display = 'none';
+                    document.getElementById('Graphs').style.display = 'none';
+    
+                    // Set sidebar width and hide the terminal
+                    document.querySelector('.sidebar').style.width = '15%';
+                    document.querySelector('.sidebar').style.minWidth = 'unset';
+                    document.querySelector('.terminal-wrapper').style.display = 'none';
+                    terminalEnabled = false;
+    
+                    // Hide developer-only controls (keep: WS Status, Folder Name, Streaming Status)
+                    const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'markerRow'];
+                    hideIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.style.display = 'none';
+                    });
+                
+                } else if (mode === 'calibrator') {
+                    // Hide the tab bar and Graphs entirely 
+                    document.querySelector('.tab').style.display = 'none';
+                    document.getElementById('Graphs').style.display = 'none';
+     
+                    // Set sidebar width and hide the terminal (same as experimenter)
+                    document.querySelector('.sidebar').style.width = '15%';
+                    document.querySelector('.sidebar').style.minWidth = 'unset';
+                    document.querySelector('.terminal-wrapper').style.display = 'none';
+                    terminalEnabled = false;
+     
+                    // Hide specific controls (keep: WS Status, Board ID, Repetitions, Folder Name, Streaming Status)
+                    const hideIds = ['serialPortRow', 'trialInputRow', 'itersRow', 'markerRow'];
+                    hideIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.style.display = 'none';
+                    });
+     
+                    // Set default iterations and repetitions for calibrator mode
+                    document.getElementById('iters').value = defaultCalbNumIters;
+                    const repsInput = document.getElementById('reps');
+                    repsInput.value = defaultCalbNumReps
+                    repsInput.onfocus = function() { if (this.value == defaultCalbNumReps) { this.value = '';}};
+                    repsInput.onblur = function() {if (this.value === '') {this.value = defaultCalbNumReps;}};
+    
+                    // Hide Ground Truth button until calibration complete
+                    document.getElementById('gtButtonRow').style.display = 'none';
+                
+                } else {
+                    initGraphs();
+                }
 
-                // Show Instructions directly (no tab click needed)
-                document.getElementById('Instructions').style.display = 'flex';
-
-                // Set sidebar width and hide the terminal
-                document.querySelector('.sidebar').style.width = '15%';
-                document.querySelector('.sidebar').style.minWidth = 'unset';
-                document.querySelector('.terminal-wrapper').style.display = 'none';
-                terminalEnabled = false;
-
-                // Hide developer-only controls (keep: WS Status, Folder Name, Streaming Status)
-                const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'markerRow'];
-                hideIds.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
+                // Start transition once layout changes are applied 
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        appWrapper.style.opacity = '1';
+                    });
                 });
-            
-            } else if (mode === 'calibrator') {
-                // Hide the tab bar and Graphs entirely 
-                document.querySelector('.tab').style.display = 'none';
-                document.getElementById('Graphs').style.display = 'none';
- 
-                // Show Instructions directly (no tab click needed)
-                document.getElementById('Instructions').style.display = 'flex';
- 
-                // Set sidebar width and hide the terminal (same as experimenter)
-                document.querySelector('.sidebar').style.width = '15%';
-                document.querySelector('.sidebar').style.minWidth = 'unset';
-                document.querySelector('.terminal-wrapper').style.display = 'none';
-                terminalEnabled = false;
- 
-                // Hide specific controls (keep: WS Status, Board ID, Repetitions, Folder Name, Streaming Status)
-                const hideIds = ['serialPortRow', 'trialInputRow', 'itersRow', 'markerRow'];
-                hideIds.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
- 
-                // Set default iterations for calibrator mode
-                document.getElementById('iters').value = defaultCalbNumIters;
+    
+                // Common init for both modes
+                document.getElementById('gtButtonRow').style.display = 'none'; // Hide ground truth feature (only appears after calibration complete)
+                document.getElementById('SessionStatus').style.display = 'flex'; // Show SessionStatus tab directly (no tab click needed)
+                setStreamingState(false, 'Idle');
+                connectWebSocket();
 
-                // Hide Ground Truth button until calibration complete
-                document.getElementById('gtButtonRow').style.display = 'none';
-            
-            } else {
-                // Developer mode
-                document.getElementById("defaultOpen").click();
-                initGraphs();
-            }
-
-            // Common init for both modes
-            document.getElementById('gtButtonRow').style.display = 'none'; // Hide ground truth feature (only appears after calibration complete)
-            setStreamingState(false, 'Idle');
-            connectWebSocket();
+            }, 300); // transition duration    
         }
         
         // ----- FRONTEND CONNECTION TO SERVER (via WebSocket) ----- //
@@ -725,19 +761,31 @@
 
             heartbeat = setTimeout(() => {
                 if (ws && ws.readyState === WebSocket.OPEN) {
+                    pongReceived = false;
                     ws.send(JSON.stringify({ action: "client_ping" }));
             
+                    if (pingTimeout) clearTimeout(pingTimeout); // clear timeout before sending new one
+                    
                     pingTimeout = setTimeout(() => {
                         console.warn("Server pong timeout! Closing connection.");
                         if (ws && ws.readyState === WebSocket.OPEN) {
                             ws.send(JSON.stringify({ action: "hb_timeout" }));
                         }
                         pongReceived = false;
-                        ws.close(); 
+                        if (ws) ws.close();
+
+                        // Show sidebar and display warning
+                        const sidebar = document.querySelector('.sidebar');
+                        sidebar.classList.remove('hidden');
+                        window.dispatchEvent(new Event('resize'));
+                        const status = document.getElementById('websocketStatus');
+                        status.style.color = "var(--color-lower)";
+                        status.innerText = "WS Status: Connection Error";
+                        
+                    
                     }, CLIENT_PING_TIMEOUT);
                 }
-
-                scheduleNextPing(); // recursively schedule next ping
+                
             }, CLIENT_PING_INTERVAL);
         }
         
@@ -770,6 +818,7 @@
                         console.info("Server pong response received");
                         pongReceived = true;
                         if (pingTimeout) clearTimeout(pingTimeout);
+                        scheduleNextPing();
                         return;
                     }
 
@@ -851,7 +900,7 @@
                             renderLoopRunning = false;
                             
                             if (data.message === "Failed to start EMG stream") {
-                                setStreamingState(false, 'Failed to start stream within 20 seconds', 'red');
+                                setStreamingState(false, 'Failed to start stream', 'red');
                             }
 
                             if (data.message === "Unexpected error in ws loop") {
@@ -881,11 +930,11 @@
                             }
 
                             // error handling if ground truth generation failed
-                            if (data.message === "Failed to generate ground truth") {
+                            if (data.type === "GT generation failed") {
                                 const gtStatusMsg = document.getElementById('gtStatusMessage');
                                 const gtBtn = document.getElementById('generateGTBtn');
                                 
-                                gtStatusMsg.innerText = "Error! Could not generate ground truth";
+                                gtStatusMsg.innerText = "Error! " + data.message;
                                 gtStatusMsg.style.color = 'var(--color-hold)'; // Red
                                 
                                 // Re-enable button so user can try again
@@ -917,6 +966,12 @@
                             else if (data.message === "EMG streaming stopped") {
                                 // Reset UI once backend has successfully stopped the stream
                                 stopAction();
+
+                                // Show final completion message if all trials were complete
+                                if (allTrialsCompleted) {
+                                    document.getElementById("sessionStatusMessage").innerText = "Session complete! Please remain seated and await further instructions."
+                                    document.getElementById("sessionStatusTab").click();
+                                }
                             }
 
                             else if (data.message === "Calibration complete") {
@@ -963,6 +1018,12 @@
         
                 ws.onerror = async (error) => {
                     console.error("WebSocket Error:", error);
+                    if (heartbeat) clearTimeout(heartbeat);
+
+                    // Show sidebar if hidden
+                    const sidebar = document.querySelector('.sidebar');
+                    sidebar.classList.remove('hidden');
+                    window.dispatchEvent(new Event('resize'));
                     
                     // Reset UI and update streaming state
                     stopAction();
@@ -993,7 +1054,7 @@
         
             // Show the current tab
             const activeTab = document.getElementById(tabName);
-            if (tabName === "Instructions") {
+            if (tabName === "Instructions" || tabName === "SessionStatus") {
                 activeTab.style.display = "flex"; // This enables vertical centering
             } else {
                 activeTab.style.display = "block";
@@ -1054,8 +1115,9 @@
             const itersInput = document.getElementById('iters');
             const repsInput = document.getElementById('reps');
             const itersValue = parseInt(itersInput.value) || (currentMode === 'calibrator' ? defaultCalbNumIters : defaultNumIters);
-            const repsValue = parseInt(repsInput.value) || defaultNumReps;
-            const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + 1 : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
+            const repsValue = parseInt(repsInput.value) || (currentMode === 'calibrator' ? defaultCalbNumReps : defaultNumReps);
+            const extraTrial = currentMode === 'calibrator' ? 0 : 1;
+            const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + extraTrial : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
             const display = document.getElementById('trialCounterDisplay');
 
             if (!display) return;
@@ -1081,6 +1143,13 @@
             const newText = `Trials Remaining: ${Math.max(0, trialsRemaining)}`;
             if (display.innerText !== newText) {
                 display.innerText = newText;
+            }
+
+            // Check if all trials are complete
+            if (trialsRemaining <= 0) {
+                allTrialsCompleted = true;
+                document.getElementById("sessionStatusMessage").innerText = "All trials complete! Stopping stream and saving data..."
+                document.getElementById("sessionStatusTab").click();
             }
         }
         
@@ -1508,6 +1577,7 @@
             }
         
             // Case 2: Start streaming + recording
+            // Get session data from controls inputs
             const boardID = document.getElementById('boardID').value;
             let useSyntheticData = false;
             if (boardID === "Synthetic") { 
@@ -1542,7 +1612,7 @@
             const repsInput = document.getElementById('reps').value;
             let numReps = parseFloat(repsInput);
             if (isNaN(numReps) || numReps < 1 || numReps > 20) {
-                numReps = defaultNumReps;
+                numReps = currentMode === 'calibrator' ? defaultCalbNumReps : defaultNumReps;
             }
 
             const folderName = document.getElementById('folderName').value;
@@ -1557,6 +1627,9 @@
             document.getElementById('serialPort').disabled = true;
             document.getElementById('folderName').disabled = true;
         
+            // Update UI
+            document.getElementById("instructionsTab").click();
+            
             const status = document.getElementById('streamingStatus');
             status.style.color = '#e65100'; // Orange for warning
         
@@ -1593,6 +1666,11 @@
             document.getElementById('boardID').disabled = false;
             document.getElementById('serialPort').disabled = false;
             
+            // Show sidebar if hidden
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.remove('hidden');
+            window.dispatchEvent(new Event('resize'));
+            
             // Clear the synchronized marker countdown display
             const display = document.getElementById('markerCountdownDisplay');
             if (display) {
@@ -1610,10 +1688,10 @@
             const instruction = document.getElementById('movementGuide');
             if (instruction) {
                 instruction.innerText = "REST";
-                instruction.style.color = "#3498db"; // Default Blue
+                instruction.style.color = "var(--color-rest)";
             }
-
-            // Reset dots to default
+ 
+            // Reset dots to default and ensure they're visible
             const dotContainer = document.getElementById('movementVisuals');
             if (dotContainer) {
                 dotContainer.classList.add('resting');
@@ -1665,6 +1743,7 @@
         
             try { 
                 // Reset global states and visual elements
+                document.getElementById('streamBtn').disabled = true; // lock button briefly
                 handleReset();
                 startRenderLoop();
 
@@ -1673,7 +1752,10 @@
             
             } catch (error) { 
                 console.error(error);
+                document.getElementById('streamBtn').disabled = false;
                 setStreamingState(false, 'Error sending start command', 'red');
+                document.getElementById("sessionStatusMessage").innerText = "Error sending start command."
+                document.getElementById("sessionStatusTab").click();
                 //alert("Error sending start command: " + error.message);
             }
         }
@@ -1709,7 +1791,9 @@
             
             } catch (e) {
                 console.error(e);
-                setStreamingState(true, 'Error Stopping', 'red'); // Revert if failed
+                setStreamingState(true, 'Error sending stop command.', 'red'); // Revert if failed
+                document.getElementById("sessionStatusMessage").innerText = "Error sending stop command."
+                document.getElementById("sessionStatusTab").click();
                 document.getElementById('streamBtn').disabled = false;
             }
         }

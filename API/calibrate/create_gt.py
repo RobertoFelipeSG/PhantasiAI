@@ -16,13 +16,15 @@ class GTGenerator:
         
     def _generate_gt(self):
         if not self.calibrations_dir.exists():
-            logging.error("[GTGenerator] Calibration directory not found")
-            return False
+            e = "Calibration directory not found"
+            logging.error(f"[GTGenerator] {e}")
+            return False, e
 
         csv_files = list(self.calibrations_dir.glob("*.csv"))
         if not csv_files:
-            logging.error("[GTGenerator] No CSV files found in calibrations folder")
-            return False
+            e = "No CSV files found in calibrations folder"
+            logging.error(f"[GTGenerator] {e}")
+            return False, e
 
         if self.mode == "accumulated": # get data from ALL files in calibrations/
             calb_files = csv_files 
@@ -40,11 +42,11 @@ class GTGenerator:
             # save as CSV
             gt_df.to_csv(self.gt_path, index=False)
             logging.info(f"[GTGenerator] Ground truth table generated")
-            return True
+            return True, None
         
         except Exception as e:
             logging.error(f"[GTGenerator] Error creating ground truth table: {e}")
-            return False
+            return False, e
         
     def run(self):
         return self._generate_gt()

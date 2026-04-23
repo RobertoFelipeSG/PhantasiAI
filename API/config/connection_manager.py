@@ -99,9 +99,8 @@ class ConnectionManager:
             if websocket.client_state != WebSocketState.DISCONNECTED:
                 try:
                     await websocket.close(code=1000)
-                    logging.info(f"[Manager] Websocket closed succesfully")
                 except Exception as e:
-                    logging.error(f"[Manager] Error closing websocket manually: {e}")
+                    logging.warning(f"[Manager] Error while closing websocket manually: {e}")
 
             logging.info(f"[Manager] Client disconnected. Total connections: {len(self.active_connections)}")
 
