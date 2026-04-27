@@ -1,8 +1,8 @@
 # 🧠 PhantasiAI
 
-**PhantasiAI** is a multimodal AI research prototype integrating live streaming data, RAG-based information retrieval, and cognitive architecture components.
+**PhantasiAI** is a multimodal AI research prototype integrating real-time signal processing and online optimization. 
 
-> ⚠️ *TODO: Add a short description*
+> ⚠️ This repo contains several prototype versions. The current prototype, documentation, and requirements are located in API/. 
 
 ---
 
@@ -10,15 +10,18 @@
 
 ```
 PhantasiAI/
-├── Docs/                   # Project documentation
+├── API/                    # Current prototype
+├── CEBRA/                  # ?
+├── Docs/                   # Project documentation (Old version)
 │   └── Architecture/       # Diagrams folder
 │   └── Guide/              # User guide folder
 │   └── SRS/                # Software Requirements Specification folder
-├── HW/                     # Hardware?
+├── GPBO/                   # ?
+├── HW/                     # ?
 ├── Multimodal_LSL/         # Multimodal Lab Streaming Layer components
-│  └── 2025/                # Current prototype
+├── Prototype/              # Old prototype version 
 ├── RAG/                    # Retrieval-Augmented Generation module
-├── requirements.txt        # List of Python dependencies
+├── requirements.txt        # List of Python dependencies for older versions
 └── README.md               # This file
 ```
 PS : to copy/paste to rbpi use : https://ctxt.io
