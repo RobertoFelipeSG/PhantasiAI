@@ -1,7 +1,41 @@
-This is a testing prototype for an API server to run an EMG-based OpenBCI Ganglion closed-loop optimization system 
+# PhantasiAI Prototype
 
-To use (FOLLOW IN-ORDER):
-*if you have any problems with these steps check the RPi Setup file*
+This is a testing prototype for an API system to run an EMG-based OpenBCI Ganglion closed-loop optimization system 
+
+## 🗂️ Project Structure
+
+```
+PhantasiAI/
+├── calibration/
+│   └── calibrator.py                   # Calibrator
+│   └── calb_change_detector.py         # WatchDogCalb
+│   └── create_gt.py                    # GroundTruthGenerator       
+├── config/
+│   └── config_manager.py               # ConfigManager
+│   └── connection_manager.py           # ConnectionManager           
+├── emg/                 
+│   └── data_acquisition.py             # Ganglion
+│   └── emg_feature_extractor.py        # FeatureExtractor
+│   └── emg_peak_classifier.py          # PeakClassifier
+│   └── recorder.py                     # RealTimeRecorder
+│   └── synthetic_data_acquisition.py   # SyntheticGanglion
+├── front-end/
+│   └── static/
+│   └── js/      
+│   └── index.html
+├── stim/
+│   └── opt_change_detector.py           # WatchDogOpt
+│   └── gbpo_new.py                      # GPBOOptimizer
+│   └── square.py                        # Stimulator
+├── .gitignore         
+├── README.md             
+├── dev.sh                               # script to run main.py
+├── main.py                              # central API 
+└── requirements.txt                     # list of Python dependencies
+```
+
+## User Guide (FOLLOW IN-ORDER):
+*if you have any problems with these steps check RPi setup file (docs/setup)*
 1. Ensure your RPi has been setup as an access point
 2. Connect to Internet
 3. In PhantasiAI/API/: Create virtual environment and install requirements: pip install -r requirements.txt
@@ -19,9 +53,13 @@ Server commands (can be run anywhere)
 - to stop the application: phstop
 - to restart the application: phrestart
 - to view real-time logs in terminal: phlogs
-- to view the application status: phstatus
+- to view the application status: phstatus      
 
-Overall Architecture (Basic):
+---
+
+## Prototype Architecture Overview
+
+```
 [ OpenBCI Ganglion Device ] <-- Catches the raw EMG data
        |                                              
        v 
@@ -37,7 +75,8 @@ Overall Architecture (Basic):
        |                                              |
        v                                              v
  [ Browser ]                                 [ Local RPi Device ] 
-(Live EMG data/real-time instructions)   (Electrical Stimulation via GPIO)        
+(Live EMG data/real-time instructions)   (Electrical Stimulation via GPIO)  
+```
 
 Data Threads:
     1. Main asynchronous thread (FastAPI/Uvicorn): central engine of app instance, controlled by asyncio Event Loop (non-blocking)
