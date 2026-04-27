@@ -79,13 +79,13 @@ Server commands (can be run anywhere)
 ```
 
 Data Threads:
-    1. Main asynchronous thread (FastAPI/Uvicorn): central engine of app instance, controlled by asyncio Event Loop (non-blocking)
-    2. Log broadcasting: periodically checks ws_handler.log_queue and broadcasts to WebSockets (non-blocking)
-    3. Websocket endpoint: client-specific thread listening for start/stop commands or pings/pongs from front-end (non-blocking)
-    4. Heartbeat: client-specific thread that periodically sends pings for connection timeouts (non-blocking)
-    5. EMG worker: client-specific thread for hardware interaction and data processing, thread=ganglion_instance._emg_thread (non-blocking/blocking)
-        - non-blocking during streaming
-        - blocking during starting: when self.board_shim.prepare_session() is called (for a maximum of 15 seconds)
-        - blocking during stopping: when self._emg_thread.join is called (for a maximum of 5 seconds)
-    6. Watchdog: client-specific thread to observe changes in features.txt to trigger GPBO (non-blocking)
-    7. [OPTIONAL] MQTT client: sends messages to seperate terminal (if initialized on server device)
+1. Main asynchronous thread (FastAPI/Uvicorn): central engine of app instance, controlled by asyncio Event Loop (non-blocking)
+2. Log broadcasting: periodically checks ws_handler.log_queue and broadcasts to WebSockets (non-blocking)
+3. Websocket endpoint: client-specific thread listening for start/stop commands or pings/pongs from front-end (non-blocking)
+4. Heartbeat: client-specific thread that periodically sends pings for connection timeouts (non-blocking)
+5. EMG worker: client-specific thread for hardware interaction and data processing, thread=ganglion_instance._emg_thread (non-blocking/blocking)
+    - non-blocking during streaming
+    - blocking during starting: when self.board_shim.prepare_session() is called (for a maximum of 15 seconds)
+    - blocking during stopping: when self._emg_thread.join is called (for a maximum of 5 seconds)
+6. Watchdog: client-specific thread to observe changes in features.txt to trigger GPBO (non-blocking)
+7. [OPTIONAL] MQTT client: sends messages to seperate terminal (if initialized on server device)
