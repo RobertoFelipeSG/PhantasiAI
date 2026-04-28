@@ -1,0 +1,32 @@
+# Ignore virtual environment folders
+venv/
+env/
+.venv/
+.env/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore system or editor files
+.DS_Store
+.ipynb_checkpoints
+Thumbs.db
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore all recording, classification, and stimulation files
+data/
+stim/extras/
+calibrate/calibrations/
+calibrate/ground_truth.csv
+
+# Ignore personal settings
+config/config.yaml
+
+# Ignore testing logs
+config/testing_logs.txt
