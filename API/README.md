@@ -12,7 +12,9 @@ PhantasiAI/
 │   └── create_gt.py                    # GroundTruthGenerator       
 ├── config/
 │   └── config_manager.py               # ConfigManager
-│   └── connection_manager.py           # ConnectionManager           
+│   └── connection_manager.py           # ConnectionManager
+├── docs/
+│   └── RPI Setup.pdf                   # software setup guide          
 ├── emg/                 
 │   └── data_acquisition.py             # Ganglion
 │   └── emg_feature_extractor.py        # FeatureExtractor
