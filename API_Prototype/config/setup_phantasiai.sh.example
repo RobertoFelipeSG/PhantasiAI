@@ -3,7 +3,7 @@
 # CONFIGURATION
 USER_NAME=$(whoami)
 HOME_DIR="/home/$USER_NAME"
-APP_DIR="$HOME_DIR/PhantasiAI/API"
+APP_DIR="$HOME_DIR/PhantasiAI/API_Prototype"
 SSID_NAME="[ACCESS_POINT]"
 
 echo "Starting PhantasiAI Environment Setup..."

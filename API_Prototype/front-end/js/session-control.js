@@ -30,6 +30,22 @@ function renderLoop() {
     requestAnimationFrame(renderLoop); // Continue looping
 }
 
+// Session data download button (used once stream has stopped)
+function handleDataDownload() {
+    if (!sessionDataFolder) return;
+    
+    // Create a URL pointing to our new FastAPI /download route
+    const url = `/download?folder_path=${encodeURIComponent(sessionDataFolder)}`;
+    
+    // Create an invisible anchor tag, click it, and remove it
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = ''; // Lets the backend dictate the filename
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
 // Ground truth generator function (used after calibration)
 function handleGenerateGT() {
     // Disable button and show "Generating..." message
@@ -183,6 +199,8 @@ async function handleStreamingClick() {
 
     // Case 2: Start streaming + recording
     // Get session data from controls inputs
+    sessionDataFolder = null;
+
     const boardID = document.getElementById('boardID').value;
     let useSyntheticData = false;
     if (boardID === "Synthetic") { 
@@ -231,6 +249,8 @@ async function handleStreamingClick() {
     document.getElementById('boardID').disabled = true;
     document.getElementById('serialPort').disabled = true;
     document.getElementById('folderName').disabled = true;
+    document.getElementById('downloadDataRow').style.display = 'none';
+    document.getElementById('gtButtonRow').style.display = 'none';
 
     // Update UI
     document.getElementById("instructionsTab").click();

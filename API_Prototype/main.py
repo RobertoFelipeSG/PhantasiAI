@@ -1,7 +1,6 @@
 import os
 import queue
-import sys
-import signal
+import shutil
 import asyncio
 import uvicorn
 import json
@@ -10,8 +9,8 @@ import threading
 import paho.mqtt.client as mqtt
 
 from starlette.websockets import WebSocketState
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, BackgroundTasks
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -201,6 +200,22 @@ async def websocket_endpoint(websocket: WebSocket):
         hb_task.cancel()
         await handle_stop_stream(session)
         await manager.disconnect(websocket)
+
+@app.get("/download")
+async def download_folder(folder_path: str, background_tasks: BackgroundTasks):
+    ''' 
+    Zips the requested folder and serves it as a downloadable file
+    '''
+    if not folder_path or not os.path.exists(folder_path):
+        return {"error": "Folder not found"}
+    
+    # create a temporary zip archive
+    zip_filename = os.path.basename(folder_path)
+    zip_path = shutil.make_archive(zip_filename, 'zip', folder_path)
+    
+    background_tasks.add_task(os.remove, zip_path) # delete ZIP once done downloading
+    
+    return FileResponse(zip_path, media_type="application/zip", filename=f"{zip_filename}.zip")
 
 async def handle_start_calibration(session, data):
     '''
@@ -432,12 +447,13 @@ async def handle_stop_stream(session):
                 except RuntimeError:
                     logging.warning("[Main] Executing calibrator stop in main FastAPI event loop")
                     session.profiler.save_as_csv(Path(session.session_dir))
+                session_dir_path = session.session_dir
                 session.session_dir = None
             session.profiler = None
         
         logging.info(f"[Main] Stopped stream/handled cleanup for client {id(session)}")
         try:
-            await session.websocket.send_json({"status": "success", "message": "EMG streaming stopped"})
+            await session.websocket.send_json({"status": "success", "message": "EMG streaming stopped", "folder": session_dir_path})
         except (WebSocketDisconnect, RuntimeError):
             pass
     else:

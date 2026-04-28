@@ -12,6 +12,7 @@ let totalTrials = null;
 let trialsRemaining = null;
 let allTrialsCompleted = false;
 let isStreaming = false;
+let sessionDataFolder = null;
 
 
 /* FUNCTIONS */
@@ -70,9 +71,6 @@ function selectMode(mode) {
             repsInput.value = defaultCalbNumReps
             repsInput.onfocus = function() { if (this.value == defaultCalbNumReps) { this.value = '';}};
             repsInput.onblur = function() {if (this.value === '') {this.value = defaultCalbNumReps;}};
-
-            // Hide Ground Truth button until calibration complete
-            document.getElementById('gtButtonRow').style.display = 'none';
         
         } else { // developer mode
             initGraphs();
@@ -86,7 +84,8 @@ function selectMode(mode) {
         });
 
         // Common init for both modes
-        document.getElementById('gtButtonRow').style.display = 'none'; // Hide ground truth feature (only appears after calibration complete)
+        document.getElementById('downloadDataRow').style.display = 'none'; // hide data download button until stream stops
+        document.getElementById('gtButtonRow').style.display = 'none'; // hide GT generation button (only appears once calibration done)
         document.getElementById('SessionStatus').style.display = 'flex'; // Show SessionStatus tab directly (no tab click needed)
         setStreamingState(false, 'Idle');
         connectWebSocket();

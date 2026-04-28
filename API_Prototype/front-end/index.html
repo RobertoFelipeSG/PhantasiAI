@@ -82,9 +82,14 @@
                 </div>
             </div>
 
+            <div class="controls-bar" id="downloadDataRow" style="display: none;">
+                <button id="downloadDataBtn" onclick="handleDataDownload()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">
+                    ⬇ Download Data </button>
+            </div>
+            
             <!-- Generate Ground Truth Feature -->
             <div class="controls-bar" id="gtButtonRow">
-                <button id="generateGTBtn" onclick="handleGenerateGT()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); ">Generate Ground Truth</button>
+                <button id="generateGTBtn" onclick="handleGenerateGT()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">Generate Ground Truth</button>
                 <div id="gtStatusMessage" style="margin-top: 10px; font-size: 14px;"></div>
             </div>
 

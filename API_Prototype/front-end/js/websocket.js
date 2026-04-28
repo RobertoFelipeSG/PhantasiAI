@@ -222,6 +222,12 @@ function connectWebSocket() {
                         // Reset UI once backend has successfully stopped the stream
                         stopAction();
 
+                        if (data.folder) {
+                            console.log("Received data folder");
+                            sessionDataFolder = data.folder; 
+                            document.getElementById('downloadDataRow').style.display = "block";
+                        }
+
                         // Show final completion message if all trials were complete
                         if (allTrialsCompleted) {
                             document.getElementById("sessionStatusMessage").innerText = "Session complete! Please remain seated and await further instructions."
