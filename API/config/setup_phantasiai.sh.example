@@ -54,7 +54,7 @@ EOF"
 sudo nmcli connection modify "$SSID_NAME" connection.autoconnect-priority 100 2>/dev/null || echo "Network $SSID_NAME not found yet; connect manually later."
 
 # 5: Add custom shortcuts to .bashrc
-if ! grep -q "pirestart" "$HOME_DIR/.bashrc"; then
+if ! grep -q "phrestart" "$HOME_DIR/.bashrc"; then
     cat <<EOF >> "$HOME_DIR/.bashrc"
 # PhantasiAI Aliases
 alias phstop='sudo systemctl stop phantasiai_backend.service'

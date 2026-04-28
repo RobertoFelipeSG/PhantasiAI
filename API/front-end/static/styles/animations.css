@@ -1,0 +1,107 @@
+/* ----- Real-Time Instructions ---- */
+#Instructions {
+    position: relative;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+#Instructions[style*="block"] {
+    display: flex !important;
+}
+
+.trial-counter {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-primary); /* Uses your Cyan color */
+    background-color: var(--bg-card-light);
+    padding: 8px 15px;
+    border-radius: 4px;
+    border: 1px solid var(--border-basic);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Subtle depth */
+    letter-spacing: 1px;
+}
+
+.guide-text {
+    font-size: clamp(60px, 10vw, 150px);
+    font-weight: 700;     
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--color-rest);
+}
+
+.dots-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 8vw; 
+    margin: 20px;
+    min-height: 80px;
+}
+
+.dot-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.3;
+}
+
+.dot-circle {
+    width: 6vw;
+    height: 6vw;
+    min-width: 40px;
+    min-height: 40px;
+    max-width: 90px;
+    max-height: 90px;
+    border-radius: 50%;
+    background-color: var(--color-inactive);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dot-wrapper.active {
+    opacity: 1;
+}
+
+.dot-wrapper.active#dot-left .dot-circle { background-color: var(--color-raise);}
+.dot-wrapper.active#dot-middle .dot-circle  { background-color: var(--color-hold);}
+.dot-wrapper.active#dot-right .dot-circle { background-color: var(--color-lower);}
+
+.dots-container.resting .dot-wrapper.active .dot-circle {
+    background-color: var(--color-rest) !important;
+}
+
+/* ----- Graphs ----- */
+.graph-container {
+    width: 90%;
+    height: 500px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+}
+
+.graph-controls {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: transparent;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+/* ----- Log Terminal ----- */
+.log-entry {
+    margin-bottom: 4px;
+    border-bottom: 1px solid #2a2a2a;
+    text-align: left;
+    font-family: monospace !important;
+    white-space: pre;
+    width: max-content; 
+    min-width: 100%;
+}

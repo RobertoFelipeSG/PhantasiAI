@@ -1,4 +1,5 @@
 import os
+import queue
 import sys
 import signal
 import asyncio
@@ -88,6 +89,7 @@ app = FastAPI(lifespan=lifespan)
 script_dir = os.path.dirname(__file__)
 static_path = os.path.join(script_dir, "front-end", "static")
 app.mount("/static", StaticFiles(directory=static_path), name="static")
+app.mount("/js", StaticFiles(directory="front-end/js"), name="js")
 
 @app.get("/")
 async def root():
@@ -294,7 +296,7 @@ async def handle_gt_generation(session, data):
     if status:
         await session.websocket.send_json({"status": "success", "message": "Ground truth generated"})
     else: 
-        await session.websocket.send_json({"status": "error", "type": "GT generation failed", "message": error})
+        await session.websocket.send_json({"status": "error", "type": "GT generation failed", "message": str(error)})
 
     session.gt_generator = None
 
