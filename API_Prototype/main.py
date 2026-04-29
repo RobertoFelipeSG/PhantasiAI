@@ -202,20 +202,24 @@ async def websocket_endpoint(websocket: WebSocket):
         await manager.disconnect(websocket)
 
 @app.get("/download")
-async def download_folder(folder_path: str, background_tasks: BackgroundTasks):
+async def download_data(data_path: str, background_tasks: BackgroundTasks):
     ''' 
     Zips the requested folder and serves it as a downloadable file
     '''
-    if not folder_path or not os.path.exists(folder_path):
+    if not data_path or not os.path.exists(data_path):
         return {"error": "Folder not found"}
     
-    # create a temporary zip archive
-    zip_filename = os.path.basename(folder_path)
-    zip_path = shutil.make_archive(zip_filename, 'zip', folder_path)
+    if os.path.isdir(data_path): # Case 1: data is a folder
+        # create a temporary zip archive
+        zip_filename = os.path.basename(data_path)
+        zip_path = shutil.make_archive(zip_filename, 'zip', data_path)
+        
+        background_tasks.add_task(os.remove, zip_path) # delete ZIP once done downloading
+        
+        return FileResponse(zip_path, media_type="application/zip", filename=f"{zip_filename}.zip")
     
-    background_tasks.add_task(os.remove, zip_path) # delete ZIP once done downloading
-    
-    return FileResponse(zip_path, media_type="application/zip", filename=f"{zip_filename}.zip")
+    elif os.path.isfile(data_path): # Case 2: data is a single file
+        return FileResponse(data_path, filename=os.path.basename(data_path))
 
 async def handle_start_calibration(session, data):
     '''
@@ -309,7 +313,8 @@ async def handle_gt_generation(session, data):
         status = session.gt_generator.run()
     
     if status:
-        await session.websocket.send_json({"status": "success", "message": "Ground truth generated"})
+        file_path = Path(__file__).parent / "calibrate" / "ground_truth.csv"
+        await session.websocket.send_json({"status": "success", "message": "Ground truth generated", "file": str(file_path)})
     else: 
         await session.websocket.send_json({"status": "error", "type": "GT generation failed", "message": str(error)})
 

@@ -82,15 +82,19 @@
                 </div>
             </div>
 
+            <!-- Download Session Data Feature -->
             <div class="controls-bar" id="downloadDataRow" style="display: none;">
-                <button id="downloadDataBtn" onclick="handleDataDownload()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">
+                <button id="downloadDataBtn" onclick="handleDataDownload('all')" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">
                     ⬇ Download Data </button>
             </div>
             
             <!-- Generate Ground Truth Feature -->
             <div class="controls-bar" id="gtButtonRow">
-                <button id="generateGTBtn" onclick="handleGenerateGT()" style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">Generate Ground Truth</button>
+                <button id="generateGTBtn" onclick="handleGenerateGT()" 
+                style="padding: 8px 12px; font-size: 16px; cursor: pointer; border-radius: 2px; background: linear-gradient(135deg, var(--color-raise) 0%, var(--color-rest) 100%); ">Generate Ground Truth</button>
                 <div id="gtStatusMessage" style="margin-top: 10px; font-size: 14px;"></div>
+                <button id="downloadGTBtn" onclick="handleDataDownload('gt')" 
+                style="display: none; padding: 6px 10px; font-size: 10px; color: black; cursor: pointer; border-radius: 2px; background: white; "> ⬇ Download</button>
             </div>
 
             <!-- Chat Terminal -->

@@ -215,6 +215,7 @@ function connectWebSocket() {
 
                         // hide ground truth generation button (for calibrator mode)
                         document.getElementById('gtButtonRow').style.display = 'none';
+                        document.getElementById('downloadGTBtn').style.display = 'none';
                         document.getElementById('gtStatusMessage').innerText = "";
                     }
                     
@@ -252,6 +253,12 @@ function connectWebSocket() {
                         gtBtn.disabled = false;
                         gtBtn.style.cursor = 'pointer';
                         gtBtn.style.opacity = '1';
+
+                        if (data.file) {
+                            console.log("Received ground truth file");
+                            sessionGroundTruth = data.file; 
+                            document.getElementById('downloadGTBtn').style.display = 'block';
+                        }
                     }
                 }
             }

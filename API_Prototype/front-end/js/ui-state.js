@@ -13,6 +13,7 @@ let trialsRemaining = null;
 let allTrialsCompleted = false;
 let isStreaming = false;
 let sessionDataFolder = null;
+let sessionGroundTruth = null;
 
 
 /* FUNCTIONS */
@@ -83,7 +84,7 @@ function selectMode(mode) {
             });
         });
 
-        // Common init for both modes
+        // Common init for all modes
         document.getElementById('downloadDataRow').style.display = 'none'; // hide data download button until stream stops
         document.getElementById('gtButtonRow').style.display = 'none'; // hide GT generation button (only appears once calibration done)
         document.getElementById('SessionStatus').style.display = 'flex'; // Show SessionStatus tab directly (no tab click needed)

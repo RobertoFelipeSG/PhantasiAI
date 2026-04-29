@@ -31,11 +31,23 @@ function renderLoop() {
 }
 
 // Session data download button (used once stream has stopped)
-function handleDataDownload() {
-    if (!sessionDataFolder) return;
+function handleDataDownload(dataType) {
+    let url;
     
-    // Create a URL pointing to our new FastAPI /download route
-    const url = `/download?folder_path=${encodeURIComponent(sessionDataFolder)}`;
+    if (dataType === 'all') {
+        if (!sessionDataFolder) return;
+        url = `/download?data_path=${encodeURIComponent(sessionDataFolder)}`; // URL pointing to FastAPI /download route
+    }
+
+    else if (dataType === 'gt') {
+        if (!sessionGroundTruth) return;
+        url = `/download?data_path=${encodeURIComponent(sessionGroundTruth)}`; // URL pointing to FastAPI /download route
+    }
+    
+    if (!url) {
+        console.error("Download URL could not be generated.");
+        return;
+    }
     
     // Create an invisible anchor tag, click it, and remove it
     const a = document.createElement('a');
@@ -200,6 +212,7 @@ async function handleStreamingClick() {
     // Case 2: Start streaming + recording
     // Get session data from controls inputs
     sessionDataFolder = null;
+    sessionGroundTruth = null;
 
     const boardID = document.getElementById('boardID').value;
     let useSyntheticData = false;
