@@ -385,7 +385,7 @@ class GPBOOptimizer:
         self.dorsi_flag.clear() # reset dorsiflexion flag to trigger stimulation
         self.file_path = file_path
         
-        # OPTIMIZATION CHECK: if all repetitions+iterations complete, start new optimization process
+        # OPTIMIZATION CHECK: if all repetitions+iterations complete, auto-stop OR start new optimization process
         if self.opt_complete:
             
             if self.on_complete:
@@ -569,13 +569,13 @@ class GPBOOptimizer:
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
-            logging.error(f"[GPBO] Hardware Stim Error: Cannot access GPIO chip. {e}")
+            logging.error(f"[GPBO] Hardware Stim Error (trial {curr_trial}): Cannot access GPIO chip. {e}")
             if self.on_stim_fail: self.on_stim_fail()
         except KeyError as e:
-            logging.error(f"[GPBO] Parameter Stim Error: Missing key in best_params: {e}")
+            logging.error(f"[GPBO] Parameter Stim Error (trial {curr_trial}): Missing key in best_params: {e}")
             if self.on_stim_fail: self.on_stim_fail()
         except Exception as e:
-            logging.error(f"[GPBO] Unexpected error during stimulation: {type(e).__name__}: {e}")
+            logging.error(f"[GPBO] Unexpected error during stimulation (trial {curr_trial}): {type(e).__name__}: {e}")
             if self.on_stim_fail: self.on_stim_fail()
 
     def run(self, file_path, curr_trial):

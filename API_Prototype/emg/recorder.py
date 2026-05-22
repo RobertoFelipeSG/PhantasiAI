@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 import numpy as np
 import pandas as pd
 import time
@@ -8,17 +9,19 @@ from pathlib import Path
 
 from config.connection_manager import logging
 from config.config_manager import load_config
+from utils.create_isi import generate_intervals
 
 CONFIG = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, profiler, dorsi_flag, base_path, folder_name=None):
+    def __init__(self, sample_rate, profiler, dorsi_flag, isi_type, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
         
         self.dorsi_flag = dorsi_flag
+        self.isi_type = isi_type
         self.profiler = profiler
         self.base_path = base_path
         self.filename = None
@@ -33,14 +36,11 @@ class RealTimeRecorder:
         self.session_dir = os.path.join(str(self.base_path), folder_name)
         os.makedirs(self.session_dir, exist_ok=True)
         
-        # Create minute analyses and classification folders within session folder
-        #self.analyses_dir = os.path.join(self.session_dir, "analyses")
-        #os.makedirs(self.analyses_dir, exist_ok=True)
+        # Create features folder within session folder
         self.features_dir = os.path.join(self.session_dir, "features")
         os.makedirs(self.features_dir, exist_ok=True)
-        #self.classification_dir = os.path.join(self.session_dir, "classifications")
-        #os.makedirs(self.classification_dir, exist_ok=True)
         
+        self.min_time = 0.0 # starting timestamp pointer for analysis DataFrame 
         self._sample_rate = sample_rate
         self._buffer_seconds = CONFIG.get("recorder_buffer_seconds")
         self._buffer_len = self._sample_rate * self._buffer_seconds # max data points per session         
@@ -49,17 +49,36 @@ class RealTimeRecorder:
 
         self.emg_channel_count = CONFIG.get("num_emg_ch") 
         self.accel_channel_count = CONFIG.get("num_accel_ch") 
-        
-        self.marker_interval = CONFIG.get("marker_interval") # event every x seconds
-        self.next_event_time = self.marker_interval // 2 # first marker occurs at half of an interval
-        self.next_trial_time = self.marker_interval
-        self.min_time = 0.0 # starting timestamp pointer for analysis DataFrame
-        
-        self.event_times_buffer = [] # buffer to store event times for frontend push
-        self._event_times = [] # store event times for entire session 
-        
-        logging.info(f"[Recorder] initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels")
 
+        self.event_times_buffer = [] # buffer to store event times for frontend push
+        self._event_times = [] # store event times for entire session
+
+        self.trial_times_buffer = [] # buffer to store trial times for frontend push (timestamp for the start of a new trial)
+        self._trial_times = [] # store trial times for entire session
+        
+        # define inter-stimulus interval and stimulus timing
+        if self.isi_type == 'dynamic':
+            isi_path = Path(__file__).parent.parent / "utils" / "dynamic_intervals.json"
+            
+            if os.path.exists(isi_path):
+                with open(isi_path, "r") as f:
+                    self.dynamic_intervals = json.load(f)["intervals"] # read from array of dynamic ISIs; 400 total
+            else: 
+                logging.warning("[Recorder] Could not load dynamic ISI file")
+                self.dynamic_intervals = generate_intervals() 
+        
+        self.inter_stim_interval = CONFIG.get("static_isi") # initial ISI always static
+        self.stim_duration = CONFIG.get("static_stim_duration")
+        
+        # setup event/trial marker logic
+        self.total_events = 0 # stores how many events completed
+        self.total_trials = 0 # stores how many trials completed
+        self.marker_interval = self.inter_stim_interval + self.stim_duration # marker occurs every (ISI + stimulus) seconds; this value does not change if ISI = static
+        self.next_event_time = self.inter_stim_interval # first event marker occurs at the end of first isi (i.e. when first stim presented)
+        self.next_trial_time = self.marker_interval # first trial marker occurs at the end of first stimulus 
+        
+        logging.info(f"[Recorder] ({self.isi_type}) initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels") 
+    
     def _mark_event(self, timestamp):
         event_flag = 0
         if timestamp >= self.next_event_time:
@@ -67,10 +86,22 @@ class RealTimeRecorder:
             self.dorsi_flag.set()
             
             event_flag = 1
+            self.total_events += 1
+            
             self._event_times.append(timestamp)
             self.event_times_buffer.append(timestamp)
+
+            # Add event timestamp and isi to profiler (to mark beginning of dorsiflexion)
+            if self.total_trials != 0:
+                self.profiler.log_metric(self.total_trials, "event", timestamp)
+                self.profiler.log_metric(self.total_trials, "isi", self.inter_stim_interval)
             
-            # Advance the marker time
+            # Advance next event marker time
+            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
+                # redefine marker interval time for dynamic
+                self.inter_stim_interval = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
+                self.marker_interval = self.stim_duration + self.inter_stim_interval 
+
             self.next_event_time += float(self.marker_interval)
             #logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
         
@@ -80,8 +111,12 @@ class RealTimeRecorder:
         trial_flag = 0
         if timestamp >= self.next_trial_time:
             trial_flag = 1
+            self.total_trials += 1
 
-            # advance next trial time
+            self._trial_times.append(timestamp)
+            self.trial_times_buffer.append(timestamp)
+
+            # Advance next trial time
             self.next_trial_time += float(self.marker_interval)
 
         return trial_flag
@@ -138,7 +173,7 @@ class RealTimeRecorder:
 
     def create_analysis_file(self, max_time, trial): 
         """
-        Create an analysis file with X number of trials and saves file as CSV 
+        Create an analysis file for data of a single trial
         Return: DataFrame (df of analysis data) 
         """
 
@@ -165,9 +200,6 @@ class RealTimeRecorder:
             output_path = os.path.join(self.analyses_dir, filename)
             analysis_data.to_csv(output_path, index=False)
             '''
-
-            # message = f"[Recorder] Analysis file created for {trial} trials, from {last_min} to {max_time}. Duration: {time.time() - start_time:.2f} seconds."
-            #logging.info(message)
         
             duration = time.time() - start_time
             self.profiler.log_metric(trial, "file_create", duration)

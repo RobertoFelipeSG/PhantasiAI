@@ -26,7 +26,7 @@ from stim.gpbo import GPBOOptimizer
 from stim.square import Stimulator
 from calibrate.calb_change_detector import WatchDogCalb
 from calibrate.calibrator import Calibrator
-from calibrate.create_gt import GTGenerator
+from calibrate.gt_generator import GTGenerator
 
 mqtt_client = None
 CONFIG = load_config()
@@ -254,11 +254,11 @@ async def handle_start_calibration(session, data):
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials,
+                                                 isi_type='static', serial_port=serial_port, sample_rate=250, num_trials=num_trials,
                                                  folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials,
+                                        isi_type='static', serial_port=serial_port, sample_rate=200, num_trials=num_trials,
                                         folder_name=folder_name, on_error=trigger_stream_stop)
 
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
@@ -353,14 +353,17 @@ async def handle_start_stream(session, data):
     # Initialize Ganglion instance
     def trigger_stream_stop(): # callback function to trigger stream stop in case of board error
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
+
+    isi_type = 'dynamic' if (n_iters == 40 and n_reps == 10) else 'static' # define inter-stimulus interval type
+    # note: currently code is harded to only accept dynamic isi for 401 trials (10 iters, 40 reps)
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials,
+                                                 isi_type=isi_type, serial_port=serial_port, sample_rate=250, num_trials=num_trials,
                                                  folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials,
+                                        isi_type=isi_type, serial_port=serial_port, sample_rate=200, num_trials=num_trials,
                                         folder_name=folder_name, on_error=trigger_stream_stop)
     
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
@@ -450,7 +453,7 @@ async def handle_stop_stream(session):
                     loop = asyncio.get_running_loop()
                     await loop.run_in_executor(None, session.profiler.save_as_csv, Path(session.session_dir))
                 except RuntimeError:
-                    logging.warning("[Main] Executing calibrator stop in main FastAPI event loop")
+                    logging.warning("[Main] Executing profiler csv save in main FastAPI event loop")
                     session.profiler.save_as_csv(Path(session.session_dir))
                 session_dir_path = session.session_dir
                 session.session_dir = None

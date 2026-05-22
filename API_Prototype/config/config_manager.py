@@ -38,12 +38,14 @@ DEFAULT_CONFIG = {
     
     # data recording
     "recorder_buffer_seconds": 120,
-    "marker_interval": 6,
+    "static_isi": 3,
+    "static_stim_duration": 3,
 
     # feature extraction
     "height_percentile": 98,
     "min_distance": 3,
     "feature_cutoff_freq": 80,
+    "feature_window": 5,
     "features": ['max_amplitude'],
 
     # GPBO

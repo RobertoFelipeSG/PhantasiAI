@@ -114,14 +114,34 @@ function connectWebSocket() {
             // Add most recent event markers (vertical lines)
             else if (data.type === 'event_times') {
                 if (currentMode === 'developer') {
-                    data.timestamps.forEach(event_time => {
+                    data.event_timestamps.forEach(event_time => {
                     updateEventDisplay(event_time);
                     });
                 }
             }
+
+            // Add most recent trial markers (vertical lines)
+            else if (data.type === 'trial_times') {
+                if (currentMode === 'developer') {
+                    data.trial_timestamps.forEach(trial_time => {
+                    updateTrialDisplay(trial_time);
+                    });
+                }
+            }
+
+            // Update marker timer countdown display 
+            else if (data.type === 'event_target_time') {
+                nextEventTargetTime = data.event_target_time;
+            }
+
+            // Update trial timer countdown display and exercise instructions
+            else if (data.type === 'trial_target_time') {
+                nextTrialTargetTime = data.trial_target_time;
+            }
             
             // update trial countdown display
             else if (data.type === 'stim_failed') {
+                console.warn("Stimulation failure for trial");
                 stimSuccess = false;
             }
             
@@ -130,10 +150,6 @@ function connectWebSocket() {
                 stimSuccess = true; // reset for next trial
             }
             
-            // Update marker display and exercise instructions
-            else if (data.type === 'marker_target_time') {
-                nextEventTargetTime = data.target_timestamp;
-            }
 
             // Update chat-terminal
             else if (data.type === 'server_log') {

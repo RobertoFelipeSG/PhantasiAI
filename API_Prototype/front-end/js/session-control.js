@@ -134,8 +134,10 @@ function handleReset() {
     CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT;
     pendingEmgData.length = 0;
     pendingAccelData.length = 0;
+    latestTimestamp = null;
     lastInstructionPhase = "";
     nextEventTargetTime = null;
+    nextTrialTargetTime = null;
     totalTrials = null;
     trialsRemaining = null;
     lastPhase = "";
@@ -156,10 +158,17 @@ function handleReset() {
     window.dispatchEvent(new Event('resize'));
     
     // Clear the synchronized marker countdown display
-    const display = document.getElementById('markerCountdownDisplay');
-    if (display) {
-        display.innerText = "";
-        display.style.color = 'blue';
+    const eventDisplay = document.getElementById('markerCountdownDisplay');
+    if (eventDisplay) {
+        eventDisplay.innerText = "";
+        eventDisplay.style.color = 'blue';
+    }
+
+    // Clear the synchronized trial timer countdown display
+    const trialDisplay = document.getElementById('trialTimeCountdownDisplay');
+    if (trialDisplay) {
+        trialDisplay.innerText = "";
+        trialDisplay.style.color = 'blue';
     }
 
     // Clear trial countdown
@@ -175,7 +184,7 @@ function handleReset() {
         instruction.style.color = "var(--color-rest)";
     }
 
-    // Reset dots to default and ensure they're visible
+    // Reset dots to default 
     const dotContainer = document.getElementById('movementVisuals');
     if (dotContainer) {
         dotContainer.classList.add('resting');

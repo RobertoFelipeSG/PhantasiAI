@@ -21,7 +21,7 @@ Thumbs.db
 
 # Ignore all recording, classification, and stimulation files
 data/
-stim/extras/
+utils/extras/
 calibrate/calibrations/
 calibrate/ground_truth.csv
 

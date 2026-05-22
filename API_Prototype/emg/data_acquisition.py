@@ -1,4 +1,5 @@
 import os
+import signal
 import time
 import threading
 import asyncio
@@ -23,7 +24,7 @@ CONFIG = load_config() # load config settings
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 
 class GanglionData:
-    def __init__(self, websocket, profiler, dorsi_flag, serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None, on_error=None):
+    def __init__(self, websocket, profiler, dorsi_flag, isi_type='static', serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None, on_error=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
@@ -46,11 +47,11 @@ class GanglionData:
         self.connection_status = "pending"
         self.stream_lost = False
         
-        self._num_trials = int(num_trials) # trials per session (inputed by user)
+        self._num_trials = int(num_trials) # trials per analysis session (default is 1; single trial analysis)
         self.next_trial_block = int(num_trials)
         self._total_events = 0
         self._total_trials = 0
-        self.marker_broadcast_counter = 0
+        self._broadcast_counter = 0
         
         # Data containers
         self._sample_rate = sample_rate
@@ -71,7 +72,7 @@ class GanglionData:
         self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
         self._all_channels = self.emg_channels + self.accel_channels
 
-        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, self.dorsi_flag, 
+        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, self.dorsi_flag, isi_type=isi_type,
                                          base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate, self.profiler, self._num_trials == 1, 
                                                   output_path=Path(self.recorder.features_dir))
@@ -115,22 +116,44 @@ class GanglionData:
 
         event_data = json.dumps({
             "type": "event_times",
-            "timestamps": new_event_times
+            "event_timestamps": new_event_times
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(event_data), loop)
 
-    def _broadcast_countdown(self, loop):
-        '''Helper to broadcast countdown until next event to frontend'''
+    def _broadcast_event_countdown(self, loop):
+        '''Helper to broadcast event countdown until next event to frontend'''
         
         next_event_time = self.recorder.next_event_time
         
         marker_data = json.dumps({
-            "type": "marker_target_time", 
-            "target_timestamp": float(next_event_time)
+            "type": "event_target_time", 
+            "event_target_time": float(next_event_time)
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(marker_data), loop)
 
     def _broadcast_trials(self, loop):
+        '''Helper to broadcast trial times to frontend'''
+        new_trial_times = self.recorder.trial_times_buffer[:]
+        self.recorder.trial_times_buffer.clear() # Clear event times after capturing
+
+        trial_data = json.dumps({
+            "type": "trial_times",
+            "trial_timestamps": new_trial_times # first timestamp of the new trial
+        })
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(trial_data), loop)
+    
+    def _broadcast_trial_countdown(self, loop):
+        '''Helper to broadcast trial countdown until next event to frontend'''
+        
+        next_trial_time = self.recorder.next_trial_time
+        
+        marker_data = json.dumps({
+            "type": "trial_target_time", 
+            "trial_target_time": float(next_trial_time)
+        })
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(marker_data), loop)
+
+    def _broadcast_trial_completion(self, loop):
         '''Helper to broadcast trial completion to frontend'''
         curr_total_trials = float(self._total_trials)
         
@@ -163,17 +186,16 @@ class GanglionData:
             has_event, end_trial = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
             
             if has_event: 
-                self._total_events += 1
+                self._total_events = self.recorder.total_events
                 #logging.info(f"[Ganglion] Recorded {self._total_events} events")
             
             if end_trial:
-                self._total_trials += 1
+                self._total_trials = self.recorder.total_trials
                 
                 self.profiler.start_trial(self._total_trials)
-                logging.info(f"[Ganglion] End of trial {self._total_trials} detected")
+                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
                 
-                self._broadcast_trials(loop)
-                #logging.info(f"[Ganglion] Trial {self._total_trials} complete")
+                self._broadcast_trial_completion(loop)
             
             # Perform analysis on selected trials
             if self._total_trials == self.next_trial_block:
@@ -182,12 +204,17 @@ class GanglionData:
         # Broadcast event markers
         if self.recorder.event_times_buffer: 
             self._broadcast_events(loop)
+
+        # Broadcast trial markers
+        if self.recorder.trial_times_buffer:
+            self._broadcast_trials(loop)
         
-        # Broadcast marker interval countdown to frontend
-        self.marker_broadcast_counter += len(relative_timestamps)
-        if self.marker_broadcast_counter >= self._num_points:
-            self._broadcast_countdown(loop) 
-            self.marker_broadcast_counter = 0
+        # Broadcast marker interval and trial countdown to frontend
+        self._broadcast_counter += len(relative_timestamps)
+        if self._broadcast_counter >= self._num_points:
+            self._broadcast_event_countdown(loop) 
+            self._broadcast_trial_countdown(loop) 
+            self._broadcast_counter = 0
 
         # Accel channel processing
         accel_data = data[self.accel_channels]

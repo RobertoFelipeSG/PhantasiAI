@@ -76,7 +76,7 @@
 .dot-wrapper.active#dot-right .dot-circle { background-color: var(--color-lower);}
 
 .dots-container.resting .dot-wrapper.active .dot-circle {
-    background-color: var(--color-rest) !important;
+    background-color: var(--color-inactive) !important;
 }
 
 /* ----- Graphs ----- */

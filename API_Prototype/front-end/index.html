@@ -76,9 +76,12 @@
                         onfocus="if(this.value==='Auto') this.value='';" 
                         onblur="if(this.value==='') this.value='Auto';" >
                 </div>
+                <br>
                 <div> Streaming Status: <span id="streamingStatus">Idle</span> 
                 </div>
-                <div id="markerRow"> <span id="markerCountdownDisplay" style="font-weight: bold; color: #666;"></span>
+                <div id="markerRow"> <span id="markerCountdownDisplay" style="display: none; font-weight: bold; color: #666;"></span>
+                </div>
+                <div id="trialTimerRow"> <span id="trialTimeCountdownDisplay" style="font-weight: bold; color: #666;"></span>
                 </div>
             </div>
 
@@ -161,7 +164,7 @@
             <!-- Session Status -->
             <div id="SessionStatus" class="tabcontent" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%;">
                 <div id="sessionStatusMessage" style="font-size: clamp(24px, 4vw, 48px); font-weight: 600; color: var(--color-primary); padding: 40px; line-height: 1.6;">
-                    Please press "START" to begin session
+                    Welcome back!<br> Please press "START" to begin session
                 </div>
             </div>
         </main>

@@ -10,7 +10,7 @@ let CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; // initial timeout until board conn
 
 // Session constants
 const defaultTotalTrials = 401;
-const defaultCalbTotalTrials = 75
+const defaultCalbTotalTrials = 75;
 const defaultNumTrials = 1;
 const defaultNumIters = 40;
 const defaultCalbNumIters = 25;

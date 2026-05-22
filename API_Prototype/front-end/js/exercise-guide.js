@@ -3,49 +3,78 @@
 /* VARIABLES */
 let latestTimestamp = null;
 let nextEventTargetTime = null;
+let nextTrialTargetTime = null;
 let lastPhase = ""; // stores only the instruction
 let lastInstructionPhase = ""; // stores instruction + active dot
+
+const countdownElements = {
+    EVENT: document.getElementById('markerCountdownDisplay'),
+    TRIAL: document.getElementById('trialTimeCountdownDisplay')
+};
+
+const movementElements = {
+    instruction: document.getElementById('movementGuide'),
+    dotContainer: document.getElementById('movementVisuals'),
+    dots: {
+        left:   document.getElementById('dot-left'),
+        middle: document.getElementById('dot-middle'),
+        right:  document.getElementById('dot-right')
+    }
+};
 
 
 /* FUNCTIONS */
 // Main function (updates all animation components)
 function updateTimerVisuals(currentTime) {
-    if (nextEventTargetTime === null) return;
+    // NO LONGER NEEDED: calculate time until next event marker and update visuals
+    /*if ((nextEventTargetTime !== null) && (currentMode === 'developer')) {
+        let eventTimeRemaining = Math.max(0, nextEventTargetTime - currentTime);
+        
+        updateMarkerCountdown('EVENT', eventTimeRemaining);
+    }*/
 
-    let timeRemaining = Math.max(0, nextEventTargetTime - currentTime);
-    
-    updateMarkerCountdown(timeRemaining);
-    updateMovementGuide(timeRemaining);
+    // calculate time until next trial and update visuals
+    if (nextTrialTargetTime !== null) {
+        let trialTimeRemaining = Math.max(0, nextTrialTargetTime - currentTime);
+        
+        updateMovementGuide(trialTimeRemaining);
+        if (currentMode === 'developer') updateMarkerCountdown('TRIAL', trialTimeRemaining);
+    }
 }
 
-// Event marker countdown (in controls bar)
-function updateMarkerCountdown(timeRemaining) {
-    const display = document.getElementById('markerCountdownDisplay');
+// Event marker / Trial timer countdown (in controls bar)
+function updateMarkerCountdown(type, timeRemaining) {
+    const display = countdownElements[type];
+    if (!display) return;
     
     const formattedTime = timeRemaining.toFixed(1) + "s";
-    const targetText = `NEXT MARKER: ${formattedTime}`;
+    const targetText = `NEXT ${type}: ${formattedTime}`;
         
-    if (display.innerText !== targetText) {
-        if (timeRemaining < PHASE_CHANGE) { // Detect rest period
-            display.style.color = "var(--color-rest)"; 
-        } 
-        else {// Detect event marker (movement begins)
-            display.style.color = "var(--color-raise)";
-        }
-
+    if (display.innerText !== targetText) { // DOM optimization: only update if text has changed
         display.innerText = targetText;
+
+        if (type === 'TRIAL') { // 1-3 = go; 3-6 = rest
+            if (timeRemaining > PHASE_CHANGE) { 
+                display.style.color = "var(--color-rest)"; 
+            } 
+            else {// Detect event marker (movement begins)
+                display.style.color = "var(--color-raise)";
+            }
+        }
+        if (type === 'EVENT') { // 1-3 = rest; 3-6 = go
+            if (timeRemaining <= PHASE_CHANGE) { 
+                display.style.color = "var(--color-rest)"; 
+            } 
+            else {// Detect event marker (movement begins)
+                display.style.color = "var(--color-raise)";
+            }
+        }
     }
 }
 
 // Basic go-rest display
 function updateMovementGuide(timeRemaining) {
-    const instruction = document.getElementById('movementGuide');
-    const dotContainer = document.getElementById('movementVisuals');
-    const dots = {
-        left:   document.getElementById('dot-left'),
-        middle: document.getElementById('dot-middle'),
-        right:  document.getElementById('dot-right')
-    };
+    const { instruction, dotContainer, dots } = movementElements;
 
     if (!instruction) return;
     
@@ -53,22 +82,13 @@ function updateMovementGuide(timeRemaining) {
     let color = "";
     let activeDot = "";
 
-    if (timeRemaining <= PHASE_CHANGE) { // REST PHASE
-        phase = "REST";
-        color = "var(--color-rest)"; // Blue
-        const timeElapsed = PHASE_CHANGE - timeRemaining;
-        if (timeElapsed < 1.0) activeDot = "left";
-        else if (timeElapsed < 2.0) activeDot = "middle";
-        else activeDot = "right";
-    } 
-    else {  // GO PHASES
-        const timeInGO = timeRemaining - PHASE_CHANGE;
-
-        if (timeInGO > ((PHASE_CHANGE / 3.0) * 2.0)) {
+    if (timeRemaining <= PHASE_CHANGE) { // GO PHASE
+        const timeInGO = PHASE_CHANGE - timeRemaining;
+        if (timeInGO <= 1.0) {
             phase = "RAISE";
             color = "var(--color-raise)"; // Green
             activeDot = "left";
-        } else if (timeInGO > (PHASE_CHANGE / 3.0)) {
+        } else if (timeInGO <= 2.0) {
             phase = "HOLD";
             color = "var(--color-hold)"; // Red
             activeDot = "middle";
@@ -77,6 +97,11 @@ function updateMovementGuide(timeRemaining) {
             color = "var(--color-lower)"; // Orange
             activeDot = "right";
         }
+
+    } 
+    else {  // REST PHASE
+        phase = "REST";
+        color = "var(--color-rest)"; // Blue
     }
 
     // DOM updates (optimized): text + colors + dots

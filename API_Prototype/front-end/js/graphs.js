@@ -149,6 +149,31 @@ function updateEventDisplay(timestamp) {
     annotations.push(annotationConfig); // update annotations
 }
 
+// Trial marker display
+function updateTrialDisplay(timestamp) {
+    if (isGraphPaused) return;
+    
+    timestamp = Number(timestamp);
+    
+    const annotationConfig = {
+    type: 'line',
+    mode: 'vertical',
+    scaleID: 'x',
+    value: timestamp,
+    borderColor: 'green',
+    borderWidth: 1,
+    label: {
+        content: 'TRIAL',
+        enabled: true,
+        position: 'top',
+        backgroundColor: 'rgba(0, 255, 8, 0.7)',
+        color: 'white'
+        }
+    };
+
+    annotations.push(annotationConfig); // update annotations
+}
+
 // Pause feature (synchronized)
 function togglePauseGraph() {
     isGraphPaused = !isGraphPaused;

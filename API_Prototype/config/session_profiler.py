@@ -14,6 +14,10 @@ class SessionProfiler:
         '''Initialize new trial dictionary for current trial'''
         self.current_trial = trial_num
         self.trials[trial_num] =  {
+            "isi": None,
+            "event": None,
+            "peak_time": None,
+            "peak_amp": None,
             "overall_process": None,
             "file_create": None,
             "feat_extract": None,
@@ -49,6 +53,10 @@ class SessionProfiler:
         
         fieldnames = [
             "trial_num",
+            "isi",
+            "event",
+            "peak_time",
+            "peak_amp",
             "overall_process",
             "file_create",
             "feat_extract",

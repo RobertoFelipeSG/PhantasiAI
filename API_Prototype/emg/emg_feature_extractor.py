@@ -37,7 +37,7 @@ class FeatureExtractor:
         self.height_percentile = CONFIG.get("height_percentile")
         self.min_distance = CONFIG.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
         self.lowpass_cutoff = min(CONFIG.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
-        self.window_duration = CONFIG.get("marker_interval") # window of feature extraction (changed from 3 to 1 minutes)
+        self.window_duration = CONFIG.get("feature_window") # window of feature extraction (currently 5s)
         self.window_samples = int(self.window_duration * self.sampling_rate) 
 
         # if we are doing ONE dorsiflexion per analysis/extraction, CSV logic is slightly different (for space efficiency)
@@ -99,9 +99,10 @@ class FeatureExtractor:
         # Iterate through each event to define the window
         for event_idx in event_indices:
             
+            # define window: -2/+3 seconds from event marker timestamp
             event_time = timestamps[event_idx]
             start_time = event_time - (self.window_duration // 2)
-            end_time = event_time + (self.window_duration // 2)
+            end_time = event_time + (self.window_duration // 2 + 1)
             
             # Find the nearest indices for the window boundaries
             start_idx = np.searchsorted(timestamps, start_time, side='left')
@@ -167,7 +168,7 @@ class FeatureExtractor:
             logging.error(f"[Extractor] Error calculating frequency features with NeuroKit2: {e}")
             return np.nan, np.nan
     
-    def extract_features(self, emg_signal: np.ndarray, peak_indices: np.ndarray, peak_amplitudes: np.ndarray, timestamps: np.ndarray
+    def extract_features(self, curr_trial: int, emg_signal: np.ndarray, peak_indices: np.ndarray, peak_amplitudes: np.ndarray, timestamps: np.ndarray
     ) -> List[Dict[str, float]]:
         """
         Extract features from EMG signal for each detected peak. 
@@ -201,6 +202,11 @@ class FeatureExtractor:
                 #'mean_frequency': float(mean_freq) if not np.isnan(mean_freq) else np.nan,
                 #'median_frequency': float(median_freq) if not np.isnan(median_freq) else np.nan
             }
+
+            # Add peak information to profiler (subtract 1 because first trial is 'trial 0', no electrical stimulation)
+            if (curr_trial - 1 != 0):
+                self.profiler.log_metric((curr_trial - 1), "peak_time", float(peak_timestamp))
+                self.profiler.log_metric((curr_trial - 1), "peak_amp", float(peak_amplitude))
             
             peak_features.append(peak_feature)
         
@@ -220,7 +226,7 @@ class FeatureExtractor:
         # Return mean tangential acceleration
         return float(np.nanmean(magnitude))
     
-    def process_channel(self, emg_signal: np.ndarray, timestamps: np.ndarray, event_column: np.ndarray, channel_name: str = "unknown", 
+    def process_channel(self, curr_trial: int, emg_signal: np.ndarray, timestamps: np.ndarray, event_column: np.ndarray, channel_name: str = "unknown", 
                         accel_x: Optional[np.ndarray] = None, accel_y: Optional[np.ndarray] = None, accel_z: Optional[np.ndarray] = None
     ) -> List[Dict[str, float]]:
         """
@@ -233,7 +239,7 @@ class FeatureExtractor:
         peak_indices, peak_amplitudes = self.detect_peaks(envelope, event_column, timestamps)        
         
         # Extract features for each peak
-        peak_features = self.extract_features(filtered_signal, peak_indices, peak_amplitudes, timestamps)
+        peak_features = self.extract_features(curr_trial, filtered_signal, peak_indices, peak_amplitudes, timestamps)
         
         # Add tangential acceleration to each peak feature
         #tangential_acc = self.calculate_tangential_acceleration(accel_x, accel_y, accel_z)
@@ -273,7 +279,7 @@ class FeatureExtractor:
         
         #logging.info(f"[Extractor] Peak feature results saved to: {output_file}")
     
-    def _run_feature_extraction(self, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
+    def _run_feature_extraction(self, curr_trial: int, analysis_df: pd.DataFrame, output_path: Path, curr_timestamp: int, channels: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """
         Process all EMG channels from a DataFrame and extract features for each peak.
@@ -311,7 +317,7 @@ class FeatureExtractor:
             emg_signal = df[channel].values
             
             # Process channel
-            peak_features = self.process_channel(emg_signal, timestamps, event_column, channel) #, accel_x, accel_y, accel_z)
+            peak_features = self.process_channel(curr_trial, emg_signal, timestamps, event_column, channel) #, accel_x, accel_y, accel_z)
             
             all_peak_features.extend(peak_features)
             
@@ -342,7 +348,7 @@ class FeatureExtractor:
     ) -> pd.DataFrame:
         start_time = time()
         
-        features_df = self._run_feature_extraction(analysis_df, curr_timestamp, channels)
+        features_df = self._run_feature_extraction(curr_trial, analysis_df, curr_timestamp, channels)
         # message = f"[Extractor] Feature extractor completed. Total peaks: {len(features_df)}. Duration: {time() - start_time:.2f} seconds."
         # logging.info(message)
 
