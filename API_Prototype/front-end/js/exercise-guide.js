@@ -14,12 +14,15 @@ const countdownElements = {
 
 const movementElements = {
     instruction: document.getElementById('movementGuide'),
-    dotContainer: document.getElementById('movementVisuals'),
+    video: document.getElementById('instructionVideo')
+    
+    // CURRENTLY NOT IN USE
+    /*dotContainer: document.getElementById('movementVisuals'),
     dots: {
         left:   document.getElementById('dot-left'),
         middle: document.getElementById('dot-middle'),
         right:  document.getElementById('dot-right')
-    }
+    }*/
 };
 
 
@@ -74,28 +77,28 @@ function updateMarkerCountdown(type, timeRemaining) {
 
 // Basic go-rest display
 function updateMovementGuide(timeRemaining) {
-    const { instruction, dotContainer, dots } = movementElements;
+    const { instruction, video } = movementElements; // NOT IN USE: dotsContainer, dots
 
     if (!instruction) return;
     
     let phase = "";
     let color = "";
-    let activeDot = "";
+    // let activeDot = "";
 
     if (timeRemaining <= PHASE_CHANGE) { // GO PHASE
         const timeInGO = PHASE_CHANGE - timeRemaining;
         if (timeInGO <= 1.0) {
             phase = "RAISE";
             color = "var(--color-raise)"; // Green
-            activeDot = "left";
+            // activeDot = "left";
         } else if (timeInGO <= 2.0) {
             phase = "HOLD";
             color = "var(--color-hold)"; // Red
-            activeDot = "middle";
+            // activeDot = "middle";
         } else {
             phase = "LOWER";
             color = "var(--color-lower)"; // Orange
-            activeDot = "right";
+            // activeDot = "right";
         }
 
     } 
@@ -105,11 +108,23 @@ function updateMovementGuide(timeRemaining) {
     }
 
     // DOM updates (optimized): text + colors + dots
-    if (phase + activeDot !== lastInstructionPhase) {
+    if (phase !== lastInstructionPhase) { // NOT IN USE: + activeDot
         instruction.innerText = phase;
         instruction.style.color = color;
+
+        // Play dorsiflexion animation exactly when entering the RAISE (GO) phase
+        if (phase === "RAISE" && video) {
+            // Rewind to start and play video (with safety in case browser blocks autoplay)
+            video.currentTime = 0;
+            video.play().catch(err => console.warn("Video playback prevented by browser:", err));
         
-        if (phase === "REST") {
+        } else if (phase === "REST" && video) {
+            // Freeze video on last frame 
+            video.pause();
+        }
+        
+        // NOT IN USE
+        /*if (phase === "REST") {
             dotContainer.classList.add('resting');
         } else {
             dotContainer.classList.remove('resting');
@@ -118,9 +133,9 @@ function updateMovementGuide(timeRemaining) {
         Object.values(dots).forEach(d => d.classList.remove('active'));
         if (dots[activeDot]) {
             dots[activeDot].classList.add('active');
-        }
+        }*/
         
-        lastInstructionPhase = phase + activeDot;
+        lastInstructionPhase = phase; // NOT IN USE: + activeDot
     }
     
 }

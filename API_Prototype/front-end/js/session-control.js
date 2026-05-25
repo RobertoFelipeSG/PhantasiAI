@@ -191,6 +191,12 @@ function handleReset() {
         document.querySelectorAll('.dot-wrapper').forEach(d => d.classList.remove('active'));
     }
 
+    // TO-DO: Reset Video
+    const video = document.getElementById('instructionVideo')
+    if (video) {
+        video.currentTime = 0;
+    }
+
     // Clear graphs and event marker displays
     annotations.length = 0; 
     [emgGraph, accelGraph].forEach(graph => {

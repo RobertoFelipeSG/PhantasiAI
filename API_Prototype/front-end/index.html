@@ -152,12 +152,19 @@
 
             <!-- Real-Time Instructions -->
             <div id="Instructions" class="tabcontent">
+                <div id="movementAnimation" class="video-container">
+                    <video id="instructionVideo" width="100%" muted playsinline>
+                        <source src="/static/dorsiflexion-animation.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
                 <div id="movementGuide" class="guide-text">REST</div>
-                <div id="movementVisuals" class="dots-container">
+                <!-- <div id="movementVisuals" class="dots-container">
                     <div id="dot-left" class="dot-wrapper"><div class="dot-circle"></div></div>
                     <div id="dot-middle" class="dot-wrapper"><div class="dot-circle"></div></div>
                     <div id="dot-right" class="dot-wrapper"><div class="dot-circle"></div></div>
-                </div>
+                </div> -->
                 <div id="trialCounterDisplay" class="trial-counter">Trials Remaining: --</div>
             </div>  
 
