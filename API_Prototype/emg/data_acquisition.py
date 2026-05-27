@@ -24,12 +24,13 @@ CONFIG = load_config() # load config settings
 # ----- EMG Logic: Initialize board, thread and stream data ----- #
 
 class GanglionData:
-    def __init__(self, websocket, profiler, dorsi_flag, isi_type='static', serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None, on_error=None):
+    def __init__(self, websocket, profiler, stim_flag, stim_state, isi_type='static', serial_port="serial_port_A", sample_rate=200, num_trials=1, folder_name=None, on_error=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
         self.profiler = profiler
-        self.dorsi_flag = dorsi_flag
+        self.stim_flag = stim_flag
+        self.stim_state = stim_state
         self.on_error = on_error
         self.base_path = Path(__file__).resolve().parent.parent / "data"
         self.base_path.mkdir(parents=True, exist_ok=True)
@@ -72,7 +73,7 @@ class GanglionData:
         self.actual_sample_rate = BoardShim.get_sampling_rate(self.board_id)
         self._all_channels = self.emg_channels + self.accel_channels
 
-        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, self.dorsi_flag, isi_type=isi_type,
+        self.recorder = RealTimeRecorder(self._sample_rate, self.profiler, self.stim_flag, self.stim_state, isi_type=isi_type,
                                          base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate, self.profiler, self._num_trials == 1, 
                                                   output_path=Path(self.recorder.features_dir))
@@ -162,6 +163,18 @@ class GanglionData:
             "total_trials": curr_total_trials
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(trial_data), loop)
+
+    def _broadcast_ready_countdown(self, loop):
+        '''Helper to broadcast event countdown until next 'ready' phase to frontend
+            Note: Ready phase = start of electrical stimulation'''
+        
+        next_ready_time = self.recorder.next_ready_time
+        
+        phase_data = json.dumps({
+            "type": "ready_target_time", 
+            "ready_target_time": float(next_ready_time)
+        })
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(phase_data), loop)
             
     def _process_data(self, loop):
         '''Complete data processing for current chunk '''
@@ -191,8 +204,6 @@ class GanglionData:
             
             if end_trial:
                 self._total_trials = self.recorder.total_trials
-                
-                self.profiler.start_trial(self._total_trials)
                 logging.info(f"[Ganglion] Trial {self._total_trials} complete")
                 
                 self._broadcast_trial_completion(loop)
@@ -209,11 +220,12 @@ class GanglionData:
         if self.recorder.trial_times_buffer:
             self._broadcast_trials(loop)
         
-        # Broadcast marker interval and trial countdown to frontend
+        # Broadcast marker interval and trial countdown, and ready countdown to frontend
         self._broadcast_counter += len(relative_timestamps)
         if self._broadcast_counter >= self._num_points:
             self._broadcast_event_countdown(loop) 
             self._broadcast_trial_countdown(loop) 
+            self._broadcast_ready_countdown(loop)
             self._broadcast_counter = 0
 
         # Accel channel processing

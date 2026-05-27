@@ -138,6 +138,7 @@ function handleReset() {
     lastInstructionPhase = "";
     nextEventTargetTime = null;
     nextTrialTargetTime = null;
+    nextReadyTargetTime = null;
     totalTrials = null;
     trialsRemaining = null;
     lastPhase = "";
@@ -162,13 +163,6 @@ function handleReset() {
     if (eventDisplay) {
         eventDisplay.innerText = "";
         eventDisplay.style.color = 'blue';
-    }
-
-    // Clear the synchronized trial timer countdown display
-    const trialDisplay = document.getElementById('trialTimeCountdownDisplay');
-    if (trialDisplay) {
-        trialDisplay.innerText = "";
-        trialDisplay.style.color = 'blue';
     }
 
     // Clear trial countdown

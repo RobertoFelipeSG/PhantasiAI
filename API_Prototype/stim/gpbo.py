@@ -29,12 +29,13 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, dorsi_flag, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
+    def __init__(self, stimulator, stim_flag, stim_state, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
         self.file_path = None
         self.plot_lock = threading.Lock()
         self.stimulator = stimulator
         self.profiler = profiler
-        self.dorsi_flag = dorsi_flag
+        self.stim_flag = stim_flag
+        self.stim_state = stim_state
         self.mqtt_client = mqtt_client
         self.recordings_directory = recordings_directory
         self.topic = client_topic
@@ -382,7 +383,7 @@ class GPBOOptimizer:
 
     def _run_optimization(self, file_path, curr_trial):
         start_opt_time = time.time() # start timer for current optimization iteration
-        self.dorsi_flag.clear() # reset dorsiflexion flag to trigger stimulation
+        self.stim_flag.clear() # reset dorsiflexion flag to trigger stimulation
         self.file_path = file_path
         
         # OPTIMIZATION CHECK: if all repetitions+iterations complete, auto-stop OR start new optimization process
@@ -561,11 +562,13 @@ class GPBOOptimizer:
         dutycycle = best_params.get('dutycycle')
         frequency = best_params.get('frequency')
         logging.info(f"[GPBO] Optimization done: FREQUENCY: {frequency}; DUTYCYCLE: {dutycycle}, waiting for event marker to start stimulation...")
-        self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
+        self.stim_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
 
-        self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
+        ready_duration = self.stim_state["ready_duration"] # get duration of prep period to pass to stimulator 
+
+        self.stim_flag.clear() # clear the flag as soon as dorsiflexion begins
         try:
-            self.stimulator.run(best_params, curr_trial)
+            self.stimulator.run(best_params, ready_duration, curr_trial)
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:

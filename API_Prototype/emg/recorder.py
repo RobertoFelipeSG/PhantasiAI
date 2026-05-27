@@ -15,12 +15,13 @@ CONFIG = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, profiler, dorsi_flag, isi_type, base_path, folder_name=None):
+    def __init__(self, sample_rate, profiler, stim_flag, stim_state, isi_type, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
         
-        self.dorsi_flag = dorsi_flag
+        self.stim_flag = stim_flag
+        self.stim_state = stim_state
         self.isi_type = isi_type
         self.profiler = profiler
         self.base_path = base_path
@@ -55,6 +56,9 @@ class RealTimeRecorder:
 
         self.trial_times_buffer = [] # buffer to store trial times for frontend push (timestamp for the start of a new trial)
         self._trial_times = [] # store trial times for entire session
+
+        self.ready_times_buffer = [] # buffer to store 'ready' times for frontend push (timestamp for the start of electrical stimulation period)
+        self._ready_times = [] # store 'ready' times for entire session
         
         # define inter-stimulus interval and stimulus timing
         if self.isi_type == 'dynamic':
@@ -67,23 +71,65 @@ class RealTimeRecorder:
                 logging.warning("[Recorder] Could not load dynamic ISI file")
                 self.dynamic_intervals = generate_intervals() 
         
-        self.inter_stim_interval = CONFIG.get("static_isi") # initial ISI always static
-        self.stim_duration = CONFIG.get("static_stim_duration")
-        
         # setup event/trial marker logic
-        self.total_events = 0 # stores how many events completed
-        self.total_trials = 0 # stores how many trials completed
-        self.marker_interval = self.inter_stim_interval + self.stim_duration # marker occurs every (ISI + stimulus) seconds; this value does not change if ISI = static
-        self.next_event_time = self.inter_stim_interval # first event marker occurs at the end of first isi (i.e. when first stim presented)
-        self.next_trial_time = self.marker_interval # first trial marker occurs at the end of first stimulus 
+        self.total_events = 0 # stores how many events completed (start of a dorsiflexion)
+        self.total_trials = 0 # stores how many trials completed (end of a dorsiflexion)
+
+        self.rest_duration = CONFIG.get("static_rest_duration")
+        self.ready_duration = CONFIG.get("static_ready_duration")
+        self.go_duration = CONFIG.get("static_go_duration")
+ 
+        self.inter_stim_interval = self.rest_duration + self.ready_duration # initial ISI always static (first trial is always 6s)
+        self.prev_isi = self.inter_stim_interval # just for time logging
+        self.marker_interval = self.inter_stim_interval + self.go_duration # marker occurs every (ISI + GO) seconds; this value does not change if ISI = static
+
+        self.next_ready_time = self.rest_duration # first "ready" marker happens right after rest period
+        self.next_event_time = self.inter_stim_interval # first event marker occurs at the end of first rest+ready period (start of first GO period)
+        self.next_trial_time = self.marker_interval # first trial marker occurs at the end of first GO period 
         
         logging.info(f"[Recorder] ({self.isi_type}) initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels") 
+    
+    def _mark_ready(self, timestamp):
+        ready_flag = 0
+        if timestamp >= self.next_ready_time:
+            logging.info(f"[Recorder] Ready state detected")
+            
+            ready_flag = 1
+
+            self._ready_times.append(timestamp)
+            self.ready_times_buffer.append(timestamp)
+
+            # Advance next event marker time
+            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
+                self.ready_duration = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
+                
+                # notify stimulator to begin stimulation
+                self.stim_state["ready_duration"] = self.ready_duration
+                self.stim_flag.set()
+                
+                # redefine marker interval time for dynamic
+                self.prev_isi = self.inter_stim_interval
+                self.inter_stim_interval = self.rest_duration + self.ready_duration
+                self.marker_interval = self.go_duration + self.inter_stim_interval
+            
+            else: #  use defaults
+                self.stim_state["ready_duration"] = None
+                self.stim_flag.set()
+            
+            # Add ready timestamp (to mark beginning of electrical stimulation)
+            if self.total_trials != 0:
+                self.profiler.log_metric(self.total_trials, "stim_start", timestamp)
+                self.profiler.log_metric(self.total_trials, "isi", self.prev_isi) 
+            
+            # Advance next ready time
+            self.next_ready_time += float(self.marker_interval)
+
+        return ready_flag 
     
     def _mark_event(self, timestamp):
         event_flag = 0
         if timestamp >= self.next_event_time:
             logging.info(f"[Recorder] Event detected")
-            self.dorsi_flag.set()
             
             event_flag = 1
             self.total_events += 1
@@ -93,14 +139,8 @@ class RealTimeRecorder:
 
             # Add event timestamp and isi to profiler (to mark beginning of dorsiflexion)
             if self.total_trials != 0:
-                self.profiler.log_metric(self.total_trials, "event", timestamp)
-                self.profiler.log_metric(self.total_trials, "isi", self.inter_stim_interval)
-            
-            # Advance next event marker time
-            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
-                # redefine marker interval time for dynamic
-                self.inter_stim_interval = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
-                self.marker_interval = self.stim_duration + self.inter_stim_interval 
+                self.profiler.log_metric(self.total_trials, "dorsi_start", timestamp)
+                self.profiler.log_metric(self.total_trials, "isi", self.prev_isi) 
 
             self.next_event_time += float(self.marker_interval)
             #logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
@@ -115,6 +155,10 @@ class RealTimeRecorder:
 
             self._trial_times.append(timestamp)
             self.trial_times_buffer.append(timestamp)
+
+            # Add trial timestamp (to mark beginning of trial)
+            self.profiler.start_trial(self.total_trials)
+            self.profiler.log_metric(self.total_trials, "trial_start", timestamp)
 
             # Advance next trial time
             self.next_trial_time += float(self.marker_interval)
@@ -142,6 +186,7 @@ class RealTimeRecorder:
                 accel_values = [float(accel_values)]
             
             # Get event flag and trial flag
+            ready_flag = self._mark_ready(timestamp)
             event_flag = self._mark_event(timestamp)
             trial_flag = self._mark_trial(timestamp)
             
@@ -150,13 +195,13 @@ class RealTimeRecorder:
             accel_values = accel_values[:self.accel_channel_count]
 
             # Numeric row for buffers
-            numeric_row = [timestamp] + emg_values + accel_values + [event_flag] + [trial_flag]
+            numeric_row = [timestamp] + emg_values + accel_values + [event_flag] + [trial_flag] + [ready_flag]
             self._buffer.append(numeric_row)
             
             # Format Row: Timestamp | Ch1 | Ch2 ... | AccelX | ... | EventFlag
             formatted_emg = [f"{v:.2f}" for v in emg_values]
             formatted_accel = [f"{v:.2f}" for v in accel_values]
-            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)] + [int(trial_flag)]
+            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)] + [int(trial_flag)] + [int(ready_flag)]
             
             self.csv_writer.writerow(row)
 
@@ -224,7 +269,7 @@ class RealTimeRecorder:
 
             emg_headers = [f'ch{i+1} (µV)' for i in range(self.emg_channel_count)]
             accel_headers = [f'accel_{axis}' for axis in ['x', 'y', 'z']]
-            header = ['timestamp'] + emg_headers + accel_headers + ['event'] + ['trial']
+            header = ['timestamp'] + emg_headers + accel_headers + ['event'] + ['trial'] + ['e_stim']
             
             self._buffer_header = header
             self.csv_writer.writerow(header)

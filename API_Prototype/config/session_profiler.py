@@ -13,17 +13,20 @@ class SessionProfiler:
     def start_trial(self, trial_num):
         '''Initialize new trial dictionary for current trial'''
         self.current_trial = trial_num
-        self.trials[trial_num] =  {
-            "isi": None,
-            "event": None,
+        self.trials[trial_num] = {
+            "trial_start": None,
+            "stim_start": None,
+            "dorsi_start": None,
             "peak_time": None,
             "peak_amp": None,
+            "isi": None,
+            "stim": None,
             "overall_process": None,
             "file_create": None,
             "feat_extract": None,
             "opt_iter": None,
             "calib": None,
-            "stim": None,
+            "stim_process": None,
             "_trial_end_time": time.time() 
         }
 
@@ -53,16 +56,19 @@ class SessionProfiler:
         
         fieldnames = [
             "trial_num",
-            "isi",
-            "event",
+            "trial_start",
+            "stim_start",
+            "dorsi_start",
             "peak_time",
             "peak_amp",
+            "isi",
+            "stim",
             "overall_process",
             "file_create",
             "feat_extract",
             "opt_iter",
             "calib",
-            "stim",
+            "stim_process",
         ]
 
         try:

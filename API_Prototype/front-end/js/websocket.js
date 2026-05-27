@@ -149,6 +149,11 @@ function connectWebSocket() {
                 if (stimSuccess) { updateTrialCountdown(data.total_trials); }
                 stimSuccess = true; // reset for next trial
             }
+
+            // Update ready timer countdown display for exercise instructions
+            else if (data.type === 'ready_target_time') {
+                nextReadyTargetTime = data.ready_target_time;
+            }
             
 
             // Update chat-terminal

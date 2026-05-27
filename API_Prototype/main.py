@@ -242,7 +242,7 @@ async def handle_start_calibration(session, data):
     except RuntimeError:
         current_loop = asyncio.get_event_loop()
     
-    shared_dorsi_flag = threading.Event()
+    shared_stim_flag = threading.Event()
 
     # Create session profiler
     session.profiler = SessionProfiler()
@@ -253,11 +253,11 @@ async def handle_start_calibration(session, data):
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
     
     if is_synthetic: 
-        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
                                                  isi_type='static', serial_port=serial_port, sample_rate=250, num_trials=num_trials,
                                                  folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
-        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
+        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
                                         isi_type='static', serial_port=serial_port, sample_rate=200, num_trials=num_trials,
                                         folder_name=folder_name, on_error=trigger_stream_stop)
 
@@ -270,7 +270,7 @@ async def handle_start_calibration(session, data):
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
 
     session.stimulator = Stimulator(profiler)
-    session.calibrator = Calibrator(session.stimulator, profiler, shared_dorsi_flag, n_reps, session.session_dir,
+    session.calibrator = Calibrator(session.stimulator, profiler, shared_stim_flag, n_reps, session.session_dir,
                                     folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
 
     # Initialize calibration WatchDog instance
@@ -344,7 +344,8 @@ async def handle_start_stream(session, data):
         return
     
     client_id = id(session) # current session client ID for mqtt handling
-    shared_dorsi_flag = threading.Event()
+    shared_stim_flag = threading.Event()
+    shared_stim_state = {"ready_duration": None}
 
     # Create session profiler
     session.profiler = SessionProfiler()
@@ -358,13 +359,13 @@ async def handle_start_stream(session, data):
     # note: currently code is harded to only accept dynamic isi for 401 trials (10 iters, 40 reps)
     
     if is_synthetic: 
-        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                                 isi_type=isi_type, serial_port=serial_port, sample_rate=250, num_trials=num_trials,
-                                                 folder_name=folder_name, on_error=trigger_stream_stop)
+        session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
+                                                 stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=250, 
+                                                 num_trials=num_trials, folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
-        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, dorsi_flag=shared_dorsi_flag,
-                                        isi_type=isi_type, serial_port=serial_port, sample_rate=200, num_trials=num_trials,
-                                        folder_name=folder_name, on_error=trigger_stream_stop)
+        session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
+                                        stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=200,
+                                        num_trials=num_trials, folder_name=folder_name, on_error=trigger_stream_stop)
     
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
     
@@ -375,7 +376,7 @@ async def handle_start_stream(session, data):
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
     
     session.stimulator = Stimulator(profiler, mqtt_client, client_topic=f"emg/client/{client_id}")
-    session.optimizer = GPBOOptimizer(session.stimulator, shared_dorsi_flag, n_iters, n_reps, 
+    session.optimizer = GPBOOptimizer(session.stimulator, shared_stim_flag, shared_stim_state, n_iters, n_reps, 
                                       session.session_dir, profiler, mqtt_client, 
                                       client_topic=f"emg/client/{client_id}",
                                       on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)

@@ -4,12 +4,12 @@
 let latestTimestamp = null;
 let nextEventTargetTime = null;
 let nextTrialTargetTime = null;
+let nextReadyTargetTime = null;
 let lastPhase = ""; // stores only the instruction
 let lastInstructionPhase = ""; // stores instruction + active dot
 
 const countdownElements = {
     EVENT: document.getElementById('markerCountdownDisplay'),
-    TRIAL: document.getElementById('trialTimeCountdownDisplay')
 };
 
 const movementElements = {
@@ -29,54 +29,43 @@ const movementElements = {
 /* FUNCTIONS */
 // Main function (updates all animation components)
 function updateTimerVisuals(currentTime) {
-    // NO LONGER NEEDED: calculate time until next event marker and update visuals
-    /*if ((nextEventTargetTime !== null) && (currentMode === 'developer')) {
-        let eventTimeRemaining = Math.max(0, nextEventTargetTime - currentTime);
-        
-        updateMarkerCountdown('EVENT', eventTimeRemaining);
-    }*/
 
     // calculate time until next trial and update visuals
-    if (nextTrialTargetTime !== null) {
-        let trialTimeRemaining = Math.max(0, nextTrialTargetTime - currentTime);
+    if (nextReadyTargetTime !== null) {
+        //let trialTimeRemaining = Math.max(0, nextTrialTargetTime - currentTime);
+        let readyTimeRemaining = Math.max(0, nextReadyTargetTime - currentTime);
         
-        updateMovementGuide(trialTimeRemaining);
-        if (currentMode === 'developer') updateMarkerCountdown('TRIAL', trialTimeRemaining);
+        updateMovementGuide(readyTimeRemaining);
+        if (currentMode === 'developer') updateMarkerCountdown(readyTimeRemaining);
     }
 }
 
-// Event marker / Trial timer countdown (in controls bar)
-function updateMarkerCountdown(type, timeRemaining) {
-    const display = countdownElements[type];
+// Trial timer countdown (in controls bar)
+function updateMarkerCountdown(timeUntilReady) {
+    const display = countdownElements['EVENT'];
     if (!display) return;
     
-    const formattedTime = timeRemaining.toFixed(1) + "s";
-    const targetText = `NEXT ${type}: ${formattedTime}`;
+    const formattedTime = timeUntilReady.toFixed(1) + "s";
+    const targetText = `NEXT STIMULATION: ${formattedTime}`;
         
     if (display.innerText !== targetText) { // DOM optimization: only update if text has changed
         display.innerText = targetText;
 
-        if (type === 'TRIAL') { // 1-3 = go; 3-6 = rest
-            if (timeRemaining > PHASE_CHANGE) { 
-                display.style.color = "var(--color-rest)"; 
-            } 
-            else {// Detect event marker (movement begins)
-                display.style.color = "var(--color-raise)";
-            }
+        // REST: 0-2.5; READY: 2.5-2.5/4.0; GO: 2.5/4.0-4.5/6.0
+        if (timeUntilReady <= REST_PHASE) { // REST PHASE = no dorsiflexion/electrical stim
+            display.style.color = "var(--color-rest)"; 
         }
-        if (type === 'EVENT') { // 1-3 = rest; 3-6 = go
-            if (timeRemaining <= PHASE_CHANGE) { 
-                display.style.color = "var(--color-rest)"; 
-            } 
-            else {// Detect event marker (movement begins)
-                display.style.color = "var(--color-raise)";
-            }
+        else if (timeUntilReady <= GO_PHASE + REST_PHASE) { // GO PHASE = dorsiflexion + electrical stim
+            display.style.color = "var(--color-raise)";
+        } 
+        else {
+            display.style.color = "var(--color-lower)"; // READY PHASE = no dorsiflexion, electrical stim
         }
     }
 }
 
 // Basic go-rest display
-function updateMovementGuide(timeRemaining) {
+function updateMovementGuide(timeUntilReady) {
     const { instruction, video } = movementElements; // NOT IN USE: dotsContainer, dots
 
     if (!instruction) return;
@@ -85,26 +74,17 @@ function updateMovementGuide(timeRemaining) {
     let color = "";
     // let activeDot = "";
 
-    if (timeRemaining <= PHASE_CHANGE) { // GO PHASE
-        const timeInGO = PHASE_CHANGE - timeRemaining;
-        if (timeInGO <= 1.0) {
-            phase = "RAISE";
-            color = "var(--color-raise)"; // Green
-            // activeDot = "left";
-        } else if (timeInGO <= 2.0) {
-            phase = "HOLD";
-            color = "var(--color-hold)"; // Red
-            // activeDot = "middle";
-        } else {
-            phase = "LOWER";
-            color = "var(--color-lower)"; // Orange
-            // activeDot = "right";
+    if (timeUntilReady <= REST_PHASE) { // REST PHASE
+            phase = "REST";
+            color = "var(--color-rest)"; // Blue
         }
-
+    else if (timeUntilReady <= GO_PHASE + REST_PHASE) { // GO PHASE
+        phase = "GO!";
+        color = "var(--color-raise)"; // Green
     } 
-    else {  // REST PHASE
-        phase = "REST";
-        color = "var(--color-rest)"; // Blue
+    else { // READY PHASE
+        phase = "READY";
+        color = "var(--color-lower)"; // Orange
     }
 
     // DOM updates (optimized): text + colors + dots
@@ -113,14 +93,14 @@ function updateMovementGuide(timeRemaining) {
         instruction.style.color = color;
 
         // Play dorsiflexion animation exactly when entering the RAISE (GO) phase
-        if (phase === "RAISE" && video) {
-            // Rewind to start and play video (with safety in case browser blocks autoplay)
-            video.currentTime = 0;
+        if (phase === "GO!" && video) {
+            // Play video (with safety in case browser blocks autoplay)
             video.play().catch(err => console.warn("Video playback prevented by browser:", err));
         
-        } else if (phase === "REST" && video) {
-            // Freeze video on last frame 
+        } else if (video) {
+            // Freeze video and rewind to start
             video.pause();
+            video.currentTime = 0;
         }
         
         // NOT IN USE

@@ -38,14 +38,15 @@ DEFAULT_CONFIG = {
     
     # data recording
     "recorder_buffer_seconds": 120,
-    "static_isi": 3,
-    "static_stim_duration": 3,
+    "static_rest_duration": 2.5,
+    "static_ready_duration": 1.5,
+    "static_go_duration": 2.0,
 
     # feature extraction
     "height_percentile": 98,
     "min_distance": 3,
     "feature_cutoff_freq": 80,
-    "feature_window": 5,
+    "feature_window": 4,
     "features": ['max_amplitude'],
 
     # GPBO
@@ -62,7 +63,13 @@ DEFAULT_CONFIG = {
     # stimulator
     "gpio_chip": "/dev/gpiochip4",
     "gpio_pin": 12,
-    "duration": 2.5,
+    "stim_default_duration": 2.0,
+    "stim_duration_mapping": {
+        0.0: 2.0,
+        0.5: 2.5,
+        1.0: 3.0,
+        1.5: 3.5
+    },
 
     # calibrator
     "n_calb_reps": 3

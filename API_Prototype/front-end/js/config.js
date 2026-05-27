@@ -16,11 +16,12 @@ const defaultNumIters = 40;
 const defaultCalbNumIters = 25;
 const defaultNumReps = 10;
 const defaultCalbNumReps = 3;
-const PHASE_CHANGE = 3.0; // halfway point of a trial (seconds)
+const REST_PHASE = 2.5 // duration of REST phase (first phase within a trial)
+const GO_PHASE = 2.0; // duration of GO phase (last phase within a trial)
 
 // Graph configuration
 const ACCEL_ENABLED = false; 
 const Y_ZOOM_FACTOR = 1.5; // controls how aggressive the Y zoom is
-const WINDOW_SIZE = PHASE_CHANGE * 2; // Controls x-axis window size (seconds)
+const WINDOW_SIZE = GO_PHASE * 2; // Controls x-axis window size (seconds)
 let SAMPLE_RATE = 200; // Default sample rate (for Ganglion)
 let MAX_DATA_POINTS = WINDOW_SIZE * SAMPLE_RATE; // Limit data for scrolling graph

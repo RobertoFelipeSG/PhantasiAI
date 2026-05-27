@@ -37,7 +37,7 @@ class FeatureExtractor:
         self.height_percentile = CONFIG.get("height_percentile")
         self.min_distance = CONFIG.get("min_distance") # safety for minimum distance between peaks (To-do: Figure out why hardcoded to 3s)
         self.lowpass_cutoff = min(CONFIG.get("feature_cutoff_freq"), self.sampling_rate // 2 - 10)  # Ensure below Nyquist
-        self.window_duration = CONFIG.get("feature_window") # window of feature extraction (currently 5s)
+        self.window_duration = CONFIG.get("feature_window") # window of feature extraction (currently 4s)
         self.window_samples = int(self.window_duration * self.sampling_rate) 
 
         # if we are doing ONE dorsiflexion per analysis/extraction, CSV logic is slightly different (for space efficiency)
@@ -99,10 +99,10 @@ class FeatureExtractor:
         # Iterate through each event to define the window
         for event_idx in event_indices:
             
-            # define window: -2/+3 seconds from event marker timestamp
+            # define window: -2/+2 seconds from event marker timestamp
             event_time = timestamps[event_idx]
             start_time = event_time - (self.window_duration // 2)
-            end_time = event_time + (self.window_duration // 2 + 1)
+            end_time = event_time + (self.window_duration // 2)
             
             # Find the nearest indices for the window boundaries
             start_idx = np.searchsorted(timestamps, start_time, side='left')
