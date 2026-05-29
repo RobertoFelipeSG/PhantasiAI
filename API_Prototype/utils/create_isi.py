@@ -4,7 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 # CONSTANTS
-ISI_BINS = [0.00, 0.50, 1.00, 1.50]   # seconds
+ISI_BINS = [0.30, 0.70, 1.10, 1.50]   # seconds
 OCCURRENCES_PER_BIN = 10
 NUM_GROUPS = 10
 GROUP_SIZE = 40
