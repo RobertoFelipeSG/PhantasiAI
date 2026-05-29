@@ -7,6 +7,8 @@ let nextTrialTargetTime = null;
 let nextReadyTargetTime = null;
 let lastPhase = ""; // stores only the instruction
 let lastInstructionPhase = ""; // stores instruction + active dot
+let inBreak = false;
+let breakEndTime = null;
 
 const countdownElements = {
     EVENT: document.getElementById('markerCountdownDisplay'),
@@ -30,13 +32,18 @@ const movementElements = {
 // Main function (updates all animation components)
 function updateTimerVisuals(currentTime) {
 
-    // calculate time until next trial and update visuals
-    if (nextReadyTargetTime !== null) {
-        //let trialTimeRemaining = Math.max(0, nextTrialTargetTime - currentTime);
+    // when NOT in break: calculate time until next trial and update visuals
+    if ((nextReadyTargetTime !== null) && (!inBreak)) {
         let readyTimeRemaining = Math.max(0, nextReadyTargetTime - currentTime);
         
         updateMovementGuide(readyTimeRemaining);
         if (currentMode === 'developer') updateMarkerCountdown(readyTimeRemaining);
+    }
+
+    // if in break: display break countdown instead of instructions
+    if ((breakEndTime !== null) && (inBreak)) {
+        let breakTimeRemaining = Math.max(0, breakEndTime - currentTime);
+        updateBreakUI(breakTimeRemaining);
     }
 }
 
@@ -118,4 +125,18 @@ function updateMovementGuide(timeUntilReady) {
         lastInstructionPhase = phase; // NOT IN USE: + activeDot
     }
     
+}
+
+function updateBreakUI(breakTimeRemaining) {
+    const { instruction, _ } = movementElements; 
+
+    if (!instruction) return;
+    
+    const formattedTime = breakTimeRemaining.toFixed(0) + "s";
+    const targetText = `BREAK REMAINING: ${formattedTime}`;
+        
+    if (instruction.innerText !== targetText) { // DOM optimization: only update if text has changed
+        instruction.innerText = targetText;
+        instruction.style.color = "var(--color-rest)";
+    }
 }

@@ -161,6 +161,25 @@ function connectWebSocket() {
                 addLog(data.message);
             }
 
+            // Update break UI
+            else if (data.type === 'break_status') {
+                const animationElement = document.getElementById('movementAnimation');
+
+                if (data.status === 'started') {
+                    console.log("Break started");
+                    inBreak = true;
+                    animationElement.style.display = "none";
+                }
+                else if (data.status === 'ended') {
+                    console.log("Break ended");
+                    inBreak = false;
+                    animationElement.style.display = "block";
+                }
+            }
+            else if (data.type === 'break_end_time') {
+                breakEndTime = data.break_end_time;
+            }
+
             // Handle command responses (success/error feedback)
             else if (data.status) {
                 if (data.status === 'error') {

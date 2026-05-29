@@ -47,6 +47,7 @@ class GanglionData:
         self._last_active = None
         self.connection_status = "pending"
         self.stream_lost = False
+        self.in_break = False
         
         self._num_trials = int(num_trials) # trials per analysis session (default is 1; single trial analysis)
         self.next_trial_block = int(num_trials)
@@ -175,6 +176,16 @@ class GanglionData:
             "ready_target_time": float(next_ready_time)
         })
         asyncio.run_coroutine_threadsafe(self.websocket.send_text(phase_data), loop)
+
+    def _broadcast_break_countdown(self, loop):
+        '''Helper to broadcast time until break is over to frontend'''
+         
+        break_end_time = self.recorder.break_end_time
+        break_data = json.dumps({
+            "type": "break_end_time", 
+            "break_end_time": float(break_end_time)
+        })
+        asyncio.run_coroutine_threadsafe(self.websocket.send_text(break_data), loop)
             
     def _process_data(self, loop):
         '''Complete data processing for current chunk '''
@@ -195,37 +206,53 @@ class GanglionData:
             curr_emg_ch = data[self.emg_channels, i]
             curr_accel_ch = data[self.accel_channels, i]
             curr_timestamp = relative_timestamps[i]
-
-            has_event, end_trial = self.recorder.record_data_point(curr_timestamp, curr_emg_ch, curr_accel_ch)
             
-            if has_event: 
-                self._total_events = self.recorder.total_events
-                #logging.info(f"[Ganglion] Recorded {self._total_events} events")
+            # record data point
+            break_status, has_event, new_trial = self.recorder.record_data_point(
+                curr_timestamp, curr_emg_ch, curr_accel_ch)
             
-            if end_trial:
-                self._total_trials = self.recorder.total_trials
-                logging.info(f"[Ganglion] Trial {self._total_trials} complete")
+            # broadcast break state to frontend
+            if break_status == "break_started":
+                self.in_break = True
+                break_start_msg = json.dumps({"type": "break_status", "status": "started"})
+                asyncio.run_coroutine_threadsafe(self.websocket.send_text(break_start_msg), loop)
+            elif break_status == "break_ended":
+                self.in_break = False
+                break_end_msg = json.dumps({"type": "break_status", "status": "ended"})
+                asyncio.run_coroutine_threadsafe(self.websocket.send_text(break_end_msg), loop)
+            
+            # signal processing ONLY if not in break
+            if not self.in_break:
+                if has_event: 
+                    self._total_events = self.recorder.total_events
+                    #logging.info(f"[Ganglion] Recorded {self._total_events} events")
                 
-                self._broadcast_trial_completion(loop)
-            
-            # Perform analysis on selected trials
-            if self._total_trials == self.next_trial_block:
-                self._handle_analysis(curr_timestamp)
-            
-        # Broadcast event markers
-        if self.recorder.event_times_buffer: 
-            self._broadcast_events(loop)
+                if new_trial:
+                    self._total_trials = self.recorder.total_trials
+                    self._broadcast_trial_completion(loop)
 
-        # Broadcast trial markers
-        if self.recorder.trial_times_buffer:
-            self._broadcast_trials(loop)
+                # Perform analysis on selected trials
+                if self._total_trials == self.next_trial_block:
+                    self._handle_analysis(curr_timestamp)
+            
+        if not self.in_break: # Send markers for real-time graphs
+            # Broadcast event markers
+            if self.recorder.event_times_buffer: 
+                self._broadcast_events(loop)
+
+            # Broadcast trial markers
+            if self.recorder.trial_times_buffer:
+                self._broadcast_trials(loop)
         
         # Broadcast marker interval and trial countdown, and ready countdown to frontend
         self._broadcast_counter += len(relative_timestamps)
         if self._broadcast_counter >= self._num_points:
-            self._broadcast_event_countdown(loop) 
-            self._broadcast_trial_countdown(loop) 
-            self._broadcast_ready_countdown(loop)
+            if not self.in_break: # Send countdowns for real-time instructions
+                self._broadcast_event_countdown(loop) 
+                self._broadcast_trial_countdown(loop) 
+                self._broadcast_ready_countdown(loop) # currently the benchmark for live animation updates
+            else: self._broadcast_break_countdown(loop)
+            
             self._broadcast_counter = 0
 
         # Accel channel processing

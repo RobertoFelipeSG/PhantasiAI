@@ -60,6 +60,13 @@ class RealTimeRecorder:
         self.ready_times_buffer = [] # buffer to store 'ready' times for frontend push (timestamp for the start of electrical stimulation period)
         self._ready_times = [] # store 'ready' times for entire session
         
+        # within session-break setup
+        self._trial_break_interval = CONFIG.get("trial_break_interval")
+        self._break_duration = CONFIG.get("break_duration")
+        self.in_break = False
+        self.break_end_time = 0.0
+        self.next_break_block = self._trial_break_interval + 1 # first trial in a session = "mock" trial
+        
         # define inter-stimulus interval and stimulus timing
         if self.isi_type == 'dynamic':
             isi_path = Path(__file__).parent.parent / "utils" / "dynamic_intervals.json"
@@ -80,7 +87,6 @@ class RealTimeRecorder:
         self.go_duration = CONFIG.get("static_go_duration")
  
         self.inter_stim_interval = self.rest_duration + self.ready_duration # initial ISI always static (first trial is always 6s)
-        self.prev_isi = self.inter_stim_interval # just for time logging
         self.marker_interval = self.inter_stim_interval + self.go_duration # marker occurs every (ISI + GO) seconds; this value does not change if ISI = static
 
         self.next_ready_time = self.rest_duration # first "ready" marker happens right after rest period
@@ -92,34 +98,22 @@ class RealTimeRecorder:
     def _mark_ready(self, timestamp):
         ready_flag = 0
         if timestamp >= self.next_ready_time:
-            logging.info(f"[Recorder] Ready state detected")
-            
             ready_flag = 1
 
             self._ready_times.append(timestamp)
             self.ready_times_buffer.append(timestamp)
 
-            # Advance next event marker time
-            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
-                self.ready_duration = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
-                
-                # notify stimulator to begin stimulation
+            if (self.isi_type == 'dynamic') and (self.total_trials > 0) and (self.total_trials < 400): # if within the 400 optimization trials
+                logging.info(f"[Recorder] Ready state detected; Duration = {self.ready_duration}")
+
+                # notify stimulator to begin stimulation based on ready duration of CURRENT trial
                 self.stim_state["ready_duration"] = self.ready_duration
-                self.stim_flag.set()
-                
-                # redefine marker interval time for dynamic
-                self.prev_isi = self.inter_stim_interval
-                self.inter_stim_interval = self.rest_duration + self.ready_duration
-                self.marker_interval = self.go_duration + self.inter_stim_interval
-            
-            else: #  use defaults
-                self.stim_state["ready_duration"] = None
                 self.stim_flag.set()
             
             # Add ready timestamp (to mark beginning of electrical stimulation)
             if self.total_trials != 0:
                 self.profiler.log_metric(self.total_trials, "stim_start", timestamp)
-                self.profiler.log_metric(self.total_trials, "isi", self.prev_isi) 
+                self.profiler.log_metric(self.total_trials, "isi", self.stim_state["ready_duration"]) 
             
             # Advance next ready time
             self.next_ready_time += float(self.marker_interval)
@@ -137,10 +131,17 @@ class RealTimeRecorder:
             self._event_times.append(timestamp)
             self.event_times_buffer.append(timestamp)
 
-            # Add event timestamp and isi to profiler (to mark beginning of dorsiflexion)
+            # Advance next event marker time
+            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
+                self.ready_duration = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
+                
+                # redefine marker interval time for dynamic
+                self.inter_stim_interval = self.rest_duration + self.ready_duration 
+                self.marker_interval = self.go_duration + self.inter_stim_interval
+
+            # Add event timestamp to profiler (to mark beginning of dorsiflexion)
             if self.total_trials != 0:
                 self.profiler.log_metric(self.total_trials, "dorsi_start", timestamp)
-                self.profiler.log_metric(self.total_trials, "isi", self.prev_isi) 
 
             self.next_event_time += float(self.marker_interval)
             #logging.info(f"[Recorder] Interval event marked at {timestamp}s. Next marker due at {self.next_event_time:.4f}s")
@@ -159,19 +160,54 @@ class RealTimeRecorder:
             # Add trial timestamp (to mark beginning of trial)
             self.profiler.start_trial(self.total_trials)
             self.profiler.log_metric(self.total_trials, "trial_start", timestamp)
+            logging.info(f"[Recorder] Trial {self.total_trials+1} starting...")
 
             # Advance next trial time
             self.next_trial_time += float(self.marker_interval)
 
         return trial_flag
         
+    def _update_break_state(self, timestamp):
+        '''
+        Checks if break should start/stop
+            Start: trial number has crossed the trial threshold
+            Stop: timestamp has crossed the time threshold
+        '''
+        
+        if self.in_break:
+            if timestamp >= self.break_end_time:
+                self.in_break = False
+                logging.info(f"[Recorder] Break complete at {timestamp:.2f}s")
+                
+                return "break_ended"
+            
+            return "in_break"
+        
+        if timestamp >= self.next_trial_time:
+            if self.total_trials > 0 and ((self.total_trials + 1) == self.next_break_block):
+                # Initialize break and advance pointers
+                self.in_break = True
+                self.break_end_time = timestamp + self._break_duration
+                self.next_break_block += self._trial_break_interval
+
+                logging.info(f"[Ganglion] Initializing break period at {timestamp:.2f}s until {self.break_end_time:.2f}s")
+
+                # Shift internal markers forward by break duration
+                self.next_trial_time += float(self._break_duration)
+                self.next_ready_time += float(self._break_duration)
+                self.next_event_time += float(self._break_duration)
+
+                return "break_started"
+            
+        return "no_break"
+    
     def record_data_point(self, timestamp, emg_values, accel_values):
         '''
         Records single row of EMG and Accel data in csv file
         Returns if event occured
         '''
         if not self.recording or not self.csv_writer:
-            return False
+            return "no_break", False, False
 
         try:
             # Ensure emg_values and accel_values are a list of floats
@@ -185,23 +221,33 @@ class RealTimeRecorder:
             else:
                 accel_values = [float(accel_values)]
             
-            # Get event flag and trial flag
-            ready_flag = self._mark_ready(timestamp)
-            event_flag = self._mark_event(timestamp)
-            trial_flag = self._mark_trial(timestamp)
+            # Evaluate break state BEFORE markers (must check before trial starts)
+            break_status = self._update_break_state(timestamp)
+            
+            # Get markers (mark start of ready phase, event (dorsiflexion), and trial)
+            if break_status in ["in_break", "break_started"]:
+                ready_flag = 0
+                event_flag = 0
+                trial_flag = 0
+                break_flag = 1
+            else: # no_break or break_ended
+                ready_flag = self._mark_ready(timestamp)
+                event_flag = self._mark_event(timestamp)
+                trial_flag = self._mark_trial(timestamp)
+                break_flag = 0
             
             # safety filters
             emg_values = emg_values[:self.emg_channel_count]
             accel_values = accel_values[:self.accel_channel_count]
 
             # Numeric row for buffers
-            numeric_row = [timestamp] + emg_values + accel_values + [event_flag] + [trial_flag] + [ready_flag]
+            numeric_row = [timestamp] + emg_values + accel_values + [event_flag] + [trial_flag] + [ready_flag] + [break_flag]
             self._buffer.append(numeric_row)
             
             # Format Row: Timestamp | Ch1 | Ch2 ... | AccelX | ... | EventFlag
             formatted_emg = [f"{v:.2f}" for v in emg_values]
             formatted_accel = [f"{v:.2f}" for v in accel_values]
-            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)] + [int(trial_flag)] + [int(ready_flag)]
+            row = [f"{timestamp}"] + formatted_emg + formatted_accel + [int(event_flag)] + [int(trial_flag)] + [int(ready_flag)] + [int(break_flag)]
             
             self.csv_writer.writerow(row)
 
@@ -210,7 +256,7 @@ class RealTimeRecorder:
                 self.csv_file.flush()
             self._index += 1
 
-            return bool(event_flag), bool(trial_flag)            
+            return break_status,bool(event_flag), bool(trial_flag)            
 
         except Exception as e:
             logging.warning(f"[Recorder] Failed to record data point: {e}")
@@ -269,7 +315,7 @@ class RealTimeRecorder:
 
             emg_headers = [f'ch{i+1} (µV)' for i in range(self.emg_channel_count)]
             accel_headers = [f'accel_{axis}' for axis in ['x', 'y', 'z']]
-            header = ['timestamp'] + emg_headers + accel_headers + ['event'] + ['trial'] + ['e_stim']
+            header = ['timestamp'] + emg_headers + accel_headers + ['event'] + ['trial'] + ['e_stim'] + ['break']
             
             self._buffer_header = header
             self.csv_writer.writerow(header)

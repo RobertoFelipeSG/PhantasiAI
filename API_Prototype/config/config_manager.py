@@ -41,6 +41,8 @@ DEFAULT_CONFIG = {
     "static_rest_duration": 2.5,
     "static_ready_duration": 1.5,
     "static_go_duration": 2.0,
+    "break_duration": 60.0,
+    "trial_break_interval": 80,
 
     # feature extraction
     "height_percentile": 98,

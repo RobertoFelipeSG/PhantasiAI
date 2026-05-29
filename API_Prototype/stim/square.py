@@ -56,7 +56,7 @@ class Stimulator:
         )
         line_request.set_value(gpio_pin, Value.ACTIVE)
         
-        logging.info(f"[Square] Stimulating ({duration}s) at frequency: {frequency}, dutycycle: {dutycycle}")
+        logging.info(f"[Square] Stimulating ({duration}s for {ready_duration}s ISI) at frequency: {frequency}, dutycycle: {dutycycle}")
         try:
             for cycle in range(total_cycles):
                 # Set pin HIGH
