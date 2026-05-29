@@ -14,15 +14,18 @@ from config.config_manager import load_config
 CONFIG = load_config()
 
 class Calibrator:
-    def __init__(self, stimulator, profiler, dorsi_flag, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
+    def __init__(self, stimulator, profiler, stim_flag, stim_state, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
         self.stimulator = stimulator
         self.profiler = profiler
-        self.dorsi_flag = dorsi_flag
+        self.stim_flag = stim_flag
+        self.stim_state = stim_state
         self.n_reps = n_reps
         self.session_dir = session_dir
         self.folder_name = folder_name
         self.on_complete = on_complete
         self.on_stim_fail = on_stim_fail
+
+        logging.info(f"[Calibrator] Initialized for {n_reps} reps per parameter combination")
 
         # define parameter combinations and stimulation array
         self.parameter_names = CONFIG.get("parameters")
@@ -85,7 +88,7 @@ class Calibrator:
         Triggered by WatchDogCalb as soon as features are written to features.txt -> sets up GPIO 
         Waits until dorsiflexion period begins to stimulate 
         '''  
-        self.dorsi_flag.clear() # reset dorsiflexion flag to trigger stimulation
+        self.stim_flag.clear() # reset dorsiflexion flag to trigger stimulation
         self.file_path = file_path
         
         # check if calibration is completed (all reps complete and data saved to CSV)
@@ -97,7 +100,7 @@ class Calibrator:
         
         # log data from last stimulation
         if (self.selected_params is not None) and self.stim_success: 
-            self._log_response() # TO:DO
+            self._log_response()
             self.curr_reps += 1
             self.stim_success = False # reset success state
         
@@ -119,11 +122,13 @@ class Calibrator:
             self.parameter_names[1]: float(self.selected_params[1])
         }
         
-        self.dorsi_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
+        self.stim_flag.wait() # wait until event marker flag is raised to signal start of dorsiflexion
 
-        self.dorsi_flag.clear() # clear the flag as soon as dorsiflexion begins
+        ready_duration = self.stim_state["ready_duration"] # get duration of prep period to pass to stimulator 
+
+        self.stim_flag.clear() # clear the flag as soon as dorsiflexion begins
         try:
-            self.stimulator.run(best_params, curr_trial)
+            self.stimulator.run(best_params, ready_duration, curr_trial)
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:

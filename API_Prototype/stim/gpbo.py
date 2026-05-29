@@ -477,6 +477,8 @@ class GPBOOptimizer:
                 self.opt_complete = True
                 self.n_optimizations += 1
 
+                logging.info("[GPBO] All reps complete!")
+
                 # add to CSV with stimulation data
                 df = pd.DataFrame(self.opt_log)
                 df.to_csv(self.stim_data, index=False)

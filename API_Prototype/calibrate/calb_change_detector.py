@@ -17,6 +17,7 @@ class ChangeHandler(FileSystemEventHandler):
         self.calibrator = calibrator
         
         self.last_hash = None
+        self.last_trial = None
         self.is_running = False
         self.last_runtime = 0
         self.debounce_interval = 0.5 # prevents debounce checks (1s after optimization starts and 1s after stimulation ends
@@ -54,7 +55,13 @@ class ChangeHandler(FileSystemEventHandler):
 
         # Check content of new features file
         new_hash = self._get_file_hash(event.src_path)
-        if new_hash == self.last_hash:
+        curr_trial = self.profiler.current_trial
+
+        if new_hash is None: # Safely ignore momentary 0-byte file truncation event
+            return
+
+        # skip if hash identical AND new trial
+        if curr_trial == self.last_trial and new_hash == self.last_hash:
             logging.info(f"[WatchDog] Change detected but identical content. Skipping stimulation...")
             return
 
@@ -62,7 +69,7 @@ class ChangeHandler(FileSystemEventHandler):
         try:
             # State updates (if content is new)
             self.is_running = True
-            curr_trial = self.profiler.current_trial # get the current trial as soon as valid change detected
+            self.last_trial = curr_trial # store current trial for future validation checks
             logging.info(f"[WatchDog] Valid change detected in {event.src_path} for trial {curr_trial}. Triggering stimulation...")
             
             self.last_hash = new_hash

@@ -235,6 +235,9 @@ async def handle_start_calibration(session, data):
     is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
     num_trials = data.get("num_trials", CONFIG.get('num_trials'))
     n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
+    dutycycles = CONFIG.get("dutycycles")
+    frequencies = CONFIG.get("frequencies")
+    session_size = len(dutycycles) * len(frequencies) * n_reps
     
     # Retrieve reference of current event loop running API server
     try:
@@ -243,6 +246,7 @@ async def handle_start_calibration(session, data):
         current_loop = asyncio.get_event_loop()
     
     shared_stim_flag = threading.Event()
+    shared_stim_state = {"ready_duration": None}
 
     # Create session profiler
     session.profiler = SessionProfiler()
@@ -254,12 +258,12 @@ async def handle_start_calibration(session, data):
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                                 isi_type='static', serial_port=serial_port, sample_rate=250, num_trials=num_trials,
-                                                 folder_name=folder_name, on_error=trigger_stream_stop)
+                                                 stim_state=shared_stim_state, isi_type='static', serial_port=serial_port, sample_rate=250, 
+                                                 num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                        isi_type='static', serial_port=serial_port, sample_rate=200, num_trials=num_trials,
-                                        folder_name=folder_name, on_error=trigger_stream_stop)
+                                        stim_state=shared_stim_state, isi_type='static', serial_port=serial_port, sample_rate=200, 
+                                        num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
 
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
 
@@ -270,7 +274,7 @@ async def handle_start_calibration(session, data):
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
 
     session.stimulator = Stimulator(profiler)
-    session.calibrator = Calibrator(session.stimulator, profiler, shared_stim_flag, n_reps, session.session_dir,
+    session.calibrator = Calibrator(session.stimulator, profiler, shared_stim_flag, shared_stim_state, n_reps, session.session_dir,
                                     folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
 
     # Initialize calibration WatchDog instance
@@ -335,6 +339,7 @@ async def handle_start_stream(session, data):
     num_trials = data.get("num_trials", CONFIG.get('num_trials'))
     n_iters = data.get("num_iters", CONFIG.get('iterations'))
     n_reps = data.get("num_reps", CONFIG.get('repetitions'))
+    session_size = n_iters * n_reps
     
     # Retrieve reference of current event loop running API server
     try:
@@ -355,17 +360,17 @@ async def handle_start_stream(session, data):
     def trigger_stream_stop(): # callback function to trigger stream stop in case of board error
         asyncio.run_coroutine_threadsafe(handle_stop_stream(session), current_loop)
 
-    isi_type = 'dynamic' if (n_iters == 40 and n_reps == 10) else 'static' # define inter-stimulus interval type
+    isi_type = 'dynamic' if (n_iters <= 40 and n_reps <= 10) else 'static' # define inter-stimulus interval type
     # note: currently code is harded to only accept dynamic isi for 401 trials (10 iters, 40 reps)
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
                                                  stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=250, 
-                                                 num_trials=num_trials, folder_name=folder_name, on_error=trigger_stream_stop)
+                                                 num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
                                         stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=200,
-                                        num_trials=num_trials, folder_name=folder_name, on_error=trigger_stream_stop)
+                                        num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
     
@@ -414,6 +419,8 @@ async def handle_stop_stream(session):
     Cleanup of all objects for client session 
     NOTE: This function is used can be used for either optimization sessions or a calibration sessions
     '''
+    logging.info("[Main] Stopping stream and saving data...")
+    
     if session.watchdog:
         session.watchdog.stop_watching()
         session.watchdog = None

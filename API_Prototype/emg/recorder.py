@@ -15,7 +15,7 @@ CONFIG = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, profiler, stim_flag, stim_state, isi_type, base_path, folder_name=None):
+    def __init__(self, sample_rate, session_size, profiler, stim_flag, stim_state, isi_type, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
@@ -61,6 +61,7 @@ class RealTimeRecorder:
         self._ready_times = [] # store 'ready' times for entire session
         
         # within session-break setup
+        self.session_size = session_size
         self._trial_break_interval = CONFIG.get("trial_break_interval")
         self._break_duration = CONFIG.get("break_duration")
         self.in_break = False
@@ -74,6 +75,8 @@ class RealTimeRecorder:
             if os.path.exists(isi_path):
                 with open(isi_path, "r") as f:
                     self.dynamic_intervals = json.load(f)["intervals"] # read from array of dynamic ISIs; 400 total
+                    self.total_intervals = len(self.dynamic_intervals)
+                    logging.info(f"[Recorder] Loaded {self.total_intervals} inter-stimulus intervals")
             else: 
                 logging.warning("[Recorder] Could not load dynamic ISI file")
                 self.dynamic_intervals = generate_intervals() 
@@ -103,7 +106,7 @@ class RealTimeRecorder:
             self._ready_times.append(timestamp)
             self.ready_times_buffer.append(timestamp)
 
-            if (self.isi_type == 'dynamic') and (self.total_trials > 0) and (self.total_trials < 400): # if within the 400 optimization trials
+            if self.total_trials > 0:
                 logging.info(f"[Recorder] Ready state detected; Duration = {self.ready_duration}")
 
                 # notify stimulator to begin stimulation based on ready duration of CURRENT trial
@@ -132,7 +135,7 @@ class RealTimeRecorder:
             self.event_times_buffer.append(timestamp)
 
             # Advance next event marker time
-            if (self.isi_type == 'dynamic') and (self.total_trials < 400): # safety to avoid index error if trials exceed 400
+            if (self.isi_type == 'dynamic') and (self.total_trials < self.total_intervals): # safety to avoid index error if trials exceed dynamic intervals array
                 self.ready_duration = self.dynamic_intervals[self.total_trials] # first ISI indexed at 0 
                 
                 # redefine marker interval time for dynamic
@@ -184,7 +187,7 @@ class RealTimeRecorder:
             return "in_break"
         
         if timestamp >= self.next_trial_time:
-            if self.total_trials > 0 and ((self.total_trials + 1) == self.next_break_block):
+            if self.total_trials > 0 and self.total_trials < self.session_size and ((self.total_trials + 1) == self.next_break_block):
                 # Initialize break and advance pointers
                 self.in_break = True
                 self.break_end_time = timestamp + self._break_duration
