@@ -45,14 +45,20 @@
                         <option value="Synthetic">Synthetic</option>
                     </select>
                 </div>
-                <div id="serialPortRow">
+                <div id="MVCInputRow">
+                    Max MVC:
+                    <input type="number" id="maxMVC" min="1" max="3000" step="50" value="1000" style="width: 55px;"
+                        onfocus="if(this.value==='1000') this.value='';" 
+                        onblur="if(this.value==='') this.value='1000';" >
+                </div>
+                <div id="serialPortRow" style="display: none;">
                     Serial Port:
                     <select id="serialPort">
                         <option value="PortA" selected>Port A</option>
                         <option value="PortB">Port B</option>
                     </select>
                 </div>
-                <div id="trialInputRow">
+                <div id="trialInputRow" style="display: none;">
                     Trials per Analysis:
                     <input type="number" id="trialInput" min="1" max="20" step="1" value="1" style="width: 35px;"
                         onfocus="if(this.value==='1') this.value='';" 
@@ -150,19 +156,26 @@
 
             <!-- Real-Time Instructions -->
             <div id="Instructions" class="tabcontent">
-                <div id="movementAnimation" class="video-container">
+                <div id="movementGuide" class="guide-text">REST</div>
+
+                <div class="biofeedback-container">
+                    <div class="biofeedback-bar" id="emgBar"></div>
+                    <div class="biofeedback-target-line"></div>
+                </div>
+
+                <div id="movementAnimation" class="video-container" style="display: none">
                     <video id="instructionVideo" width="100%" muted playsinline>
                         <source src="/static/dorsiflexion-animation.mp4" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
                 </div>
-
-                <div id="movementGuide" class="guide-text">REST</div>
-                <!-- <div id="movementVisuals" class="dots-container">
+                
+                <div id="movementVisuals" class="dots-container" style="display: none">
                     <div id="dot-left" class="dot-wrapper"><div class="dot-circle"></div></div>
                     <div id="dot-middle" class="dot-wrapper"><div class="dot-circle"></div></div>
                     <div id="dot-right" class="dot-wrapper"><div class="dot-circle"></div></div>
-                </div> -->
+                </div>
+
                 <div id="trialCounterDisplay" class="trial-counter">Trials Remaining: --</div>
             </div>  
 

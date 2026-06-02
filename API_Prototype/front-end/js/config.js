@@ -16,6 +16,7 @@ const defaultNumIters = 40;
 const defaultCalbNumIters = 25;
 const defaultNumReps = 10;
 const defaultCalbNumReps = 3;
+const defaultMaxMVC = 1000;
 const REST_PHASE = 2.5 // duration of REST phase (first phase within a trial)
 const GO_PHASE = 2.0; // duration of GO phase (last phase within a trial)
 
