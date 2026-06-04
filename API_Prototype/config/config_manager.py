@@ -35,6 +35,12 @@ DEFAULT_CONFIG = {
     # EMG signal filterings
     "cutoff_freq": 50,
     "cutoff_order": 4,
+
+    # Biofeedback
+    "alpha_acc": 0.10, # Dampens rapid Y-axis acceleration spikes
+    "alpha_emg": 0.05, # Smooths out raw EMG muscle firing bursts
+    "k_acc": 1.5, # Weight given to physical foot displacement
+    "k_emg": 4.0, # Weight given to muscle contraction intensity
     
     # data recording
     "recorder_buffer_seconds": 120,
@@ -67,9 +73,9 @@ DEFAULT_CONFIG = {
     "gpio_pin": 12,
     "stim_default_duration": 2.0,
     "stim_duration_mapping": {
-        0.0: 2.0,
-        0.5: 2.5,
-        1.0: 3.0,
+        0.3: 2.0,
+        0.7: 2.5,
+        1.1: 3.0,
         1.5: 3.5
     },
 
