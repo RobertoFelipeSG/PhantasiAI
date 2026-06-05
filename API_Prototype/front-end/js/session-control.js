@@ -283,6 +283,8 @@ async function handleStreamingClick() {
     const folderName = document.getElementById('folderName').value;
     let folderToUse = (folderName === 'Auto' || folderName === '') ? null : folderName;
 
+    const isCalibrateVoltageChecked = document.getElementById('calibrateVoltage').checked;
+
     // Lock controls before async loop starts and start main countdown
     document.getElementById('streamBtn').disabled = true;
     document.getElementById('trialInput').disabled = true;
@@ -309,10 +311,10 @@ async function handleStreamingClick() {
     }
     
     // Send number of trials per session and start stream + recording
-    await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse);
+    await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked);
 }
 
-async function startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse)  {
+async function startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked)  {
     // If websocket closed/not auto created, attempt connection
     if (!ws || ws.readyState === WebSocket.CLOSED) {
         connectWebSocket();
@@ -341,7 +343,8 @@ async function startStream(numTrials, numIters, numReps, useSyntheticData, portT
         num_iters: numIters,
         num_reps: numReps,
         synthetic: useSyntheticData,
-        folder_name: folderToUse
+        folder_name: folderToUse,
+        calibrate_voltage: isCalibrateVoltageChecked
     };
 
     try { 

@@ -233,6 +233,7 @@ async def handle_start_calibration(session, data):
     folder_name = data.get("folder_name", None)
     serial_port = data.get("serial_port", CONFIG.get('default_serial_port'))
     is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
+    calibrate_voltage = data.get("calibrate_voltage", False)
     num_trials = data.get("num_trials", CONFIG.get('num_trials'))
     n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
     dutycycles = CONFIG.get("dutycycles")
@@ -274,7 +275,7 @@ async def handle_start_calibration(session, data):
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
 
     session.stimulator = Stimulator(profiler)
-    session.calibrator = Calibrator(session.stimulator, profiler, shared_stim_flag, shared_stim_state, n_reps, session.session_dir,
+    session.calibrator = Calibrator(calibrate_voltage, session.stimulator, profiler, shared_stim_flag, shared_stim_state, n_reps, session.session_dir,
                                     folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
 
     # Initialize calibration WatchDog instance
