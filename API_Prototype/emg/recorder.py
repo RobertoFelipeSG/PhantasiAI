@@ -193,7 +193,7 @@ class RealTimeRecorder:
                 self.break_end_time = timestamp + self._break_duration
                 self.next_break_block += self._trial_break_interval
 
-                logging.info(f"[Ganglion] Initializing break period at {timestamp:.2f}s until {self.break_end_time:.2f}s")
+                logging.info(f"[Recorder] Initializing break period at {timestamp:.2f}s until {self.break_end_time:.2f}s")
 
                 # Shift internal markers forward by break duration
                 self.next_trial_time += float(self._break_duration)

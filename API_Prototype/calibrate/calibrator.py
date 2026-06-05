@@ -14,7 +14,8 @@ from config.config_manager import load_config
 CONFIG = load_config()
 
 class Calibrator:
-    def __init__(self, stimulator, profiler, stim_flag, stim_state, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
+    def __init__(self, calibrate_voltage, stimulator, profiler, stim_flag, stim_state, n_reps, session_dir, folder_name, on_complete=None, on_stim_fail=None):
+        self.calibrate_voltage = calibrate_voltage # boolean to determine type of calibration 
         self.stimulator = stimulator
         self.profiler = profiler
         self.stim_flag = stim_flag
@@ -28,10 +29,13 @@ class Calibrator:
         logging.info(f"[Calibrator] Initialized for {n_reps} reps per parameter combination")
 
         # define parameter combinations and stimulation array
+        if self.calibrate_voltage:
+            self.no_stim_reps = 0
+        else:
+            self.no_stim_reps = CONFIG.get("no_stim_reps")
         self.parameter_names = CONFIG.get("parameters")
         dutycycles = CONFIG.get("dutycycles")
         frequencies = CONFIG.get("frequencies")
-        self.no_stim_reps = CONFIG.get("no_stim_reps")
         self.total_reps = len(dutycycles) * len(frequencies) * self.n_reps + self.no_stim_reps
         self.param_combos = [[dc, freq] for dc in dutycycles for freq in frequencies for _ in range(n_reps)]
         self.curr_reps = 0
@@ -117,7 +121,13 @@ class Calibrator:
             return 
         
         # run next stimulation trial
-        if self.curr_reps < self.no_stim_reps: # no stim reps to test baseline MVC
+        if self.calibrate_voltage: # keep a static frequency and dutycycle when we are calibrating the voltage
+            self.selected_params = self.param_combos[0]
+            best_params = {
+                self.parameter_names[0]: float(self.selected_params[0]),
+                self.parameter_names[1]: float(self.selected_params[1])
+            }
+        elif self.curr_reps < self.no_stim_reps: # no stim reps to test baseline MVC
             self.selected_params = [0.0, 0.0]
         else: # stimulation reps
             self.selected_params = self.param_combos[self.curr_reps - self.no_stim_reps]

@@ -269,7 +269,7 @@ class GPBOOptimizer:
             return
         gt_df = pd.read_csv(self.gt_path)
         
-        if len(gt_df) != (len(self.dutycycles) * len(self.frequencies)):
+        if len(gt_df) != (len(self.dutycycles) * len(self.frequencies)) + 1: # +1 due to 0.0 from initial MVC baseline
             logging.warning("[GPBO] Ground truth table does not match stimulation parameter options")
             return
         gt_max_val = gt_df['max_amplitude'].max()
