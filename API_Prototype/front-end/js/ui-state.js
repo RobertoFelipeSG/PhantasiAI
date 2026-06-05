@@ -173,7 +173,7 @@ function initializeTrialCountdown() {
     const repsInput = document.getElementById('reps');
     const itersValue = parseInt(itersInput.value) || (currentMode === 'calibrator' ? defaultCalbNumIters : defaultNumIters);
     const repsValue = parseInt(repsInput.value) || (currentMode === 'calibrator' ? defaultCalbNumReps : defaultNumReps);
-    const extraTrial = currentMode === 'calibrator' ? 0 : 1;
+    const extraTrial = currentMode === 'calibrator' ? (defaultCalbNoStim) : 1;
     const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + extraTrial : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
     const display = document.getElementById('trialCounterDisplay');
 

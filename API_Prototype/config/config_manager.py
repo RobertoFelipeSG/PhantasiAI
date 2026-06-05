@@ -80,7 +80,8 @@ DEFAULT_CONFIG = {
     },
 
     # calibrator
-    "n_calb_reps": 3
+    "n_calb_reps": 3,
+    "no_stim_reps": 10
 }
 
 def load_config():

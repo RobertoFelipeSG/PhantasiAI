@@ -10,12 +10,13 @@ let CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; // initial timeout until board conn
 
 // Session constants
 const defaultTotalTrials = 401;
-const defaultCalbTotalTrials = 75;
+const defaultCalbTotalTrials = 85;
 const defaultNumTrials = 1;
 const defaultNumIters = 40;
 const defaultCalbNumIters = 25;
 const defaultNumReps = 10;
 const defaultCalbNumReps = 3;
+const defaultCalbNoStim = 10;
 const defaultMaxMVC = 1000;
 const REST_PHASE = 2.5 // duration of REST phase (first phase within a trial)
 const GO_PHASE = 2.0; // duration of GO phase (last phase within a trial)

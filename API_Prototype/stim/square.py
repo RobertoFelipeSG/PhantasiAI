@@ -78,7 +78,8 @@ class Stimulator:
         #logging.info("[Square] Starting stimulation process...")
         start_time = time()
         
-        self._run_stimulation(curr_trial, best_params, ready_duration)
+        if best_params:
+            self._run_stimulation(curr_trial, best_params, ready_duration)
 
         duration = time() - start_time
         self.profiler.log_metric(curr_trial, "stim_process", duration)
