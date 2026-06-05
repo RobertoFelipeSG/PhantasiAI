@@ -64,3 +64,4 @@ stim_duration_mapping:
 
 # calibrator
 n_calb_reps: 3
+no_stim_reps: 10
