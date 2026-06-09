@@ -36,7 +36,10 @@ class Calibrator:
         self.parameter_names = CONFIG.get("parameters")
         dutycycles = CONFIG.get("dutycycles")
         frequencies = CONFIG.get("frequencies")
-        self.total_reps = len(dutycycles) * len(frequencies) * self.n_reps + self.no_stim_reps
+        if self.calibrate_voltage:
+            self.total_reps = 4 * 10
+        else:
+            self.total_reps = len(dutycycles) * len(frequencies) * self.n_reps + self.no_stim_reps
         self.param_combos = [[dc, freq] for dc in dutycycles for freq in frequencies for _ in range(n_reps)]
         self.curr_reps = 0
         self.selected_params = None
@@ -121,8 +124,15 @@ class Calibrator:
             return 
         
         # run next stimulation trial
-        if self.calibrate_voltage: # keep a static frequency and dutycycle when we are calibrating the voltage
-            self.selected_params = self.param_combos[0]
+        if self.calibrate_voltage: # keep selected frequency and dutycycle when we are calibrating the voltage
+            voltage_param_combos = [
+                self.param_combos[0],     # first duty, first freq
+                [self.param_combos[0][0], self.param_combos[-1][1]],  # first duty, last freq
+                [self.param_combos[-1][0], self.param_combos[0][1]],  # last duty, first freq
+                self.param_combos[-1]     # last duty, last freq
+             ]
+            combo_index = self.curr_reps // 10
+            self.selected_params = voltage_param_combos[combo_index]
             best_params = {
                 self.parameter_names[0]: float(self.selected_params[0]),
                 self.parameter_names[1]: float(self.selected_params[1])

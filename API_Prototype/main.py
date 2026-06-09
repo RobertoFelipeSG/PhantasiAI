@@ -238,7 +238,10 @@ async def handle_start_calibration(session, data):
     n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
     dutycycles = CONFIG.get("dutycycles")
     frequencies = CONFIG.get("frequencies")
-    session_size = len(dutycycles) * len(frequencies) * n_reps
+    if calibrate_voltage:
+        session_size = 4 * 10
+    else:
+        session_size = len(dutycycles) * len(frequencies) * n_reps 
     
     # Retrieve reference of current event loop running API server
     try:

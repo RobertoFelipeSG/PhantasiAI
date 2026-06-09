@@ -171,10 +171,20 @@ function addLog(message) {
 function initializeTrialCountdown() {
     const itersInput = document.getElementById('iters');
     const repsInput = document.getElementById('reps');
+    const calibrateVoltage = document.getElementById('calibrateVoltage')?.checked || false;
     const itersValue = parseInt(itersInput.value) || (currentMode === 'calibrator' ? defaultCalbNumIters : defaultNumIters);
     const repsValue = parseInt(repsInput.value) || (currentMode === 'calibrator' ? defaultCalbNumReps : defaultNumReps);
-    const extraTrial = currentMode === 'calibrator' ? (defaultCalbNoStim) : 1;
-    const totalTrialsInput = (itersValue > 0 && repsValue > 0) ? (itersValue * repsValue) + extraTrial : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
+    let totalTrialsInput;
+    
+    if (currentMode === 'calibrator' && calibrateVoltage) {
+        totalTrialsInput = 4 * 10;
+    } else {
+        const extraTrial = currentMode === 'calibrator' ? defaultCalbNoStim : 1;
+        totalTrialsInput = (itersValue > 0 && repsValue > 0)
+            ? (itersValue * repsValue) + extraTrial
+            : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
+    } // Voltage calibration uses 4 combos with 10 reps each (40 trials total)
+    
     const display = document.getElementById('trialCounterDisplay');
 
     if (!display) return;
