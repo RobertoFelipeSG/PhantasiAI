@@ -353,6 +353,7 @@ async function startStream(numTrials, numIters, numReps, useSyntheticData, portT
         handleReset();
         startRenderLoop();
 
+        console.log("payload =", payload);
         ws.send(JSON.stringify(payload)); // Send start command to server
         setStreamingState(false, 'Connecting to board...', 'orange'); // update UI
     
