@@ -15,7 +15,7 @@ CONFIG = load_config()
 
 # ----- Real Time EMG Recorder: CSV Storing & Analysis Files ---- #
 class RealTimeRecorder:
-    def __init__(self, sample_rate, session_size, profiler, stim_flag, stim_state, isi_type, base_path, folder_name=None):
+    def __init__(self, sample_rate, session_size, profiler, stim_flag, stim_state, isi_type, calibrate_voltage, base_path, folder_name=None):
         self.recording = False
         self.csv_file = None
         self.csv_writer = None
@@ -62,10 +62,14 @@ class RealTimeRecorder:
         
         # within session-break setup
         self.session_size = session_size
-        self._trial_break_interval = CONFIG.get("trial_break_interval")
-        self._break_duration = CONFIG.get("break_duration")
         self.in_break = False
         self.break_end_time = 0.0
+        if calibrate_voltage:
+            self._trial_break_interval = 10
+            self._break_duration = 10
+        else:
+            self._trial_break_interval = CONFIG.get("trial_break_interval")
+            self._break_duration = CONFIG.get("break_duration")
         self.next_break_block = self._trial_break_interval + 1 # first trial in a session = "mock" trial
         
         # define inter-stimulus interval and stimulus timing

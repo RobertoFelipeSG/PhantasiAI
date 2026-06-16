@@ -235,12 +235,13 @@ async def handle_start_calibration(session, data):
     is_synthetic = data.get("synthetic", CONFIG.get('synthetic'))
     calibrate_voltage = data.get("calibrate_voltage", False)
     num_trials = data.get("num_trials", CONFIG.get('num_trials'))
-    n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
     dutycycles = CONFIG.get("dutycycles")
     frequencies = CONFIG.get("frequencies")
     if calibrate_voltage:
+        n_reps = 10
         session_size = 4 * 10
     else:
+        n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
         session_size = len(dutycycles) * len(frequencies) * n_reps 
     
     # Retrieve reference of current event loop running API server
@@ -262,12 +263,14 @@ async def handle_start_calibration(session, data):
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                                 stim_state=shared_stim_state, isi_type='static', serial_port=serial_port, sample_rate=250, 
-                                                 num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
+                                                 stim_state=shared_stim_state, isi_type='static', calibrate_voltage=calibrate_voltage, 
+                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials, 
+                                                 session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                        stim_state=shared_stim_state, isi_type='static', serial_port=serial_port, sample_rate=200, 
-                                        num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
+                                        stim_state=shared_stim_state, isi_type='static', calibrate_voltage=calibrate_voltage,
+                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials, 
+                                        session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
 
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
 
@@ -369,12 +372,14 @@ async def handle_start_stream(session, data):
     
     if is_synthetic: 
         session.ganglion = SyntheticGanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                                 stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=250, 
-                                                 num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
+                                                 stim_state=shared_stim_state, isi_type=isi_type, calibrate_voltage=False,
+                                                 serial_port=serial_port, sample_rate=250, num_trials=num_trials, 
+                                                 session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     else: 
         session.ganglion = GanglionData(websocket=session.websocket, profiler=profiler, stim_flag=shared_stim_flag,
-                                        stim_state=shared_stim_state, isi_type=isi_type, serial_port=serial_port, sample_rate=200,
-                                        num_trials=num_trials, session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
+                                        stim_state=shared_stim_state, isi_type=isi_type, calibrate_voltage=False,
+                                        serial_port=serial_port, sample_rate=200, num_trials=num_trials, 
+                                        session_size=session_size, folder_name=folder_name, on_error=trigger_stream_stop)
     
     session.session_dir = str(session.ganglion.recorder.session_dir) # current session data folder (initialized within recorder)
     
