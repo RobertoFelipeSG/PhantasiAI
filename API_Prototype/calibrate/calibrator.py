@@ -131,6 +131,12 @@ class Calibrator:
                 [self.param_combos[-1][0], self.param_combos[0][1]],  # last duty, first freq
                 self.param_combos[-1]     # last duty, last freq
              ]
+
+            # Pause 5 seconds before starting each new combo, except the first one
+            if self.curr_reps > 0 and self.curr_reps % 10 == 0:
+                logging.info("[Calibrator] Voltage calibration combo complete. Resting 5 seconds before next combo...")
+                sleep(5) 
+                
             combo_index = self.curr_reps // 10
             self.selected_params = voltage_param_combos[combo_index]
             best_params = {
