@@ -23,8 +23,8 @@ CONFIG = load_config() # load config settings
 ganglion_instance = None
 
 class SyntheticGanglionData:
-    def __init__(self, websocket, profiler, stim_flag, stim_state, isi_type='static', serial_port="serial_port_A", sample_rate=250, 
-                 num_trials=1, session_size=400, folder_name=None, on_error=None):
+    def __init__(self, websocket, profiler, stim_flag, stim_state, isi_type='static', calibrate_voltage=False, 
+                 serial_port="serial_port_A", sample_rate=250, num_trials=1, session_size=400, folder_name=None, on_error=None):
         '''Initialize Ganglion board system'''
 
         self.websocket = websocket
@@ -68,7 +68,8 @@ class SyntheticGanglionData:
         self.board_shim = None
         self.board_id = BoardIds.SYNTHETIC_BOARD
 
-        self.recorder = RealTimeRecorder(self._sample_rate, session_size, self.profiler, self.stim_flag, self.stim_state, isi_type=isi_type,
+        self.recorder = RealTimeRecorder(self._sample_rate, session_size, self.profiler, self.stim_flag, self.stim_state, 
+                                         isi_type=isi_type, calibrate_voltage=calibrate_voltage,
                                          base_path=self.base_path, folder_name=folder_name)
         self.feature_extractor = FeatureExtractor(self._sample_rate, self.profiler, self._num_trials == 1, 
                                                   output_path=Path(self.recorder.features_dir))
