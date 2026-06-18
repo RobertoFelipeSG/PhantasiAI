@@ -9,8 +9,6 @@ let lastPhase = ""; // stores only the instruction
 let lastInstructionPhase = ""; // stores instruction + active dot
 let inBreak = false;
 let breakEndTime = null;
-let targetBiofeedbackPercentage = 0;
-let maxEmgExpected = null; // defined in session-control.js
 
 const countdownElements = {
     EVENT: document.getElementById('markerCountdownDisplay'),
@@ -31,7 +29,7 @@ const movementElements = {
 
 
 /* FUNCTIONS */
-// Main function (updates all animation components except for the biofeedback bar)
+// Main function (updates all animation components)
 function updateTimerVisuals(currentTime) {
 
     // when NOT in break: calculate time until next trial and update visuals
@@ -101,9 +99,8 @@ function updateMovementGuide(timeUntilReady) {
         instruction.innerText = phase;
         instruction.style.color = color;
 
-        // NOT IN USE
         // Play dorsiflexion animation exactly when entering the RAISE (GO) phase
-        /*if (phase === "GO!" && video) {
+        if (phase === "GO!" && video) {
             // Play video (with safety in case browser blocks autoplay)
             video.play().catch(err => console.warn("Video playback prevented by browser:", err));
         
@@ -111,7 +108,7 @@ function updateMovementGuide(timeUntilReady) {
             // Freeze video and rewind to start
             video.pause();
             video.currentTime = 0;
-        }*/
+        }
         
         // NOT IN USE
         /*if (phase === "REST") {
@@ -141,37 +138,5 @@ function updateBreakUI(breakTimeRemaining) {
     if (instruction.innerText !== targetText) { // DOM optimization: only update if text has changed
         instruction.innerText = targetText;
         instruction.style.color = "var(--color-rest)";
-    }
-}
-
-function processBiofeedbackData(ganglionData) {
-    if (!ganglionData || ganglionData.length === 0) return;
-
-    let sum = 0;
-    ganglionData.forEach(val => {
-        sum += Math.abs(val); 
-    });
-    const averageAmplitude = sum / ganglionData.length;
-
-    let percentage = (averageAmplitude / maxEmgExpected) * 100;
-    
-    // Store the result in the global state variable
-    targetBiofeedbackPercentage = Math.max(0, Math.min(100, percentage));
-}
-
-function updateBiofeedbackBar() {
-    const feedbackBar = document.getElementById('emgBar');
-    if (!feedbackBar) return;
-
-    // Update height based on the latest state
-    feedbackBar.style.height = `${targetBiofeedbackPercentage}%`;
-
-    // Update colors
-    if (targetBiofeedbackPercentage > 75) {
-        feedbackBar.style.backgroundColor = '#4CAF50'; 
-    } else if (targetBiofeedbackPercentage > 50) {
-        feedbackBar.style.backgroundColor = '#ff9800'; 
-    } else {
-        feedbackBar.style.backgroundColor = '#f44336';
     }
 }

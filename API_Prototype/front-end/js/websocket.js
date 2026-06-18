@@ -90,8 +90,6 @@ function connectWebSocket() {
                     latestTimestamp = data.timestamp[data.timestamp.length - 1];
                 }
 
-                processBiofeedbackData(data.value);
-
                 if (currentMode === 'developer') {
                     data.value.forEach((val, i) => {
                         pendingEmgData.push({ x: data.timestamp[i], y: val });

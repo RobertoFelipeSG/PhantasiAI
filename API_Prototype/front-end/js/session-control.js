@@ -5,6 +5,7 @@ let stimSuccess = true; // stores whether stimulation from current trial was suc
 let isStopping = false;
 let renderLoopRunning = false; // for all visuals (graphs + instructions)
 
+
 /* FUNCTIONS */ 
 // Session-dependant Graph display + Real-time visuals
 function startRenderLoop() {
@@ -25,8 +26,6 @@ function renderLoop() {
     if (latestTimestamp > 0) {
         updateTimerVisuals(latestTimestamp)
     }
-
-    updateBiofeedbackBar();
 
     requestAnimationFrame(renderLoop); // Continue looping
 }
@@ -91,7 +90,6 @@ function setStreamingState(active, statusMessage, color="333") {
     const iters = document.getElementById('iters');
     const reps = document.getElementById('reps');
     const boardId = document.getElementById('boardID');
-    const maxMVCInput = document.getElementById('maxMVC');
     const serialPort = document.getElementById('serialPort');
     const folderName = document.getElementById('folderName');
     const status = document.getElementById('streamingStatus');
@@ -106,7 +104,6 @@ function setStreamingState(active, statusMessage, color="333") {
     if (iters) iters.disabled = active;
     if (reps) reps.disabled = active;
     if (boardId) boardId.disabled = active;
-    if (maxMVCInput) maxMVCInput.disabled = active;
     if (serialPort) serialPort.disabled = active;
     if (folderName) folderName.disabled = active;
 
@@ -142,7 +139,6 @@ function handleReset() {
     nextEventTargetTime = null;
     nextTrialTargetTime = null;
     nextReadyTargetTime = null;
-    targetBiofeedbackPercentage = 0;
     totalTrials = null;
     trialsRemaining = null;
     lastPhase = "";
@@ -155,7 +151,6 @@ function handleReset() {
     document.getElementById('iters').disabled = false;
     document.getElementById('reps').disabled = false;
     document.getElementById('boardID').disabled = false;
-    document.getElementById('maxMVC').disabled = false;
     document.getElementById('serialPort').disabled = false;
     
     // Show sidebar if hidden
@@ -183,13 +178,6 @@ function handleReset() {
         instruction.style.color = "var(--color-rest)";
     }
 
-    // Reset biofeedback bar back to default
-    const feedbackBar = document.getElementById('emgBar');
-    if (feedbackBar) {
-        feedbackBar.style.height = 0;
-        feedbackBar.style.backgroundColor = '#f44336'; 
-    }
-
     // Reset dots to default 
     const dotContainer = document.getElementById('movementVisuals');
     if (dotContainer) {
@@ -197,7 +185,7 @@ function handleReset() {
         document.querySelectorAll('.dot-wrapper').forEach(d => d.classList.remove('active'));
     }
 
-    // Reset Video
+    // TO-DO: Reset Video
     const video = document.getElementById('instructionVideo')
     if (video) {
         video.currentTime = 0;
@@ -244,15 +232,7 @@ async function handleStreamingClick() {
         useSyntheticData = false;
         SAMPLE_RATE = 200;
     }
-    MAX_DATA_POINTS = SAMPLE_RATE * WINDOW_SIZE;
-
-    const maxMVCInput = document.getElementById('maxMVC').value;
-    maxEmgExpected = parseFloat(maxMVCInput);
-    if (isNaN(maxEmgExpected) || maxEmgExpected < 1 || maxEmgExpected > 3000) { 
-        maxEmgExpected = defaultMaxMVC; 
-        console.log("Using default Max EMG Expected");
-    }
-    console.log("Max EMG Expected:", maxEmgExpected);
+    MAX_DATA_POINTS = SAMPLE_RATE * WINDOW_SIZE 
 
     const serialPort = document.getElementById('serialPort').value;
     let portToUse = 'serial_port_A';
@@ -291,7 +271,6 @@ async function handleStreamingClick() {
     document.getElementById('iters').disabled = true;
     document.getElementById('reps').disabled = true;
     document.getElementById('boardID').disabled = true;
-    document.getElementById('maxMVC').disabled = true;
     document.getElementById('serialPort').disabled = true;
     document.getElementById('folderName').disabled = true;
     document.getElementById('downloadDataRow').style.display = 'none';
