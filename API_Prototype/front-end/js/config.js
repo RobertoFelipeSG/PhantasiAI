@@ -2,10 +2,10 @@
 
 // Heartbeat connection variables
 const IDLE_PING_INTERVAL = 10000;
-const ACTIVE_PING_INTERVAL = 3000;
+const ACTIVE_PING_INTERVAL = 5000;
 let CLIENT_PING_INTERVAL = IDLE_PING_INTERVAL; // intial heartbeat until board connects
 const IDLE_PING_TIMEOUT = 30000;
-const ACTIVE_PING_TIMEOUT = 6000;
+const ACTIVE_PING_TIMEOUT = 15000;
 let CLIENT_PING_TIMEOUT = IDLE_PING_TIMEOUT; // initial timeout until board connects
 
 // Session constants
@@ -16,7 +16,9 @@ const defaultNumIters = 40;
 const defaultCalbNumIters = 25;
 const defaultNumReps = 10;
 const defaultCalbNumReps = 3;
-const defaultCalbNoStim = 10;
+const defaultCalbNoStim = 5;
+const defaultCalbVoltCombos = 4;
+const defaultCalbVoltReps = 10;
 const REST_PHASE = 2.5 // duration of REST phase (first phase within a trial)
 const GO_PHASE = 2.0; // duration of GO phase (last phase within a trial)
 

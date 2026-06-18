@@ -65,8 +65,8 @@ class RealTimeRecorder:
         self.in_break = False
         self.break_end_time = 0.0
         if calibrate_voltage:
-            self._trial_break_interval = 10
-            self._break_duration = 10
+            self._trial_break_interval = CONFIG.get("trial_break_int_volt")
+            self._break_duration = CONFIG.get("break_duration_volt")
         else:
             self._trial_break_interval = CONFIG.get("trial_break_interval")
             self._break_duration = CONFIG.get("break_duration")
