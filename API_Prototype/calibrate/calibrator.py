@@ -37,7 +37,7 @@ class Calibrator:
         dutycycles = CONFIG.get("dutycycles")
         frequencies = CONFIG.get("frequencies")
         if self.calibrate_voltage:
-            self.total_reps = 4 * 10
+            self.total_reps = CONFIG.get("n_calb_combos") * self.n_reps
         else:
             self.total_reps = len(dutycycles) * len(frequencies) * self.n_reps + self.no_stim_reps
         self.param_combos = [[dc, freq] for dc in dutycycles for freq in frequencies for _ in range(n_reps)]
@@ -132,7 +132,7 @@ class Calibrator:
                 self.param_combos[-1]     # last duty, last freq
              ]
                 
-            combo_index = self.curr_reps // 10
+            combo_index = self.curr_reps // self.n_reps
             self.selected_params = voltage_param_combos[combo_index]
             best_params = {
                 self.parameter_names[0]: float(self.selected_params[0]),

@@ -238,8 +238,8 @@ async def handle_start_calibration(session, data):
     dutycycles = CONFIG.get("dutycycles")
     frequencies = CONFIG.get("frequencies")
     if calibrate_voltage:
-        n_reps = 10
-        session_size = 4 * 10
+        n_reps = CONFIG.get("n_calb_volt_reps")
+        session_size = CONFIG.get("n_calb_combos") * n_reps
     else:
         n_reps = data.get("num_reps", CONFIG.get('n_calb_reps'))
         session_size = len(dutycycles) * len(frequencies) * n_reps 

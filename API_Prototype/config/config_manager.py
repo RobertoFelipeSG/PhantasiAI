@@ -11,7 +11,7 @@ DEFAULT_CONFIG = {
     # web connection
     "host_IPv4": "0.0.0.0",
     "heartbeat_settings": {
-        "connected": (3, 6),
+        "connected": (5, 15),
         "pending": (10, 30),
         "failed": (10, 30),
         "none": (10, 30) },
@@ -48,7 +48,9 @@ DEFAULT_CONFIG = {
     "static_ready_duration": 1.5,
     "static_go_duration": 2.0,
     "break_duration": 60.0,
+    "break_duration_volt": 15.0,
     "trial_break_interval": 80,
+    "trial_break_int_volt": 10, 
 
     # feature extraction
     "height_percentile": 98,
@@ -81,7 +83,9 @@ DEFAULT_CONFIG = {
 
     # calibrator
     "n_calb_reps": 3,
-    "no_stim_reps": 10
+    "no_stim_reps": 5,
+    "n_calb_volt_reps": 10,
+    "n_calb_combos": 4
 }
 
 def load_config():

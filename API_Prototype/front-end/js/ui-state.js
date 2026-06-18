@@ -177,13 +177,13 @@ function initializeTrialCountdown() {
     let totalTrialsInput;
     
     if (currentMode === 'calibrator' && calibrateVoltage) {
-        totalTrialsInput = 4 * 10;
+        totalTrialsInput = defaultCalbVoltCombos * defaultCalbVoltReps;
     } else {
         const extraTrial = currentMode === 'calibrator' ? defaultCalbNoStim : 1;
         totalTrialsInput = (itersValue > 0 && repsValue > 0)
             ? (itersValue * repsValue) + extraTrial
             : (currentMode === 'calibrator' ? defaultCalbTotalTrials : defaultTotalTrials);
-    } // Voltage calibration uses 4 combos with 10 reps each (40 trials total)
+    }
     
     const display = document.getElementById('trialCounterDisplay');
 
