@@ -27,10 +27,10 @@ cutoff_freq: 50
 cutoff_order: 4
 
 # Biofeedback
-alpha_acc = 0.10 # Dampens rapid Y-axis acceleration spikes
-alpha_emg = 0.05 # Smooths out raw EMG muscle firing bursts
-k_acc = 1.5 # Weight given to physical foot displacement
-k_emg = 4.0 # Weight given to muscle contraction intensity
+alpha_acc: 0.10 # Dampens rapid Y-axis acceleration spikes
+alpha_emg: 0.05 # Smooths out raw EMG muscle firing bursts
+k_acc: 1.5 # Weight given to physical foot displacement
+k_emg: 4.0 # Weight given to muscle contraction intensity
 
 # Data recording
 recorder_buffer_seconds: 120
