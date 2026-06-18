@@ -16,7 +16,6 @@ const defaultNumIters = 40;
 const defaultCalbNumIters = 25;
 const defaultNumReps = 10;
 const defaultCalbNumReps = 3;
-const defaultCalbNoStim = 10;
 const defaultCalbNoStim = 5;
 const defaultCalbVoltCombos = 4;
 const defaultCalbVoltReps = 10;

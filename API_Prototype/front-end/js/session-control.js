@@ -314,6 +314,12 @@ async function startStream(numTrials, numIters, numReps, useSyntheticData, portT
         return;
     }
 
+    // Prepare folder name
+    const mode = currentMode === 'calibrator'
+        ? (isCalibrateVoltageChecked ? 'calibrate_voltage' : 'calibration')
+        : 'optimization';
+    const finalFolderToUse = `${folderToUse}_${mode}`;
+
     // Prepare backend command payload
     const payload = {
         action: currentMode === 'calibrator' ? "start_calibration" : "start_stream",
@@ -322,7 +328,7 @@ async function startStream(numTrials, numIters, numReps, useSyntheticData, portT
         num_iters: numIters,
         num_reps: numReps,
         synthetic: useSyntheticData,
-        folder_name: folderToUse,
+        folder_name: finalFolderToUse,
         calibrate_voltage: isCalibrateVoltageChecked
     };
 

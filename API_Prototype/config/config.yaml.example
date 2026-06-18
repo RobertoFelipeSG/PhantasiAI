@@ -38,7 +38,9 @@ static_rest_duration: 2.5
 static_ready_duration: 1.5
 static_go_duration: 2.0
 break_duration: 60.0
+break_duration_volt: 15.0
 trial_break_interval: 80
+trial_break_int_volt: 10
 
 # Feature extraction
 height_percentile: 98
