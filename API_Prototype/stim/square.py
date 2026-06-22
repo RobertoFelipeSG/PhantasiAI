@@ -12,7 +12,8 @@ from config.config_manager import load_config
 CONFIG = load_config()
 
 class Stimulator:
-    def __init__(self, profiler, mqtt_client=None, client_topic=None):
+    def __init__(self, control_stim, profiler, mqtt_client=None, client_topic=None):
+        self.control_stim = control_stim
         self.profiler = profiler
         self.mqtt_client = mqtt_client
         self.client_topic = client_topic
@@ -32,6 +33,7 @@ class Stimulator:
         gpio_pin = self.gpio_pin
         if ready_duration is not None:
             duration = self.duration_mapping.get(float(ready_duration), self.default_duration)
+        elif self.control_stim: duration = 1 
         else: duration = self.default_duration
         
         # Define frequency (Hz) and duty cycle (0-1)

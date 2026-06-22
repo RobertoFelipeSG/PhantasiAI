@@ -185,7 +185,7 @@ function handleReset() {
         document.querySelectorAll('.dot-wrapper').forEach(d => d.classList.remove('active'));
     }
 
-    // TO-DO: Reset Video
+    // Reset Video
     const video = document.getElementById('instructionVideo')
     if (video) {
         video.currentTime = 0;
@@ -265,6 +265,20 @@ async function handleStreamingClick() {
 
     const isCalibrateVoltageChecked = document.getElementById('calibrateVoltage').checked;
 
+    const isControlStimChecked = document.getElementById('controlStim').checked;
+
+    const dutyInput = document.getElementById('staticDutycycle').value;
+    let numDuty = parseFloat(dutyInput);
+    if (isNaN(numDuty) || numDuty < 0.1 || numDuty > 0.9) {
+        numDuty = defaultDutycycle;
+    }
+
+    const freqInput = document.getElementById('staticFrequency').value;
+    let numFreq = parseFloat(freqInput);
+    if (isNaN(numFreq) || numFreq < 0.1 || numFreq > 0.9) {
+        numDuty = defaultFrequency;
+    }
+
     // Lock controls before async loop starts and start main countdown
     document.getElementById('streamBtn').disabled = true;
     document.getElementById('trialInput').disabled = true;
@@ -290,10 +304,10 @@ async function handleStreamingClick() {
     }
     
     // Send number of trials per session and start stream + recording
-    await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked);
+    await startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked, isControlStimChecked, numDuty, numFreq);
 }
 
-async function startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked)  {
+async function startStream(numTrials, numIters, numReps, useSyntheticData, portToUse, folderToUse, isCalibrateVoltageChecked, isControlStimChecked, numDuty, numFreq)  {
     // If websocket closed/not auto created, attempt connection
     if (!ws || ws.readyState === WebSocket.CLOSED) {
         connectWebSocket();
@@ -329,7 +343,10 @@ async function startStream(numTrials, numIters, numReps, useSyntheticData, portT
         num_reps: numReps,
         synthetic: useSyntheticData,
         folder_name: finalFolderToUse,
-        calibrate_voltage: isCalibrateVoltageChecked
+        calibrate_voltage: isCalibrateVoltageChecked,
+        control_stim: isControlStimChecked,
+        static_duty: numDuty,
+        static_freq: numFreq
     };
 
     try { 

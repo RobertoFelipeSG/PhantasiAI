@@ -60,7 +60,7 @@ function selectMode(mode) {
             terminalEnabled = false;
 
             // Hide specific controls (keep: WS Status, Board ID, Repetitions, Folder Name, Streaming Status)
-            const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'markerRow', 'trialTimerRow'];
+            const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'controlStimRow', 'staticDutyRow', 'staticFreqRow', 'markerRow', 'trialTimerRow'];
             hideIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';

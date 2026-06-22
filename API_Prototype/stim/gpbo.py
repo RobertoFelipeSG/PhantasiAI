@@ -29,7 +29,8 @@ np.random.seed(42)
 torch.manual_seed(42)
 
 class GPBOOptimizer:
-    def __init__(self, stimulator, stim_flag, stim_state, n_iters, n_reps, recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
+    def __init__(self, stimulator, stim_flag, stim_state, n_iters, n_reps, control_stim, static_duty, static_freq, 
+                 recordings_directory, profiler, mqtt_client, client_topic, on_complete=None, on_stim_fail=None):
         self.file_path = None
         self.plot_lock = threading.Lock()
         self.stimulator = stimulator
@@ -41,6 +42,9 @@ class GPBOOptimizer:
         self.topic = client_topic
         self.on_complete = on_complete
         self.on_stim_fail = on_stim_fail
+        self.control_stim = control_stim
+        self.static_duty = static_duty
+        self.static_freq = static_freq
         
         # get ground truth/calibration data 
         parent_base_path = Path(__file__).parent.parent
@@ -502,8 +506,13 @@ class GPBOOptimizer:
                 return
         
         # SELECT NEXT POINT TO TEST
+        # skip optimization if we are in the controlled stimulation mode
+        if self.control_stim:
+            logging.info(f"[GPBO] Running static control stimulation")
+            self.selected_params = [self.static_duty, self.static_freq]
+        
         # PHASE 1: Broad search (random sampling for n iterations if no GP prior)
-        if self.curr_iter < self.num_rand:
+        elif self.curr_iter < self.num_rand:
             # logging.info(f"[GPBO] Random sampling for first iteration")
             next_idx = np.random.randint(len(self.X_test))
             self.selected_params = self.X_test[next_idx]

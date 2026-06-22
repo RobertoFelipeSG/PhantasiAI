@@ -347,6 +347,14 @@ async def handle_start_stream(session, data):
     n_iters = data.get("num_iters", CONFIG.get('iterations'))
     n_reps = data.get("num_reps", CONFIG.get('repetitions'))
     session_size = n_iters * n_reps
+    control_stim = data.get("control_stim")
+    if control_stim: 
+        logging.info(f"[Main] Running static control stim")
+        static_duty = data.get("static_duty")
+        static_freq = data.get("static_freq")
+    else:
+        static_duty = None
+        static_freq = None
     
     # Retrieve reference of current event loop running API server
     try:
@@ -389,8 +397,9 @@ async def handle_start_stream(session, data):
     def handle_stim_failed(): # callback function to notify frontend of stimulation failure
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
     
-    session.stimulator = Stimulator(profiler, mqtt_client, client_topic=f"emg/client/{client_id}")
+    session.stimulator = Stimulator(control_stim, profiler, mqtt_client, client_topic=f"emg/client/{client_id}")
     session.optimizer = GPBOOptimizer(session.stimulator, shared_stim_flag, shared_stim_state, n_iters, n_reps, 
+                                      control_stim, static_duty, static_freq,
                                       session.session_dir, profiler, mqtt_client, 
                                       client_topic=f"emg/client/{client_id}",
                                       on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)

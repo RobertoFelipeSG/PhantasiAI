@@ -19,6 +19,8 @@ const defaultCalbNumReps = 3;
 const defaultCalbNoStim = 5;
 const defaultCalbVoltCombos = 4;
 const defaultCalbVoltReps = 10;
+const defaultDutycycle = 0.9;
+const defaultFrequency = 20;
 const REST_PHASE = 2.5 // duration of REST phase (first phase within a trial)
 const GO_PHASE = 2.0; // duration of GO phase (last phase within a trial)
 
