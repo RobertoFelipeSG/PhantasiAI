@@ -410,11 +410,11 @@ class GPBOOptimizer:
             self.stim_success = False # reset success state
             # logging.info(f"[GPBO] Rep:{self.curr_rep + 1}, Iter:{self.curr_iter} | Response for {self.selected_params}: {last_response.item():.2f}")
 
-            # add to dataset
-            self.x_train = torch.cat([self.x_train, torch.tensor([self.selected_params]).float()])
-            self.y_train = torch.cat([self.y_train, last_response.unsqueeze(0)])
-            self.tested_params = torch.cat([self.tested_params,
-                                            torch.tensor([self.selected_params]).float()])
+            if not self.control_stim: # add to dataset
+                self.x_train = torch.cat([self.x_train, torch.tensor([self.selected_params]).float()])
+                self.y_train = torch.cat([self.y_train, last_response.unsqueeze(0)])
+                self.tested_params = torch.cat([self.tested_params,
+                                                torch.tensor([self.selected_params]).float()])
 
             # add to data log
             iter_data = {
@@ -432,41 +432,42 @@ class GPBOOptimizer:
         # REPETITION CHECK: if n iterations done, repetition is complete
         if self.curr_iter >= self.n_iters:
             
-            # fit model on final input->output pair
-            x_train_norm = normalize(self.x_train, self.bounds_discrete)
-            y_train_std = standardize(self.y_train)
-            gp = SingleTaskGP(x_train_norm, y_train_std)
-            mll = ExactMarginalLogLikelihood(gp.likelihood, gp)
-            fit_gpytorch_mll(mll)
+            if not self.control_stim:
+                # fit model on final input->output pair
+                x_train_norm = normalize(self.x_train, self.bounds_discrete)
+                y_train_std = standardize(self.y_train)
+                gp = SingleTaskGP(x_train_norm, y_train_std)
+                mll = ExactMarginalLogLikelihood(gp.likelihood, gp)
+                fit_gpytorch_mll(mll)
 
-            gp.eval()
-            gp.likelihood.eval()
-        
-            # save posterior mean and variance for current iteration
-            with torch.no_grad():
-                posterior = gp.posterior(self.X_test_norm.unsqueeze(1))
-                posterior_mean = posterior.mean.squeeze()
-                
-                self.gp_history[self.curr_iter]  = {
-                    'mean': posterior_mean.cpu().numpy(),
-                    'variance': posterior.variance.squeeze().cpu().numpy()
-                }
-                
-                converged_idx = posterior_mean.argmax().item()
-                converged_coord = self.X_test[converged_idx]
+                gp.eval()
+                gp.likelihood.eval()
+            
+                # save posterior mean and variance for current iteration
+                with torch.no_grad():
+                    posterior = gp.posterior(self.X_test_norm.unsqueeze(1))
+                    posterior_mean = posterior.mean.squeeze()
+                    
+                    self.gp_history[self.curr_iter]  = {
+                        'mean': posterior_mean.cpu().numpy(),
+                        'variance': posterior.variance.squeeze().cpu().numpy()
+                    }
+                    
+                    converged_idx = posterior_mean.argmax().item()
+                    converged_coord = self.X_test[converged_idx]
 
             self.curr_rep += 1
             logging.info(f"[GPBO] Rep {self.curr_rep}; Converged on coordinates: {converged_coord}")
 
-            # save history to overall dictionary
-            self.history[self.curr_rep] = {
-                'x_train': self.x_train.clone(),
-                'y_train': self.y_train.clone(),
-                'state_dict': gp.state_dict(),
-                'tested_params': self.tested_params.clone(),
-                'converged_coord': converged_coord,
-                'posteriors': self.gp_history
-            }
+            if not self.control_stim: # save history to overall optimization dictionary
+                self.history[self.curr_rep] = {
+                    'x_train': self.x_train.clone(),
+                    'y_train': self.y_train.clone(),
+                    'state_dict': gp.state_dict(),
+                    'tested_params': self.tested_params.clone(),
+                    'converged_coord': converged_coord,
+                    'posteriors': self.gp_history
+                }
 
             # reset state repetition variables 
             self.selected_params = None
@@ -488,21 +489,23 @@ class GPBOOptimizer:
                 df.to_csv(self.stim_data, index=False)
                 self.data_saved = True
                 
-                # visualize all maps
-                try: 
-                    self._visualize_all_maps()
-                    self.visuals_complete = True
-                except Exception as e:
-                    logging.error(f"[GPBO] Visualization error: {e}")
+                # processing for optimization condition only
+                if not self.control_stim:
+                    # visualize all maps
+                    try: 
+                        self._visualize_all_maps()
+                        self.visuals_complete = True
+                    except Exception as e:
+                        logging.error(f"[GPBO] Visualization error: {e}")
 
-                # evaluate model: perform exploration/exploitation evaluation
-                try:
-                    self._perform_model_eval()
-                    self.model_evals_complete = True
-                except Exception as e:
-                    logging.error(f"[GPBO] Model evaluation error: {e}")
-                
-                logging.info("[GPBO] All repetitions completed and maps generated!")
+                    # evaluate model: perform exploration/exploitation evaluation
+                    try:
+                        self._perform_model_eval()
+                        self.model_evals_complete = True
+                    except Exception as e:
+                        logging.error(f"[GPBO] Model evaluation error: {e}")
+                    
+                    logging.info("[GPBO] All repetitions completed and maps generated!")
                 return
         
         # SELECT NEXT POINT TO TEST
@@ -579,7 +582,8 @@ class GPBOOptimizer:
 
         self.stim_flag.clear() # clear the flag as soon as dorsiflexion begins
         try:
-            self.stimulator.run(best_params, ready_duration, curr_trial)
+            if self.selected_params[0] != 0.0 and self.selected_params[1] != 0.0:
+                self.stimulator.run(best_params, ready_duration, curr_trial)
             self.stim_success = True
             self.profiler.mark_process_complete(curr_trial)
         except (OSError, FileNotFoundError) as e:
@@ -593,7 +597,7 @@ class GPBOOptimizer:
             if self.on_stim_fail: self.on_stim_fail()
 
     def run(self, file_path, curr_trial):
-        #logging.info("[GPBO] Starting Bayesian optimization...")
+        logging.info("[GPBO] Starting Bayesian optimization...")
         self._run_optimization(file_path, curr_trial)
 
     def handle_stop(self):

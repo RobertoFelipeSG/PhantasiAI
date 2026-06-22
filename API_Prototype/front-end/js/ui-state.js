@@ -42,7 +42,7 @@ function selectMode(mode) {
             terminalEnabled = false;
 
             // Hide developer-only controls (keep: WS Status, Folder Name, Streaming Status)
-            const hideIds = ['serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'calibrateRow', 'markerRow', 'trialTimerRow']; //'boardIDRow', 
+            const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'calibrateRow', 'markerRow', 'trialTimerRow']; 
             hideIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';

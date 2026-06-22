@@ -272,14 +272,14 @@ async function handleStreamingClick() {
 
     const dutyInput = document.getElementById('staticDutycycle').value;
     let numDuty = parseFloat(dutyInput);
-    if (isNaN(numDuty) || numDuty < 0.1 || numDuty > 0.9) {
+    if (isNaN(numDuty) || numDuty < 0.0 || numDuty > 0.9) {
         numDuty = defaultDutycycle;
     }
 
     const freqInput = document.getElementById('staticFrequency').value;
     let numFreq = parseFloat(freqInput);
-    if (isNaN(numFreq) || numFreq < 0.1 || numFreq > 0.9) {
-        numDuty = defaultFrequency;
+    if (isNaN(numFreq) || numFreq < 0.0 || numFreq > 60.0) {
+        numFreq= defaultFrequency;
     }
 
     // Lock controls before async loop starts and start main countdown

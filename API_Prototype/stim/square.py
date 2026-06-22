@@ -31,9 +31,10 @@ class Stimulator:
         # Open GPIO chip and request the line
         chip = gpiod.Chip(GPIO_CHIP)
         gpio_pin = self.gpio_pin
-        if ready_duration is not None:
-            duration = self.duration_mapping.get(float(ready_duration), self.default_duration)
-        elif self.control_stim: duration = 1 
+        if self.control_stim: 
+            duration = 1.0 # TODO: add to config
+        elif ready_duration is not None:
+            duration = self.duration_mapping.get(float(ready_duration), self.default_duration) 
         else: duration = self.default_duration
         
         # Define frequency (Hz) and duty cycle (0-1)

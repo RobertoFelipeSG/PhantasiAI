@@ -348,7 +348,7 @@ async def handle_start_stream(session, data):
     n_reps = data.get("num_reps", CONFIG.get('repetitions'))
     session_size = n_iters * n_reps
     control_stim = data.get("control_stim")
-    if control_stim: 
+    if control_stim: # TODO: add defaults and get them from CONFIG
         logging.info(f"[Main] Running static control stim")
         static_duty = data.get("static_duty")
         static_freq = data.get("static_freq")
