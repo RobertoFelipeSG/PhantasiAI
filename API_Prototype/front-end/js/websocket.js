@@ -90,13 +90,11 @@ function connectWebSocket() {
                     latestTimestamp = data.timestamp[data.timestamp.length - 1];
                 }
 
-                if (currentMode === 'developer') {
-                    data.value.forEach((val, i) => {
-                        pendingEmgData.push({ x: data.timestamp[i], y: val });
-                    });
-                    if (pendingEmgData.length > MAX_DATA_POINTS * 2) {
-                        pendingEmgData = pendingEmgData.slice(-MAX_DATA_POINTS);
-                    }
+                data.value.forEach((val, i) => {
+                    pendingEmgData.push({ x: data.timestamp[i], y: val });
+                });
+                if (pendingEmgData.length > MAX_DATA_POINTS * 2) {
+                    pendingEmgData = pendingEmgData.slice(-MAX_DATA_POINTS);
                 }
             }
 

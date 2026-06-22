@@ -13,6 +13,8 @@ button {
     top: 20px;       /* Aligns with header */
     left: 15px;
     z-index: 1000;   /* Ensures it stays on top */
+    width: 115px;
+    text-align: center;
     background: transparent;
     border: 1px solid var(--border-basic);
     color: var(--color-text);
@@ -28,7 +30,7 @@ button {
 #streamBtn {
     position: absolute;
     top: 20px;
-    left: 55px;
+    left: 142px;;
     z-index: 1000;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
     color: var(--color-text);
@@ -71,6 +73,27 @@ button {
 #terminalToggleBtn.off:hover {
     background: #555;
     color: #000;
+}
+
+#toggleRightSidebarBtn {
+    position: absolute;
+    top: 20px;
+    right: 15px;      /* Anchors it to the right side of the screen */
+    z-index: 1000;    /* Ensures it stays on top of the canvas/sidebar */
+    width: 140px;
+    background: transparent;
+    border: 1px solid var(--border-basic);
+    color: var(--color-text);
+    font-size: 1rem;
+    padding: 5px 5px;
+    border-radius: 5px;
+    cursor: pointer;  /* Makes it obvious it's clickable */
+    transition: border 0.2s, color 0.2s;
+}
+
+#toggleRightSidebarBtn:hover {
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
 }
 
 .tab button {

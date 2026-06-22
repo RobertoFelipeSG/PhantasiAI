@@ -42,7 +42,7 @@ function selectMode(mode) {
             terminalEnabled = false;
 
             // Hide developer-only controls (keep: WS Status, Folder Name, Streaming Status)
-            const hideIds = ['boardIDRow', 'serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'calibrateRow', 'markerRow', 'trialTimerRow'];
+            const hideIds = ['serialPortRow', 'trialInputRow', 'itersRow', 'repsRow', 'calibrateRow', 'markerRow', 'trialTimerRow']; //'boardIDRow', 
             hideIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.style.display = 'none';
@@ -74,7 +74,6 @@ function selectMode(mode) {
             repsInput.onblur = function() {if (this.value === '') {this.value = defaultCalbNumReps;}};
         
         } else { // developer mode
-            initGraphs();
         }
 
         // Start transition once layout changes are applied 
@@ -85,6 +84,7 @@ function selectMode(mode) {
         });
 
         // Common init for all modes
+        initGraphs();
         document.getElementById('downloadDataRow').style.display = 'none'; // hide data download button until stream stops
         document.getElementById('gtButtonRow').style.display = 'none'; // hide GT generation button (only appears once calibration done)
         document.getElementById('SessionStatus').style.display = 'flex'; // Show SessionStatus tab directly (no tab click needed)
@@ -118,7 +118,7 @@ function openTab(evt, tabName) {
     evt.currentTarget.className += " active";
 }
 
-// Sidebar control
+// Left Sidebar control
 function toggleSidebar() {
     const sidebar = document.querySelector('.sidebar');
 
@@ -165,6 +165,24 @@ function addLog(message) {
     entry.textContent = message;
     terminal.appendChild(entry);
     terminal.scrollTop = terminal.scrollHeight;
+}
+
+// Right sidebar control
+function toggleRightSidebar() {
+    const sidebarRight = document.querySelector('.sidebar-right');
+
+    if (sidebarRight.classList.contains('hidden')) {
+        sidebarRight.classList.remove('hidden');
+        isGraphPaused = false;
+        console.log("Enabling graphs while sidebar is toggled ON")
+    } else {
+        sidebarRight.classList.add('hidden');
+        isGraphPaused = true; // Pause graphs (to ensure 0 DOM work if graph bar toggled OFF)
+        console.log("Disabling graphs while sidebar is toggled OFF")
+    }
+
+    // Force Chart.js to recalculate the canvas size on transition completion
+    window.dispatchEvent(new Event('resize'));
 }
 
 // Trial countdown logic

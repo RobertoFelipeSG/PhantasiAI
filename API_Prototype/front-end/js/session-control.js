@@ -19,8 +19,11 @@ function renderLoop() {
     if (!renderLoopRunning) return;
     
     if (!isGraphPaused && currentMode === 'developer') {
-        batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
         batchUpdateGraph(accelGraph, pendingAccelData, 'accel');
+    }
+
+    if (!isGraphPaused) {
+        batchUpdateGraph(emgGraph, pendingEmgData, 'emg');
     }
 
     if (latestTimestamp > 0) {
