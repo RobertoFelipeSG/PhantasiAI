@@ -16,7 +16,7 @@ def generate_gt():
 
     try:
         # prepare calibration data
-        file = base_path / "mock_calb.csv"
+        file = base_path / "yosra_calibration_2026-06-18_18h48m35.csv"
         calb_df = pd.read_csv(file)
         raw_df = pd.concat(calb_df, ignore_index=True)
         

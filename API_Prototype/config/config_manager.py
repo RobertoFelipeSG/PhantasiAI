@@ -85,7 +85,13 @@ DEFAULT_CONFIG = {
     "n_calb_reps": 3,
     "no_stim_reps": 5,
     "n_calb_volt_reps": 10,
-    "n_calb_combos": 4
+    "n_calb_combos": 4,
+
+    # beeper settings
+    "beep_enabled": True,
+    "beep_duration": 0.2,
+    "beep_frequency": 1000,
+    "beep_volume": 0.1,
 }
 
 def load_config():

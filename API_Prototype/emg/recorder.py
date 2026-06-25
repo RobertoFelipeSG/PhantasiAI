@@ -10,6 +10,7 @@ from pathlib import Path
 from config.connection_manager import logging
 from config.config_manager import load_config
 from utils.create_isi import generate_intervals
+from utils.beeper import Beeper
 
 CONFIG = load_config()
 
@@ -99,6 +100,14 @@ class RealTimeRecorder:
         self.next_ready_time = self.rest_duration # first "ready" marker happens right after rest period
         self.next_event_time = self.inter_stim_interval # first event marker occurs at the end of first rest+ready period (start of first GO period)
         self.next_trial_time = self.marker_interval # first trial marker occurs at the end of first GO period 
+        # Add beeper for auditory feedback
+        self.beeper = Beeper(
+            enabled=CONFIG.get("beep_enabled", True),
+            duration=CONFIG.get("beep_duration", 0.2),
+            frequency=CONFIG.get("beep_frequency", 1000),
+            volume=CONFIG.get("beep_volume", 0.5),
+            device="plughw:CARD=vc4hdmi0,DEV=0",
+        )
         
         logging.info(f"[Recorder] ({self.isi_type}) initialized for {self.emg_channel_count} EMG and {self.accel_channel_count} Accel channels") 
     
@@ -131,6 +140,7 @@ class RealTimeRecorder:
         event_flag = 0
         if timestamp >= self.next_event_time:
             logging.info(f"[Recorder] Event detected")
+            self.beeper.beep() 
             
             event_flag = 1
             self.total_events += 1
