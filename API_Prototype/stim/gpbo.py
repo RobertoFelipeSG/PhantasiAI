@@ -457,7 +457,8 @@ class GPBOOptimizer:
                     converged_coord = self.X_test[converged_idx]
 
             self.curr_rep += 1
-            logging.info(f"[GPBO] Rep {self.curr_rep}; Converged on coordinates: {converged_coord}")
+            if not self.control_stim: 
+                logging.info(f"[GPBO] Rep {self.curr_rep}; Converged on coordinates: {converged_coord}")
 
             if not self.control_stim: # save history to overall optimization dictionary
                 self.history[self.curr_rep] = {
