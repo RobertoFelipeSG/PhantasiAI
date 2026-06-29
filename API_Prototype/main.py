@@ -280,7 +280,7 @@ async def handle_start_calibration(session, data):
     def handle_stim_failed(): # callback function to notify frontend of stimulation failure
         asyncio.run_coroutine_threadsafe(session.websocket.send_json({"type": "stim_failed"}), current_loop)
 
-    session.stimulator = Stimulator(profiler)
+    session.stimulator = Stimulator(False,profiler)
     session.calibrator = Calibrator(calibrate_voltage, session.stimulator, profiler, shared_stim_flag, shared_stim_state, n_reps, session.session_dir,
                                     folder_name=folder_name, on_complete=trigger_auto_stop, on_stim_fail=handle_stim_failed)
 
